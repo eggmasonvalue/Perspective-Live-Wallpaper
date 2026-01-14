@@ -74,18 +74,16 @@ class MainActivity : AppCompatActivity() {
         initViews()
         setupTabs()
         
-        // Check if life calendar onboarding is complete
+        // Check if life calendar onboarding is complete, if not create defaults
         if (!preferencesManager.hasPreferences()) {
-            redirectToOnboarding()
-            return
+            createDefaultPreferences()
         }
         
         // Initialize draft preferences from stored preferences
         try {
             draftPreferences = preferencesManager.getPreferences()
         } catch (e: Exception) {
-            redirectToOnboarding()
-            return
+            createDefaultPreferences()
         }
         
         // Initialize day counter defaults if not set
@@ -167,9 +165,19 @@ class MainActivity : AppCompatActivity() {
         })
     }
     
-    private fun redirectToOnboarding() {
-        startActivity(Intent(this, OnboardingActivity::class.java))
-        finish()
+    private fun createDefaultPreferences() {
+        val defaultDate = LocalDate.now().minusYears(25)
+        val defaultScheme = ColorSchemeProvider.getAllSchemes().firstOrNull()?.id ?: "dark"
+        
+        val defaultPrefs = UserPreferences(
+            birthDate = defaultDate,
+            expectedLifespan = 90,
+            colorSchemeId = defaultScheme,
+            isOnboardingComplete = true
+        )
+        
+        preferencesManager.savePreferences(defaultPrefs)
+        draftPreferences = defaultPrefs
     }
     
     /**

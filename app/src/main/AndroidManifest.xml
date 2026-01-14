@@ -43,11 +43,7 @@
             </intent-filter>
         </activity>
 
-        <!-- Onboarding Activity -->
-        <activity
-            android:name=".settings.OnboardingActivity"
-            android:exported="false"
-            android:theme="@style/AppTheme" />
+
 
         <!-- Custom Color Picker Activity -->
         <activity
