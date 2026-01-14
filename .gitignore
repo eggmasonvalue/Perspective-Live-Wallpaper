@@ -28,6 +28,7 @@ local.properties
 .DS_Store
 captures/
 *.hprof
+*.jks
 
 # NDK
 obj/

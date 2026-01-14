@@ -4,12 +4,12 @@ plugins {
 }
 
 android {
-    namespace = "com.lifecalendar.livewallpaper"
+    namespace = "com.timehorizons.wallpaper"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.lifecalendar.livewallpaper"
-        minSdk = 24
+        applicationId = "com.timehorizons.wallpaper"
+        minSdk = 28
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -32,13 +32,17 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
 }
 
 dependencies {
+    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.google.android.material:material:1.12.0")
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
 }
