@@ -28,6 +28,7 @@ class PreferencesManager(context: Context) {
         const val HAS_CUSTOM_COLORS = "has_custom_colors"
         
         // Day Counter keys
+        private const val KEY_DAY_COUNTER_MODE = "day_counter_mode"
         private const val KEY_EVENT_DATE = "event_date"
         private const val KEY_EVENT_NAME = "event_name"
         private const val KEY_COUNTDOWN_START_DATE = "countdown_start_date"
@@ -79,6 +80,7 @@ class PreferencesManager(context: Context) {
         
         val isDayCounterOnboardingComplete = prefs.getBoolean(KEY_DAY_COUNTER_ONBOARDING_COMPLETE, false)
 
+        val dayCounterMode = prefs.getString(KEY_DAY_COUNTER_MODE, "STATIC") ?: "STATIC"
         val unitShapeId = prefs.getString(KEY_UNIT_SHAPE_ID, "rounded_square") ?: "rounded_square"
         val unitScale = prefs.getFloat(KEY_UNIT_SCALE, 1.0f)
 
@@ -92,6 +94,7 @@ class PreferencesManager(context: Context) {
             eventName = eventName,
             countdownStartDate = countdownStartDate,
             isDayCounterOnboardingComplete = isDayCounterOnboardingComplete,
+            dayCounterMode = dayCounterMode,
             unitShapeId = unitShapeId,
             unitScale = unitScale
         )
@@ -121,6 +124,7 @@ class PreferencesManager(context: Context) {
                 putString(KEY_COUNTDOWN_START_DATE, preferences.countdownStartDate.toString())
             }
             putBoolean(KEY_DAY_COUNTER_ONBOARDING_COMPLETE, preferences.isDayCounterOnboardingComplete)
+            putString(KEY_DAY_COUNTER_MODE, preferences.dayCounterMode)
             
             // Style fields
             putString(KEY_UNIT_SHAPE_ID, preferences.unitShapeId)

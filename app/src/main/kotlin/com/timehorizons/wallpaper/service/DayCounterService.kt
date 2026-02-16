@@ -101,6 +101,17 @@ class DayCounterService : WallpaperService() {
             }
         }
         
+        override fun onSurfaceDestroyed(holder: SurfaceHolder) {
+            try {
+                super.onSurfaceDestroyed(holder)
+                isVisible = false
+                handler.removeCallbacksAndMessages(null)
+                scheduler.cancel()
+            } catch (e: Exception) {
+                Log.e(TAG, "Error in onSurfaceDestroyed", e)
+            }
+        }
+
         /**
          * Initializes the renderer with day counter state.
          */

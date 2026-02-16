@@ -102,6 +102,17 @@ class LifeCalendarService : WallpaperService() {
             }
         }
         
+        override fun onSurfaceDestroyed(holder: SurfaceHolder) {
+            try {
+                super.onSurfaceDestroyed(holder)
+                isVisible = false
+                handler.removeCallbacksAndMessages(null)
+                scheduler.cancel()
+            } catch (e: Exception) {
+                Log.e(TAG, "Error in onSurfaceDestroyed", e)
+            }
+        }
+
         /**
          * Initializes or re-initializes the renderer with current preferences.
          * Draws a placeholder if preferences are not set.

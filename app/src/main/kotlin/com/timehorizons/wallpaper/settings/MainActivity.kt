@@ -334,7 +334,8 @@ class MainActivity : AppCompatActivity() {
         draftPreferences = prefs.copy(
             eventName = "No Tomorrow",
             countdownStartDate = today,
-            eventDate = today
+            eventDate = today,
+            dayCounterMode = "NO_TOMORROW"
         )
         customObjectiveLayout.visibility = View.GONE
         displayDayCounterSettings()
@@ -346,7 +347,8 @@ class MainActivity : AppCompatActivity() {
         draftPreferences = prefs.copy(
             eventName = "Rise Above",
             countdownStartDate = today.minusDays(1),
-            eventDate = today
+            eventDate = today,
+            dayCounterMode = "VS_YESTERDAY"
         )
         customObjectiveLayout.visibility = View.GONE
         displayDayCounterSettings()
@@ -393,7 +395,8 @@ class MainActivity : AppCompatActivity() {
                 // Start date stays as it was, event date is the target
                 draftPreferences = prefs.copy(
                     eventDate = newDate,
-                    countdownStartDate = prefs.countdownStartDate ?: LocalDate.now()
+                    countdownStartDate = prefs.countdownStartDate ?: LocalDate.now(),
+                    dayCounterMode = "STATIC"
                 )
                 displayDayCounterSettings()
             },
@@ -411,7 +414,7 @@ class MainActivity : AppCompatActivity() {
             this,
             { _, year, month, dayOfMonth ->
                 val newDate = LocalDate.of(year, month + 1, dayOfMonth)
-                draftPreferences = prefs.copy(countdownStartDate = newDate)
+                draftPreferences = prefs.copy(countdownStartDate = newDate, dayCounterMode = "STATIC")
                 displayDayCounterSettings()
             },
             currentDate.year,
