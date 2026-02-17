@@ -9,9 +9,11 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.app.WallpaperColors
 import android.service.wallpaper.WallpaperService
 import android.util.Log
 import android.view.SurfaceHolder
+import androidx.annotation.RequiresApi
 import com.timehorizons.wallpaper.data.ColorSchemeProvider
 import com.timehorizons.wallpaper.data.LifeState
 import com.timehorizons.wallpaper.data.PreferencesManager
@@ -113,6 +115,12 @@ class LifeCalendarService : WallpaperService() {
             }
         }
 
+        @RequiresApi(Build.VERSION_CODES.O_MR1)
+        override fun onComputeColors(): WallpaperColors? {
+            val scheme = renderer?.colorScheme ?: return null
+            return WallpaperColors(Color.valueOf(scheme.backgroundColor), null, null)
+        }
+
         /**
          * Initializes or re-initializes the renderer with current preferences.
          * Draws a placeholder if preferences are not set.
@@ -144,6 +152,10 @@ class LifeCalendarService : WallpaperService() {
                 // Reset error count on successful init
                 consecutiveErrors = 0
                 isSafeMode = false
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                    notifyColorsChanged()
+                }
                 
                 drawFrame()
             } catch (e: IllegalStateException) {
