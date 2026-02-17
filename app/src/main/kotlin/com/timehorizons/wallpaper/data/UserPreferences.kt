@@ -22,7 +22,7 @@ data class UserPreferences(
     val eventName: String? = null,
     val countdownStartDate: LocalDate? = null,
     val isDayCounterOnboardingComplete: Boolean = false,
-    val dayCounterMode: String = "STATIC",
+    val dayCounterMode: String = DayCounterMode.STATIC,
     // Style settings
     val unitShapeId: String = "rounded_square",
     val unitScale: Float = 1.0f

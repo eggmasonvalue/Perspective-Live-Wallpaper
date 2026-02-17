@@ -1,5 +1,6 @@
 package com.timehorizons.wallpaper.modules
 
+import com.timehorizons.wallpaper.data.DayCounterMode
 import com.timehorizons.wallpaper.data.UserPreferences
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -19,7 +20,7 @@ class DayCounterModuleTest {
 
         val prefs = UserPreferences(
             birthDate = LocalDate.of(1990, 1, 1),
-            dayCounterMode = "NO_TOMORROW",
+            dayCounterMode = DayCounterMode.NO_TOMORROW,
             eventName = "No Tomorrow"
         )
 
@@ -43,7 +44,7 @@ class DayCounterModuleTest {
 
         val prefs = UserPreferences(
             birthDate = LocalDate.of(1990, 1, 1),
-            dayCounterMode = "VS_YESTERDAY",
+            dayCounterMode = DayCounterMode.VS_YESTERDAY,
             eventName = "Rise Above"
         )
 
@@ -71,7 +72,7 @@ class DayCounterModuleTest {
 
         val prefs = UserPreferences(
             birthDate = LocalDate.of(1990, 1, 1),
-            dayCounterMode = "STATIC",
+            dayCounterMode = DayCounterMode.STATIC,
             countdownStartDate = today,
             eventDate = future,
             eventName = "Static Event"

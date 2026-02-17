@@ -1,5 +1,6 @@
 package com.timehorizons.wallpaper.modules
 
+import com.timehorizons.wallpaper.data.DayCounterMode
 import com.timehorizons.wallpaper.data.UserPreferences
 import com.timehorizons.wallpaper.utils.DateCalculator
 import java.time.LocalDate
@@ -39,7 +40,7 @@ class DayCounterModule : CountdownModule {
     }
 
     override fun validatePreferences(preferences: UserPreferences): Boolean {
-        if (preferences.dayCounterMode == "NO_TOMORROW" || preferences.dayCounterMode == "VS_YESTERDAY") return true
+        if (preferences.dayCounterMode == DayCounterMode.NO_TOMORROW || preferences.dayCounterMode == DayCounterMode.VS_YESTERDAY) return true
 
         val startDate = preferences.countdownStartDate ?: return false
         val eventDate = preferences.eventDate ?: return false
@@ -48,16 +49,16 @@ class DayCounterModule : CountdownModule {
 
     private fun getStartDate(preferences: UserPreferences): LocalDate {
         return when (preferences.dayCounterMode) {
-            "NO_TOMORROW" -> LocalDate.now()
-            "VS_YESTERDAY" -> LocalDate.now().minusDays(1)
+            DayCounterMode.NO_TOMORROW -> LocalDate.now()
+            DayCounterMode.VS_YESTERDAY -> LocalDate.now().minusDays(1)
             else -> preferences.countdownStartDate ?: LocalDate.now()
         }
     }
 
     private fun getEventDate(preferences: UserPreferences): LocalDate {
         return when (preferences.dayCounterMode) {
-            "NO_TOMORROW" -> LocalDate.now()
-            "VS_YESTERDAY" -> LocalDate.now()
+            DayCounterMode.NO_TOMORROW -> LocalDate.now()
+            DayCounterMode.VS_YESTERDAY -> LocalDate.now()
             else -> preferences.eventDate ?: LocalDate.now().plusDays(30)
         }
     }
