@@ -79,6 +79,8 @@ class StyleSelectionBottomSheet : BottomSheetDialogFragment() {
         setupButtons(view)
     }
 
+    override fun getTheme(): Int = com.google.android.material.R.style.Theme_Material3_DayNight_BottomSheetDialog
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
         
