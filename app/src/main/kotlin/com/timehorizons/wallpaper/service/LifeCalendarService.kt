@@ -154,6 +154,7 @@ class LifeCalendarService : WallpaperService() {
                 isSafeMode = false
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                    // Notify system of color change
                     notifyColorsChanged()
                 }
 

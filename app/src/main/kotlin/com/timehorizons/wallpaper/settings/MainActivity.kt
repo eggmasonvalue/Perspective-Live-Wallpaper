@@ -165,7 +165,11 @@ class MainActivity : AppCompatActivity() {
             val eventDate = prefs.eventDate
             if (eventDate != null) {
                 val daysRemaining = ChronoUnit.DAYS.between(LocalDate.now(), eventDate)
-                dcDaysRemaining.text = "Days Remaining: $daysRemaining"
+                if (daysRemaining < 0) {
+                    dcDaysRemaining.text = "Days Past: ${-daysRemaining}"
+                } else {
+                    dcDaysRemaining.text = "Days Remaining: $daysRemaining"
+                }
             } else {
                 dcDaysRemaining.text = "Days Remaining: --"
             }
