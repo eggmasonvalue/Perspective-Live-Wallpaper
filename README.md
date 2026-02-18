@@ -8,7 +8,7 @@
 
 ## 🌌 The Concept
 
-Time famously "flies". **Horizon** renders it as a precise, modular grid of geometry, allowing you a ferquent dose of perspective at a glance.
+Time famously "flies". **Horizon** renders it as a precise, modular grid of geometry, allowing you a frequent dose of perspective at a glance.
 
 ### 🔭 Perspective (Life Calendar)
 Your life clock on your lock screen.
@@ -18,17 +18,19 @@ Your life clock on your lock screen.
 Focus your energy on the immediate future.
 - **The Grid**: Each unit represents **one day**
 - **The Modes**:
-    - **"There is no tomorrow"**: one visible shape for today(breathing).
-    - **"You vs. You, yesterday"**: Two visible shapes - one for today(breathing) and one for yesterday.
+    - **"There is no tomorrow"**: one visible shape for today (breathing).
+    - **"You vs. You, yesterday"**: Two visible shapes - one for today (breathing) and one for yesterday.
     - **"Custom"**: classic deadline tracking.
 
 ## ✨ Features
 
 ### 🎨 Deep Customization
 Make the horizon yours with the new **Style** engine:
-- **Shape Shifting**: Choose your primitive—**Circle**, **Rounded Square** (Classic), or **Sharp Square**.
+- **Shape Shifting**: Choose your primitive—**Circle**, **Rounded Square** (Classic), or **Rhombus** (Rotated Square).
 - **Density Control**: Adjust the grid scale from **0.5x** (airy, minimalist) to **1.0x** (dense, data-rich).
+- **Container Padding**: Fine-tune the margin around the grid for perfect alignment with your device's bezels.
 - **Colors**: Select from preset color schemes or define your own custom palette.
+- **System Theme**: Adapts to Material You (Monet) on supported devices.
 
 ### ✒️ Typography
 - **Lato**: The app features the **Lato** typeface bundled directly into the core, ensuring crisp, professional typography on every device.
@@ -42,7 +44,7 @@ Make the horizon yours with the new **Style** engine:
 1. **Install** the APK.
 2. **Open** the Horizon app.
 3. Choose your **Perspective** (Life) or **Momentum** (Day) tab.
-4. Tap **Style** to customize shapes, sizes, and colors.
+4. Tap **Style** to customize shapes, sizes, padding, and colors.
 5. Tap **Set Perspective** to apply the live wallpaper.
 
 ## License
