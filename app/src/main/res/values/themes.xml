@@ -34,6 +34,7 @@
 
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">true</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.Material3.Button.OutlinedButton</item>
     </style>
     
     <!-- NoActionBar theme for fullscreen activities -->

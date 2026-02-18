@@ -117,7 +117,11 @@ class DayCounterService : WallpaperService() {
         @RequiresApi(Build.VERSION_CODES.O_MR1)
         override fun onComputeColors(): WallpaperColors? {
             val scheme = renderer?.colorScheme ?: return null
-            return WallpaperColors(Color.valueOf(scheme.backgroundColor), null, null)
+            return WallpaperColors(
+                Color.valueOf(scheme.backgroundColor),
+                Color.valueOf(scheme.currentYearColor),
+                Color.valueOf(scheme.pastYearsColor)
+            )
         }
 
         /**

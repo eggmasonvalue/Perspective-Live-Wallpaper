@@ -118,7 +118,13 @@ class LifeCalendarService : WallpaperService() {
         @RequiresApi(Build.VERSION_CODES.O_MR1)
         override fun onComputeColors(): WallpaperColors? {
             val scheme = renderer?.colorScheme ?: return null
-            return WallpaperColors(Color.valueOf(scheme.backgroundColor), null, null)
+            // Provide primary (background), secondary (current year accent), and tertiary (past years)
+            // using the constructor available since API 27: WallpaperColors(Color, Color, Color)
+            return WallpaperColors(
+                Color.valueOf(scheme.backgroundColor),
+                Color.valueOf(scheme.currentYearColor),
+                Color.valueOf(scheme.pastYearsColor)
+            )
         }
 
         /**
