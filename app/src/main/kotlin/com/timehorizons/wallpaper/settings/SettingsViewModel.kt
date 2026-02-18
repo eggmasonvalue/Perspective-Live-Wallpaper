@@ -3,6 +3,7 @@ package com.timehorizons.wallpaper.settings
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.timehorizons.wallpaper.data.ColorSchemeProvider
 import com.timehorizons.wallpaper.data.DayCounterMode
 import com.timehorizons.wallpaper.data.PreferencesManager
@@ -141,7 +142,7 @@ class SettingsViewModel(private val preferencesManager: PreferencesManager) : Vi
     }
 }
 
-class SettingsViewModelFactory(private val preferencesManager: PreferencesManager) : androidx.lifecycle.ViewModelProvider.Factory {
+class SettingsViewModelFactory(private val preferencesManager: PreferencesManager) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(SettingsViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")

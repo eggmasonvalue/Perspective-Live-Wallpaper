@@ -1,5 +1,6 @@
 package com.timehorizons.wallpaper.service
 
+import android.app.WallpaperColors
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -9,7 +10,6 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import android.app.WallpaperColors
 import android.service.wallpaper.WallpaperService
 import android.util.Log
 import android.view.SurfaceHolder
@@ -33,40 +33,40 @@ class DayCounterService : WallpaperService() {
     companion object {
         private const val TAG = "DayCounterService"
     }
-    
+
     override fun onCreateEngine(): Engine {
         return DayCounterEngine()
     }
-    
+
     /**
      * The wallpaper engine for day counter.
      * Reuses CanvasRenderer, PulseAnimator, and MidnightScheduler.
      */
     inner class DayCounterEngine : Engine() {
-        
+
         private lateinit var preferencesManager: PreferencesManager
         private var renderer: CanvasRenderer? = null
         private lateinit var animator: PulseAnimator
         private lateinit var scheduler: MidnightScheduler
         private val handler = Handler(Looper.getMainLooper())
         private val dayCounterModule = DayCounterModule()
-        
+
         private var isVisible = false
         private var surfaceWidth = 0
         private var surfaceHeight = 0
         private var consecutiveErrors = 0
         private val MAX_CONSECUTIVE_ERRORS = 5
         private var isSafeMode = false
-        
+
         override fun onCreate(surfaceHolder: SurfaceHolder) {
             try {
                 super.onCreate(surfaceHolder)
 
-                
+
                 preferencesManager = PreferencesManager(this@DayCounterService)
                 animator = PulseAnimator()
                 scheduler = MidnightScheduler(this@DayCounterService)
-                
+
                 // Register update receiver
                 val filter = IntentFilter(MidnightReceiver.ACTION_UPDATE_WALLPAPER)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -79,7 +79,7 @@ class DayCounterService : WallpaperService() {
                 Log.e(TAG, "Error in onCreate", e)
             }
         }
-        
+
         override fun onSurfaceCreated(holder: SurfaceHolder) {
             try {
                 super.onSurfaceCreated(holder)
@@ -88,21 +88,21 @@ class DayCounterService : WallpaperService() {
                 Log.e(TAG, "Error in onSurfaceCreated", e)
             }
         }
-        
+
         override fun onSurfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
             try {
                 super.onSurfaceChanged(holder, format, width, height)
 
-                
+
                 surfaceWidth = width
                 surfaceHeight = height
-                
+
                 initializeRenderer()
             } catch (e: Exception) {
                 Log.e(TAG, "Error in onSurfaceChanged", e)
             }
         }
-        
+
         override fun onSurfaceDestroyed(holder: SurfaceHolder) {
             try {
                 super.onSurfaceDestroyed(holder)
@@ -130,17 +130,17 @@ class DayCounterService : WallpaperService() {
                     drawPlaceholder()
                     return
                 }
-                
+
                 val preferences = preferencesManager.getPreferences()
 
-                
+
                 // Calculate state using DayCounterModule
                 val today = LocalDate.now()
                 val totalDays = dayCounterModule.calculateTotalItems(preferences)
                 val pastDays = dayCounterModule.calculatePastItems(preferences, today)
                 val currentIndex = dayCounterModule.calculateCurrentItemIndex(preferences, today)
                 val remainingDays = maxOf(0, totalDays - pastDays - 1)
-                
+
                 // Create LifeState compatible structure for CanvasRenderer
                 val dayState = LifeState(
                     totalYears = totalDays,
@@ -150,26 +150,26 @@ class DayCounterService : WallpaperService() {
                     birthDate = preferences.countdownStartDate ?: LocalDate.now(),
                     expectedLifespan = totalDays
                 )
-                
+
                 val colorScheme = ColorSchemeProvider.getScheme(preferences.colorSchemeId, preferencesManager)
-                
+
                 renderer = CanvasRenderer(
                     lifeState = dayState,
                     colorScheme = colorScheme,
                     screenWidth = surfaceWidth,
                     screenHeight = surfaceHeight
                 )
-                
+
                 // Apply style settings
                 renderer?.updateStyle(preferences.unitShapeId, preferences.unitScale)
-                
+
                 consecutiveErrors = 0
                 isSafeMode = false
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
                     notifyColorsChanged()
                 }
-                
+
                 drawFrame()
             } catch (e: IllegalStateException) {
                 Log.w(TAG, "Day counter onboarding not completed", e)
@@ -179,11 +179,11 @@ class DayCounterService : WallpaperService() {
                 handleError()
             }
         }
-        
+
         private fun drawPlaceholder() {
             val holder = surfaceHolder
             var canvas: Canvas? = null
-            
+
             try {
                 canvas = holder.lockCanvas()
                 canvas?.drawColor(0xFF0A0A0A.toInt())
@@ -199,20 +199,20 @@ class DayCounterService : WallpaperService() {
                 }
             }
         }
-        
+
         override fun onVisibilityChanged(visible: Boolean) {
             try {
                 super.onVisibilityChanged(visible)
 
                 isVisible = visible
-                
+
                 if (visible) {
                     animator.reset()
-                    
+
                     if (!isSafeMode) {
                         initializeRenderer()
                     }
-                    
+
                     scheduleNextFrame()
                     scheduler.scheduleMidnightCheck()
                 } else {
@@ -223,14 +223,14 @@ class DayCounterService : WallpaperService() {
                 Log.e(TAG, "Error in onVisibilityChanged", e)
             }
         }
-        
+
         override fun onDestroy() {
             try {
                 super.onDestroy()
 
                 handler.removeCallbacksAndMessages(null)
                 scheduler.cancel()
-                
+
                 try {
                     unregisterReceiver(updateReceiver)
                 } catch (e: IllegalArgumentException) {
@@ -240,24 +240,24 @@ class DayCounterService : WallpaperService() {
                 Log.e(TAG, "Error in onDestroy", e)
             }
         }
-        
+
         private fun scheduleNextFrame() {
             if (!isVisible || isSafeMode) return
-            
+
             handler.postDelayed({
                 drawFrame()
                 scheduleNextFrame()
             }, PulseAnimator.FRAME_DURATION_MS)
         }
-        
+
         private fun drawFrame() {
             if (renderer == null && !isSafeMode) {
                 return
             }
-            
+
             val holder = surfaceHolder
             var canvas: Canvas? = null
-            
+
             try {
                 canvas = holder.lockCanvas()
                 if (canvas != null) {
@@ -281,7 +281,7 @@ class DayCounterService : WallpaperService() {
                 }
             }
         }
-        
+
         private fun handleError() {
             consecutiveErrors++
             if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
@@ -290,23 +290,23 @@ class DayCounterService : WallpaperService() {
                 drawPlaceholder()
             }
         }
-        
+
         /**
          * Called at midnight to update the day counter.
          */
         private fun onMidnight() {
             try {
                 if (!preferencesManager.hasDayCounterPreferences()) return
-                
+
 
                 initializeRenderer()
-                
+
                 scheduler.scheduleMidnightCheck()
             } catch (e: Exception) {
                 Log.e(TAG, "Error in onMidnight", e)
             }
         }
-        
+
         private val updateReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 if (intent?.action == MidnightReceiver.ACTION_UPDATE_WALLPAPER) {

@@ -1,6 +1,7 @@
 package com.timehorizons.wallpaper.data
 
 import android.content.Context
+import com.timehorizons.wallpaper.data.DayCounterMode
 import android.content.SharedPreferences
 import java.time.LocalDate
 import java.time.format.DateTimeParseException

@@ -103,12 +103,6 @@ class CanvasRenderer(
                 // Drawing a rhombus (rotated square) instead of a regular square
                 canvas.save()
                 canvas.rotate(45f, x + size / 2f, y + size / 2f)
-                // Adjust size to fit within the original bounding box if needed,
-                // but usually rhombus uses the same side length or diagonal.
-                // Using 'size' as side length means the rhombus will be larger than the bounding box.
-                // To fit in bounding box (size x size), the side length should be size / sqrt(2).
-                // However, visual weight might be better if we just rotate.
-                // Let's scale it slightly so corners don't touch if spacing is tight.
                 val scale = 0.707f // 1/sqrt(2) to fit exactly inside the square bounds
                 val center = size / 2f
                 // We draw a centered rect then rotate
