@@ -311,7 +311,9 @@ class MainActivity : AppCompatActivity() {
             this,
             { _, year, month, dayOfMonth ->
                 val newDate = LocalDate.of(year, month + 1, dayOfMonth)
-                viewModel.updateEventDate(newDate)
+                if (!viewModel.updateEventDate(newDate)) {
+                    Toast.makeText(this, R.string.event_date_validation_error, Toast.LENGTH_SHORT).show()
+                }
             },
             currentDate.year,
             currentDate.monthValue - 1,
@@ -327,7 +329,10 @@ class MainActivity : AppCompatActivity() {
             this,
             { _, year, month, dayOfMonth ->
                 val newDate = LocalDate.of(year, month + 1, dayOfMonth)
-                viewModel.updateStartDate(newDate)
+                if (!viewModel.updateStartDate(newDate)) {
+                    // Reusing event date error or generic error, or we could add start_date_validation_error
+                    Toast.makeText(this, "Start date cannot be after event date", Toast.LENGTH_SHORT).show()
+                }
             },
             currentDate.year,
             currentDate.monthValue - 1,

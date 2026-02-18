@@ -121,21 +121,39 @@ class SettingsViewModel(private val preferencesManager: PreferencesManager) : Vi
         _userPreferences.value = current.copy(eventName = name)
     }
 
-    fun updateEventDate(date: LocalDate) {
-        val current = _userPreferences.value ?: return
+    /**
+     * Updates the event date. Returns true if valid and updated, false otherwise.
+     */
+    fun updateEventDate(date: LocalDate): Boolean {
+        val current = _userPreferences.value ?: return false
+        val startDate = current.countdownStartDate ?: LocalDate.now()
+
+        // Ensure event date is not before start date (allow same day)
+        if (date.isBefore(startDate)) return false
+
         _userPreferences.value = current.copy(
             eventDate = date,
-            countdownStartDate = current.countdownStartDate ?: LocalDate.now(),
+            countdownStartDate = startDate,
             dayCounterMode = DayCounterMode.STATIC
         )
+        return true
     }
 
-    fun updateStartDate(date: LocalDate) {
-        val current = _userPreferences.value ?: return
+    /**
+     * Updates the start date. Returns true if valid and updated, false otherwise.
+     */
+    fun updateStartDate(date: LocalDate): Boolean {
+        val current = _userPreferences.value ?: return false
+        val eventDate = current.eventDate ?: date.plusDays(30)
+
+        // Ensure start date is not after event date
+        if (date.isAfter(eventDate)) return false
+
         _userPreferences.value = current.copy(
             countdownStartDate = date,
             dayCounterMode = DayCounterMode.STATIC
         )
+        return true
     }
 
     fun savePreferences() {
