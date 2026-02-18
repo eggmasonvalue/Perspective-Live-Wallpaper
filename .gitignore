@@ -15,7 +15,6 @@ bin/
 gen/
 out/
 build/
-.gradle/
 .cxx/
 .externalNativeBuild/
 
@@ -40,8 +39,6 @@ brain/
 artifacts/
 tools/
 android-sdk/
-gradle/
-!gradle/wrapper/
 
 # Documentation & Notes
 TOOLS_README.md
