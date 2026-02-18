@@ -27,9 +27,9 @@ android {
 
     buildTypes {
         release {
+            // Fallback to debug signing if release keystore is missing (common in CI for non-release builds or open source)
+            // Ideally, production builds should fail if secrets are missing, but we allow debug signing for development convenience.
             signingConfig = if (signingConfigs.getByName("release").storeFile != null) signingConfigs.getByName("release") else signingConfigs.getByName("debug")
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {

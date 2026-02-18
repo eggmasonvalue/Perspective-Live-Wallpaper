@@ -38,6 +38,7 @@ class PreferencesManager(context: Context) {
         // Style keys
         private const val KEY_UNIT_SHAPE_ID = "unit_shape_id"
         private const val KEY_UNIT_SCALE = "unit_scale"
+        private const val KEY_CONTAINER_PADDING_SCALE = "container_padding_scale"
     }
 
     /**
@@ -83,6 +84,7 @@ class PreferencesManager(context: Context) {
 
         val dayCounterMode = prefs.getString(KEY_DAY_COUNTER_MODE, DayCounterMode.STATIC) ?: DayCounterMode.STATIC
         val unitShapeId = prefs.getString(KEY_UNIT_SHAPE_ID, "rounded_square") ?: "rounded_square"
+        val containerPaddingScale = prefs.getFloat(KEY_CONTAINER_PADDING_SCALE, 0.05f)
         val unitScale = prefs.getFloat(KEY_UNIT_SCALE, 1.0f)
 
         return UserPreferences(
@@ -97,7 +99,8 @@ class PreferencesManager(context: Context) {
             isDayCounterOnboardingComplete = isDayCounterOnboardingComplete,
             dayCounterMode = dayCounterMode,
             unitShapeId = unitShapeId,
-            unitScale = unitScale
+            unitScale = unitScale,
+            containerPaddingScale = containerPaddingScale,
         )
     }
 
@@ -127,6 +130,7 @@ class PreferencesManager(context: Context) {
             putBoolean(KEY_DAY_COUNTER_ONBOARDING_COMPLETE, preferences.isDayCounterOnboardingComplete)
             putString(KEY_DAY_COUNTER_MODE, preferences.dayCounterMode)
 
+            putFloat(KEY_CONTAINER_PADDING_SCALE, preferences.containerPaddingScale)
             // Style fields
             putString(KEY_UNIT_SHAPE_ID, preferences.unitShapeId)
             putFloat(KEY_UNIT_SCALE, preferences.unitScale)

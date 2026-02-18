@@ -25,5 +25,6 @@ data class UserPreferences(
     val dayCounterMode: String = DayCounterMode.STATIC,
     // Style settings
     val unitShapeId: String = "rounded_square",
-    val unitScale: Float = 1.0f
+    val unitScale: Float = 1.0f,
+    val containerPaddingScale: Float = 0.05f // Default 5% margin
 )

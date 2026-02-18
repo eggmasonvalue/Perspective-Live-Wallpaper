@@ -83,12 +83,13 @@ class SettingsViewModel(private val preferencesManager: PreferencesManager) : Vi
         _userPreferences.value = current.copy(expectedLifespan = lifespan)
     }
 
-    fun updateColorScheme(schemeId: String, shapeId: String, scale: Float) {
+    fun updateColorScheme(schemeId: String, shapeId: String, scale: Float, paddingScale: Float = 0.05f) {
         val current = _userPreferences.value ?: return
         _userPreferences.value = current.copy(
             colorSchemeId = schemeId,
             unitShapeId = shapeId,
-            unitScale = scale
+            unitScale = scale,
+            containerPaddingScale = paddingScale
         )
     }
 

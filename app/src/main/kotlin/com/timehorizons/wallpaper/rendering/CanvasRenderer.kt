@@ -25,12 +25,14 @@ class CanvasRenderer(
     // Style settings
     private var unitShapeId: String = "rounded_square"
     private var unitScale: Float = 1.0f
+    private var containerPaddingScale: Float = 0.05f
     
     init {
         gridConfig = GridCalculator.calculateGridLayout(
             totalDots = lifeState.totalYears,
             screenWidth = screenWidth,
-            screenHeight = screenHeight
+            screenHeight = screenHeight,
+            marginPercent = containerPaddingScale
         )
     }
     
@@ -147,8 +149,9 @@ class CanvasRenderer(
     /**
      * Updates the visual style settings.
      */
-    fun updateStyle(shapeId: String, scale: Float) {
+    fun updateStyle(shapeId: String, scale: Float, paddingScale: Float = 0.05f) {
         this.unitShapeId = shapeId
         this.unitScale = scale
+        this.containerPaddingScale = paddingScale
     }
 }

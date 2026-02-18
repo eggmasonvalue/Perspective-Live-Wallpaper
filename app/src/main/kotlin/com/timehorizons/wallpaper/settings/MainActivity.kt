@@ -248,10 +248,11 @@ class MainActivity : AppCompatActivity() {
         val bottomSheet = StyleSelectionBottomSheet.newInstance(
             prefs.colorSchemeId,
             prefs.unitShapeId,
-            prefs.unitScale
+            prefs.unitScale,
+            prefs.containerPaddingScale
         )
-        bottomSheet.setOnStyleAppliedListener { scheme, shapeId, scale ->
-            viewModel.updateColorScheme(scheme.id, shapeId, scale)
+        bottomSheet.setOnStyleAppliedListener { scheme, shapeId, scale, padding ->
+            viewModel.updateColorScheme(scheme.id, shapeId, scale, padding)
         }
         bottomSheet.show(supportFragmentManager, "StyleSelectionBottomSheet")
     }
@@ -336,10 +337,11 @@ class MainActivity : AppCompatActivity() {
         val bottomSheet = StyleSelectionBottomSheet.newInstance(
             prefs.colorSchemeId,
             prefs.unitShapeId,
-            prefs.unitScale
+            prefs.unitScale,
+            prefs.containerPaddingScale
         )
-        bottomSheet.setOnStyleAppliedListener { scheme, shapeId, scale ->
-            viewModel.updateColorScheme(scheme.id, shapeId, scale)
+        bottomSheet.setOnStyleAppliedListener { scheme, shapeId, scale, padding ->
+            viewModel.updateColorScheme(scheme.id, shapeId, scale, padding)
         }
         bottomSheet.show(supportFragmentManager, "StyleSelectionBottomSheet")
     }
