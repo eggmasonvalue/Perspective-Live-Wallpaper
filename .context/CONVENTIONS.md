@@ -3,6 +3,7 @@
 ## Code Style
 -   **Language**: Kotlin (Official style).
 -   **Formatting**: Standard Android/Kotlin formatting (4 spaces indent).
+-   **Linting**: Use **Detekt** for static analysis.
 
 ## Architecture
 -   **MVVM**: Use `ViewModel` for UI logic.
@@ -15,6 +16,7 @@
 
 ## UI
 -   **Material Design 3**: Use Material components.
+-   **Typography**: Use **Geist** font for all text.
 -   **XML Layouts**: Keep layouts flat where possible.
 
 ## Wallpaper Service
