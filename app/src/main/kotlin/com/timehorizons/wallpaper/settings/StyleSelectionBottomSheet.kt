@@ -132,7 +132,7 @@ class StyleSelectionBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun setupPaddingSlider(view: View) {
-        val slider = view.findViewById<Slider>(R.id.sizeSlider)
+        val slider = view.findViewById<Slider>(R.id.paddingSlider)
         if (slider != null) {
             slider.value = selectedPaddingScale
             slider.addOnChangeListener { _, value, _ ->

@@ -25,6 +25,7 @@
     <string name="style_title">Style</string>
     <string name="style_shape">Shape</string>
     <string name="style_size">Size</string>
+    <string name="style_padding">Container Padding</string>
     <string name="shape_circle">Circle</string>
     <string name="shape_rounded">Rounded</string>
     <string name="shape_square">Square</string>
