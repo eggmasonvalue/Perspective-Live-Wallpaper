@@ -60,3 +60,4 @@ verify_adb.bat
 **/build_output*.txt
 **/kotlin_debug.txt
 **/kotlin_errors.txt
+.gradle/

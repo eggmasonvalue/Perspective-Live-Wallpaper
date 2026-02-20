@@ -1,5 +1,7 @@
 package com.timehorizons.wallpaper.settings
 
+import android.graphics.drawable.GradientDrawable
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -72,32 +74,33 @@ class ColorCardAdapter(
 
     private fun bindSchemeCard(holder: SchemeViewHolder, position: Int) {
         val scheme = schemes[position]
-        
+
         // Set preview container background color
-        holder.previewContainer.setBackgroundColor(scheme.backgroundColor)
-        
+        setRoundedBackground(holder.previewContainer, scheme.backgroundColor, 12f)
+
         // Set 4 boxes in 2x2 grid: 3 past/future, 1 current (bottom-right)
-        holder.boxTopLeft.setBackgroundColor(scheme.pastYearsColor)
-        holder.boxTopRight.setBackgroundColor(scheme.pastYearsColor)
-        holder.boxBottomLeft.setBackgroundColor(scheme.pastYearsColor)
-        holder.boxBottomRight.setBackgroundColor(scheme.currentYearColor)
-        
+        val dotRadius = 8f
+        setRoundedBackground(holder.boxTopLeft, scheme.pastYearsColor, dotRadius)
+        setRoundedBackground(holder.boxTopRight, scheme.pastYearsColor, dotRadius)
+        setRoundedBackground(holder.boxBottomLeft, scheme.pastYearsColor, dotRadius)
+        setRoundedBackground(holder.boxBottomRight, scheme.currentYearColor, dotRadius)
+
         // Set scheme name
         holder.schemeName.text = scheme.name
-        
+
         // Set selected state
         val isSelected = scheme.id == selectedSchemeId
         holder.checkmark.visibility = if (isSelected) View.VISIBLE else View.GONE
         holder.card.strokeWidth = if (isSelected) 4 else 0
         holder.card.elevation = if (isSelected) 8f else 2f
-        
+
         // Click handler
         holder.card.setOnClickListener {
             selectedSchemeId = scheme.id
-            
+
             // Notify adapter to update selection states
             notifyDataSetChanged()
-            
+
             onSchemeSelected(scheme)
         }
     }
@@ -105,13 +108,13 @@ class ColorCardAdapter(
     private fun bindCreateCustomCard(holder: CreateCustomViewHolder) {
         // Hide preview elements for create custom card
         holder.itemView.findViewById<View>(R.id.previewContainer)?.visibility = View.GONE
-        
+
         holder.schemeName.text = "+ Create Custom"
         holder.schemeName.textSize = 16f
-        
+
         // Make the entire card area clickable
         holder.card.minimumHeight = 180
-        
+
         holder.card.setOnClickListener {
             onCreateCustom()
         }
@@ -142,5 +145,18 @@ class ColorCardAdapter(
             schemes.add(customScheme)
             notifyItemInserted(schemes.size - 1)
         }
+    }
+
+    private fun setRoundedBackground(view: View, color: Int, cornerRadiusDp: Float) {
+        val radiusPx = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            cornerRadiusDp,
+            view.resources.displayMetrics
+        )
+        val drawable = GradientDrawable()
+        drawable.shape = GradientDrawable.RECTANGLE
+        drawable.cornerRadius = radiusPx
+        drawable.setColor(color)
+        view.background = drawable
     }
 }

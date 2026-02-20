@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Horizon</string>
+    <string name="app_name">Perspective - Live</string>
     <string name="wallpaper_description">Visualizing the road ahead. A minimalist timeline of your journey.</string>
 
     <!-- Onboarding -->
-    <string name="welcome_title">Horizon</string>
+    <string name="welcome_title">Perspective - Live</string>
     <string name="welcome_description">Master your timeline. A bird\'s-eye view of your lifetime, one square at a time.</string>
     <string name="birth_date_label">Birth Date</string>
     <string name="expected_lifespan_label">Life Expectancy (Years)</string>

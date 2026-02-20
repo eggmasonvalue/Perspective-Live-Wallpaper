@@ -116,8 +116,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupTabs() {
         // Add tabs with refined labels
-        modeTabLayout.addTab(modeTabLayout.newTab().setText("Perspective"))
-        modeTabLayout.addTab(modeTabLayout.newTab().setText("Momentum"))
+        modeTabLayout.addTab(modeTabLayout.newTab().setText("Macro"))
+        modeTabLayout.addTab(modeTabLayout.newTab().setText("Micro"))
 
         modeTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {

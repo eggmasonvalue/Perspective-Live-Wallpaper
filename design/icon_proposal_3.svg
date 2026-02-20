@@ -1,0 +1,19 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background: Deep Blue / Slate -->
+  <rect width="512" height="512" rx="100" fill="#2E3440" />
+
+  <!-- Perspective Squares -->
+  <g transform="translate(256, 256) rotate(45)">
+    <!-- Outer Square - Macro -->
+    <rect x="-140" y="-140" width="280" height="280" rx="20"
+          fill="none" stroke="#88C0D0" stroke-width="20" />
+
+    <!-- Inner Square - Medium -->
+    <rect x="-80" y="-80" width="160" height="160" rx="10"
+          fill="none" stroke="#81A1C1" stroke-width="15" />
+
+    <!-- Center Dot - Micro -->
+    <rect x="-30" y="-30" width="60" height="60" rx="5"
+          fill="#ECEFF4" />
+  </g>
+</svg>
