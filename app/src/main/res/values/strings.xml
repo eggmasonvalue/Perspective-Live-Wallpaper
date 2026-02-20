@@ -43,7 +43,7 @@
 
     <!-- Momentum (Day Counter) -->
     <string name="momentum_mode_no_tomorrow">There\'s no tomorrow</string>
-    <string name="momentum_mode_vs_yesterday">You vs You, yesterday</string>
+    <string name="momentum_mode_vs_yesterday">You vs You(yesterday)</string>
     <string name="momentum_mode_custom">Set Dates</string>
     <string name="momentum_description">Track your progress toward a specific destination. Every square is a day of momentum.</string>
     <string name="event_name_label">Objective Name</string>

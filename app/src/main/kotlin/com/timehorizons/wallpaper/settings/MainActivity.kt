@@ -152,7 +152,7 @@ class MainActivity : AppCompatActivity() {
         if (prefs.dayCounterMode == DayCounterMode.NO_TOMORROW) {
             dcEventName.text = "Event: ${prefs.eventName ?: "No Tomorrow"}"
             dcEventDate.text = "Event Date: Today (Dynamic)"
-            dcDaysRemaining.text = "Days Remaining: 1"
+            dcDaysRemaining.text = "Days Remaining: 0"
         } else if (prefs.dayCounterMode == DayCounterMode.VS_YESTERDAY) {
             dcEventName.text = "Event: ${prefs.eventName ?: "Rise Above"}"
             dcEventDate.text = "Event Date: Today (vs Yesterday)"

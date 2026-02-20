@@ -35,12 +35,12 @@ object ColorSchemeProvider {
             isDynamic = true
         ),
         ColorScheme(
-            id = "sage_garden",
-            name = "Sage Garden",
-            backgroundColor = 0xFFF2F5F2.toInt(),      // Very pale green-white
-            pastYearsColor = 0xFF88A096.toInt(),       // Muted sage
-            currentYearColor = 0xFFE6B8A2.toInt(),     // Soft peach
-            futureYearsColor = 0x4D88A096.toInt(),
+            id = "sage_garden", // Keeping ID stable for existing users if any, or could change if desired.
+            name = "Iconic",
+            backgroundColor = 0xFFEAE7DC.toInt(),      // Beige/Sand (Icon Background)
+            pastYearsColor = 0xFF8E8D8A.toInt(),       // Sage/Grey (Icon Past/Future)
+            currentYearColor = 0xFFE85A4F.toInt(),     // Red/Rust (Icon Horizon)
+            futureYearsColor = 0x4D8E8D8A.toInt(),     // 30% opacity Sage/Grey
             isDynamic = true
         ),
         ColorScheme(
