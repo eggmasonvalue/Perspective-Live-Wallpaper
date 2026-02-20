@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.SharedPreferences
 import android.graphics.Canvas
 import android.graphics.Color
 import android.os.Build
@@ -39,7 +40,7 @@ abstract class BaseWallpaperService : WallpaperService() {
 
     abstract fun createBaseEngine(): BaseEngine
 
-    abstract inner class BaseEngine : Engine() {
+    abstract inner class BaseEngine : Engine(), SharedPreferences.OnSharedPreferenceChangeListener {
 
         protected lateinit var preferencesManager: PreferencesManager
         protected var renderer: CanvasRenderer? = null
@@ -60,6 +61,10 @@ abstract class BaseWallpaperService : WallpaperService() {
                 preferencesManager = PreferencesManager(this@BaseWallpaperService)
                 animator = PulseAnimator()
                 scheduler = MidnightScheduler(this@BaseWallpaperService)
+
+                // Register for preference changes
+                val prefs = getSharedPreferences("life_calendar_prefs", Context.MODE_PRIVATE)
+                prefs.registerOnSharedPreferenceChangeListener(this)
 
                 val filter = IntentFilter(MidnightReceiver.ACTION_UPDATE_WALLPAPER)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -106,10 +111,13 @@ abstract class BaseWallpaperService : WallpaperService() {
         @RequiresApi(Build.VERSION_CODES.O_MR1)
         override fun onComputeColors(): WallpaperColors? {
             val scheme = renderer?.colorScheme ?: return null
+            // Primary: Past/Future Years (Grey in Iconic)
+            // Secondary: Current Year/Shape (Red in Iconic - breathing shape)
+            // Tertiary: Background (Beige in Iconic)
             return WallpaperColors(
-                Color.valueOf(scheme.backgroundColor),
+                Color.valueOf(scheme.pastYearsColor),
                 Color.valueOf(scheme.currentYearColor),
-                Color.valueOf(scheme.pastYearsColor)
+                Color.valueOf(scheme.backgroundColor)
             )
         }
 
@@ -139,6 +147,10 @@ abstract class BaseWallpaperService : WallpaperService() {
                 super.onDestroy()
                 handler.removeCallbacksAndMessages(null)
                 scheduler.cancel()
+
+                val prefs = getSharedPreferences("life_calendar_prefs", Context.MODE_PRIVATE)
+                prefs.unregisterOnSharedPreferenceChangeListener(this)
+
                 try {
                     unregisterReceiver(updateReceiver)
                 } catch (e: IllegalArgumentException) {
@@ -146,6 +158,14 @@ abstract class BaseWallpaperService : WallpaperService() {
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error in onDestroy", e)
+            }
+        }
+
+        override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+            // Re-initialize renderer if style/content preferences change
+            handler.post {
+                initializeRenderer()
+                scheduleNextFrame()
             }
         }
 

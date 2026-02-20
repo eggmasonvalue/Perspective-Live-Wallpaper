@@ -39,7 +39,7 @@ class SettingsViewModel(private val preferencesManager: PreferencesManager) : Vi
 
     private fun createDefaultPreferences() {
         val defaultDate = LocalDate.now().minusYears(25)
-        val defaultScheme = ColorSchemeProvider.getAllSchemes().firstOrNull()?.id ?: "dark"
+        val defaultScheme = "sage_garden"
 
         val defaultPrefs = UserPreferences(
             birthDate = defaultDate,

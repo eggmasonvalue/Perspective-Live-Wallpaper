@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Horizon</string>
+    <string name="app_name">Perspective - Live</string>
     <string name="wallpaper_description">Visualizing the road ahead. A minimalist timeline of your journey.</string>
 
     <!-- Onboarding -->
-    <string name="welcome_title">Horizon</string>
+    <string name="welcome_title">Perspective - Live</string>
     <string name="welcome_description">Master your timeline. A bird\'s-eye view of your lifetime, one square at a time.</string>
     <string name="birth_date_label">Birth Date</string>
     <string name="expected_lifespan_label">Life Expectancy (Years)</string>
@@ -43,7 +43,7 @@
 
     <!-- Momentum (Day Counter) -->
     <string name="momentum_mode_no_tomorrow">There\'s no tomorrow</string>
-    <string name="momentum_mode_vs_yesterday">You vs You, yesterday</string>
+    <string name="momentum_mode_vs_yesterday">You vs You(yesterday)</string>
     <string name="momentum_mode_custom">Set Dates</string>
     <string name="momentum_description">Track your progress toward a specific destination. Every square is a day of momentum.</string>
     <string name="event_name_label">Objective Name</string>
