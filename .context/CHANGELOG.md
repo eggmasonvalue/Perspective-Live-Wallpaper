@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+-   **CI/CD**: Fixed GitHub Actions release workflow permissions to resolve 403 error.
+
 ## [v1.1.0]
 
 ### Added
