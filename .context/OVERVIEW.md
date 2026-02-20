@@ -1,12 +1,13 @@
 # Project Overview
 
-**Horizon** is a minimalist Live Wallpaper engine for Android that transforms abstract time into a tangible visual landscape. It features a "Life Calendar" (Perspective) and a "Day Counter" (Momentum) mode.
+**Perspective - Live** is a minimalist Live Wallpaper engine for Android that transforms abstract time into a tangible visual landscape. It features a "Macro" (Life Calendar) and a "Micro" (Day Counter) mode.
 
 ## Core Features
-- **Perspective (Life Calendar)**: Visualizes life in years on a grid.
-- **Momentum (Day Counter)**: Visualizes days until an event or "No Tomorrow" mode.
-- **Deep Customization**: Shapes (Circle, Rounded Square, Rhombus), Density, Padding, Colors.
+- **Macro (Life Calendar)**: Visualizes life in years on a grid.
+- **Micro (Day Counter)**: Visualizes days until an event or "No Tomorrow" mode.
+- **Deep Customization**: Shapes (Circle, Rounded Square, Rhombus), Density, Padding, Colors (Iconic Scheme and more).
 - **Material You**: Adapts to system colors (Monet).
+- **Typography**: Uses the **Geist** typeface for a modern, crisp look.
 - **Performance**: Zero battery drain when not visible; native Canvas rendering.
 
 ## Tech Stack
@@ -24,3 +25,5 @@
 - `androidx.lifecycle:lifecycle-viewmodel-ktx`
 - `androidx.lifecycle:lifecycle-livedata-ktx`
 - `androidx.activity:activity-ktx`
+- `junit:junit:4.13.2` (Test)
+- `io.gitlab.arturbosch.detekt` (Linting)

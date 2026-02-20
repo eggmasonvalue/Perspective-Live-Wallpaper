@@ -12,14 +12,15 @@ Time famously "flies". **Perspective - Live** renders it as a precise, modular g
 
 ### 🔭 Macro (Life Calendar)
 Your life clock on your lock screen.
-- **The Grid**: Each unit represents **one year**
+- **The Grid**: Each unit represents **one year**.
+- **The Goal**: Visualize how much life you've lived vs. what you might have left.
 
 ### 🚀 Micro (Day Counter)
 Focus your energy on the immediate future.
-- **The Grid**: Each unit represents **one day**
+- **The Grid**: Each unit represents **one day**.
 - **The Modes**:
     - **"There is no tomorrow"**: one visible shape for today (breathing).
-    - **"You vs. You, yesterday"**: Two visible shapes - one for today (breathing) and one for yesterday.
+    - **"You vs. You (yesterday)"**: Two visible shapes - one for today (breathing) and one for yesterday.
     - **"Custom"**: classic deadline tracking.
 
 ## ✨ Features
@@ -29,7 +30,7 @@ Make the horizon yours with the new **Style** engine:
 - **Shape Shifting**: Choose your primitive—**Circle**, **Rounded Square** (Classic), or **Rhombus** (Rotated Square).
 - **Density Control**: Adjust the grid scale from **0.5x** (airy, minimalist) to **1.0x** (dense, data-rich).
 - **Container Padding**: Fine-tune the margin around the grid for perfect alignment with your device's bezels.
-- **Colors**: Select from preset color schemes or define your own custom palette.
+- **Colors**: Defaulting to the **Iconic** scheme (Sage/Red/Beige), you can also choose from presets or define your own custom palette.
 - **System Theme**: Adapts to Material You (Monet) on supported devices.
 
 ### ✒️ Typography
@@ -43,7 +44,7 @@ Make the horizon yours with the new **Style** engine:
 
 1. **Install** the APK.
 2. **Open** the Perspective - Live app.
-3. Choose your **Macro** (Life) or **Micro** (Day) tab.
+3. Choose your **Macro** or **Micro** tab.
 4. Tap **Style** to customize shapes, sizes, padding, and colors.
 5. Tap **Set Perspective** to apply the live wallpaper.
 

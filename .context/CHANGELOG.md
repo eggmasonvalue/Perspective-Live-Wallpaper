@@ -3,6 +3,8 @@
 ## [Unreleased]
 
 ### Added
+-   **Typography**: Updated entire app to use **Geist** typeface.
+-   **Color Schemes**: Introduced "Iconic" color scheme as default.
 -   **Container Padding**: New slider in styling options to adjust grid margins.
 -   **Rhombus Shape**: Replaced "Square" option with a Rhombus (rotated square).
 -   **Material You**: Wallpaper now exposes colors to the system theme engine.
@@ -10,6 +12,8 @@
 -   **License**: Added MIT License.
 
 ### Changed
+-   **Project Name**: Renamed from "Horizon" to "**Perspective - Live**".
+-   **Terminology**: Renamed "Perspective" tab to "**Macro**" (Life Calendar) and "Momentum" tab to "**Micro**" (Day Counter).
 -   **Architecture**: Refactored `MainActivity` to use `SettingsViewModel` (MVVM).
 -   **Logic**: "No Tomorrow" and "Vs Yesterday" modes now use dynamic date calculations (`DayCounterMode`), fixing the static date bug.
 -   **Build**: Updated signing config to use environment variables with debug fallback.
