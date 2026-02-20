@@ -165,7 +165,11 @@ class DayCounterService : WallpaperService() {
                 )
 
                 // Apply style settings
-                renderer?.updateStyle(preferences.unitShapeId, preferences.unitScale)
+                renderer?.updateStyle(
+                    preferences.unitShapeId,
+                    preferences.unitScale,
+                    preferences.containerPaddingScale
+                )
 
                 consecutiveErrors = 0
                 isSafeMode = false

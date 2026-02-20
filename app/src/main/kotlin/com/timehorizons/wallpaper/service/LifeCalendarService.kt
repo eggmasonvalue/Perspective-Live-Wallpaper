@@ -153,7 +153,11 @@ class LifeCalendarService : WallpaperService() {
                 )
 
                 // Apply style settings
-                renderer?.updateStyle(preferences.unitShapeId, preferences.unitScale)
+                renderer?.updateStyle(
+                    preferences.unitShapeId,
+                    preferences.unitScale,
+                    preferences.containerPaddingScale
+                )
 
                 // Reset error count on successful init
                 consecutiveErrors = 0
