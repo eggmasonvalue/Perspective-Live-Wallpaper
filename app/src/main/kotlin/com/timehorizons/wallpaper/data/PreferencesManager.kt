@@ -56,7 +56,7 @@ class PreferencesManager(context: Context) {
         }
 
         val expectedLifespan = prefs.getInt(KEY_EXPECTED_LIFESPAN, 90)
-        val colorSchemeId = prefs.getString(KEY_COLOR_SCHEME_ID, "dark") ?: "dark"
+        val colorSchemeId = prefs.getString(KEY_COLOR_SCHEME_ID, "sage_garden") ?: "sage_garden"
 
         val lastCheckStr = prefs.getString(KEY_LAST_BIRTHDAY_CHECK, null)
         val lastCheck = if (lastCheckStr != null) {

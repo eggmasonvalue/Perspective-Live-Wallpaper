@@ -106,10 +106,13 @@ abstract class BaseWallpaperService : WallpaperService() {
         @RequiresApi(Build.VERSION_CODES.O_MR1)
         override fun onComputeColors(): WallpaperColors? {
             val scheme = renderer?.colorScheme ?: return null
+            // Primary: Past/Future Years (Grey in Iconic)
+            // Secondary: Current Year/Shape (Red in Iconic - breathing shape)
+            // Tertiary: Background (Beige in Iconic)
             return WallpaperColors(
-                Color.valueOf(scheme.backgroundColor),
+                Color.valueOf(scheme.pastYearsColor),
                 Color.valueOf(scheme.currentYearColor),
-                Color.valueOf(scheme.pastYearsColor)
+                Color.valueOf(scheme.backgroundColor)
             )
         }
 
