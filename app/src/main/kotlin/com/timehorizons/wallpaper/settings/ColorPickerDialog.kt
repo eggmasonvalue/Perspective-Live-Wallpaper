@@ -10,6 +10,7 @@ import android.widget.SeekBar
 import android.widget.TextView
 import android.view.View
 import com.timehorizons.wallpaper.R
+import java.util.Locale
 
 /**
  * Simple color picker dialog using RGB sliders.
@@ -98,7 +99,7 @@ class ColorPickerDialog(
         colorPreview.setBackgroundColor(currentColor)
         
         // Update hex text
-        val hexColor = String.format("#%02X%02X%02X", red, green, blue)
+        val hexColor = String.format(Locale.US, "#%02X%02X%02X", red, green, blue)
         hexText.text = hexColor
     }
 }

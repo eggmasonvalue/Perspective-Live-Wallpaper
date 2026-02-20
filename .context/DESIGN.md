@@ -22,3 +22,6 @@
 - [x] Crash fix for screen recording.
 - [x] CI/CD Pipeline (GitHub Actions).
 - [x] Unit Tests for logic.
+- [x] BaseWallpaperService refactoring for code reuse.
+- [x] Optimized CanvasRenderer (Strategy Pattern, reduced allocations).
+- [x] Linting with Detekt.

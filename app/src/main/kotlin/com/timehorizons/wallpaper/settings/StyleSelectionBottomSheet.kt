@@ -64,7 +64,6 @@ class StyleSelectionBottomSheet : BottomSheetDialogFragment() {
 
         // Initialize state from args
         arguments?.let { args ->
-            val schemeId = args.getString(ARG_INITIAL_SCHEME_ID)
             selectedShapeId = args.getString(ARG_INITIAL_SHAPE_ID, "rounded_square")
             selectedScale = args.getFloat(ARG_INITIAL_SCALE, 1.0f)
             selectedPaddingScale = args.getFloat(ARG_INITIAL_PADDING_SCALE, 0.05f)
@@ -106,7 +105,7 @@ class StyleSelectionBottomSheet : BottomSheetDialogFragment() {
         // Select initial button
         val initialBtnId = when (selectedShapeId) {
             "circle" -> R.id.btnShapeCircle
-            "square" -> R.id.btnShapeSquare
+            "rhombus", "square" -> R.id.btnShapeRhombus
             else -> R.id.btnShapeRounded
         }
         toggleGroup.check(initialBtnId)
@@ -115,7 +114,7 @@ class StyleSelectionBottomSheet : BottomSheetDialogFragment() {
             if (isChecked) {
                 selectedShapeId = when (checkedId) {
                     R.id.btnShapeCircle -> "circle"
-                    R.id.btnShapeSquare -> "square"
+                    R.id.btnShapeRhombus -> "rhombus"
                     else -> "rounded_square"
                 }
             }

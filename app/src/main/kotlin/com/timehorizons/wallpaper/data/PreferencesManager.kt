@@ -47,14 +47,12 @@ class PreferencesManager(context: Context) {
      */
     fun getPreferences(): UserPreferences {
         val birthDateStr = prefs.getString(KEY_BIRTH_DATE, null)
-        if (birthDateStr == null) {
-            throw IllegalStateException("Birth date not set")
-        }
+        check(birthDateStr != null) { "Birth date not set" }
 
         val birthDate = try {
             LocalDate.parse(birthDateStr)
         } catch (e: DateTimeParseException) {
-            throw IllegalStateException("Invalid birth date format stored")
+            error("Invalid birth date format stored")
         }
 
         val expectedLifespan = prefs.getInt(KEY_EXPECTED_LIFESPAN, 90)
