@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Horizon</string>
     <string name="wallpaper_description">Visualizing the road ahead. A minimalist timeline of your journey.</string>
-    
+
     <!-- Onboarding -->
     <string name="welcome_title">Horizon</string>
     <string name="welcome_description">Master your timeline. A bird\'s-eye view of your lifetime, one square at a time.</string>
@@ -12,7 +12,7 @@
     <string name="color_scheme_label">Color Scheme</string>
     <string name="create_custom_colors">Custom Aura</string>
     <string name="get_started">Commence</string>
-    
+
     <!-- Settings -->
     <string name="settings_title">Settings</string>
     <string name="current_settings">Current Configuration</string>
@@ -20,7 +20,7 @@
     <string name="edit_lifespan">Adjust Life Expectancy</string>
     <string name="change_color_scheme">Style</string>
     <string name="apply_wallpaper">Set Perspective</string>
-    
+
     <!-- Style Customization -->
     <string name="style_title">Style</string>
     <string name="style_shape">Shape</string>
@@ -28,19 +28,19 @@
     <string name="style_padding">Container Padding</string>
     <string name="shape_circle">Circle</string>
     <string name="shape_rounded">Rounded</string>
-    <string name="shape_square">Square</string>
-    
+    <string name="shape_rhombus">Rhombus</string>
+
     <!-- Validation -->
     <string name="birth_date_validation_error">Birth date must be in the past.</string>
     <string name="lifespan_validation_error">Please enter a valid period.</string>
-    
+
     <!-- Color Schemes -->
     <string name="color_scheme_dark">Onyx</string>
     <string name="color_scheme_light">Ivory</string>
     <string name="color_scheme_sepia">Classical</string>
     <string name="color_scheme_warm">Solar</string>
     <string name="color_scheme_cool">Glacier</string>
-    
+
     <!-- Momentum (Day Counter) -->
     <string name="momentum_mode_no_tomorrow">There\'s no tomorrow</string>
     <string name="momentum_mode_vs_yesterday">You vs You, yesterday</string>

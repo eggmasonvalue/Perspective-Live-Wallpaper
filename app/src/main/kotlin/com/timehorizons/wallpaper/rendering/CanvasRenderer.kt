@@ -5,16 +5,16 @@ import android.graphics.Color
 import android.graphics.Paint
 import com.timehorizons.wallpaper.data.ColorScheme
 import com.timehorizons.wallpaper.data.GridConfig
-import com.timehorizons.wallpaper.data.LifeState
+import com.timehorizons.wallpaper.data.GridState
 import com.timehorizons.wallpaper.utils.ColorUtils
 import java.time.LocalDateTime
 
 /**
- * Renders the life calendar grid on a Canvas.
- * Handles drawing the background, all year dots, and applying the pulse animation.
+ * Renders the grid on a Canvas.
+ * Optimized with strategy pattern for shape drawing.
  */
 class CanvasRenderer(
-    private var lifeState: LifeState,
+    private var gridState: GridState,
     val colorScheme: ColorScheme,
     private val screenWidth: Int,
     private val screenHeight: Int
@@ -27,27 +27,23 @@ class CanvasRenderer(
     private var unitScale: Float = 1.0f
     private var containerPaddingScale: Float = 0.05f
 
+    private var shapeDrawer: ShapeDrawer = RoundedSquareDrawer()
+
     init {
         gridConfig = calculateGrid()
+        updateShapeDrawer()
     }
 
     private fun calculateGrid(): GridConfig {
         return GridCalculator.calculateGridLayout(
-            totalDots = lifeState.totalYears,
+            totalDots = gridState.totalItems,
             screenWidth = screenWidth,
             screenHeight = screenHeight,
             marginPercent = containerPaddingScale
         )
     }
 
-    /**
-     * Renders the complete life calendar to the canvas.
-     *
-     * @param canvas The canvas to draw on
-     * @param currentYearOpacity Opacity value for the current year dot (from PulseAnimator)
-     */
-    fun render(canvas: Canvas, currentYearOpacity: Float) {
-        // Draw background with time-of-day adaptation
+    fun render(canvas: Canvas, currentItemOpacity: Float) {
         val hour = LocalDateTime.now().hour
         val bgColor = if (colorScheme.isDynamic) {
             ColorUtils.adaptBackgroundForTimeOfDay(colorScheme.backgroundColor, hour)
@@ -56,108 +52,98 @@ class CanvasRenderer(
         }
         canvas.drawColor(bgColor)
 
-        // Draw all dots
         var dotIndex = 0
-
-        // Calculate effective dot size based on scale
-        // unitScale 1.0 = gridConfig.dotSize
-        // unitScale 0.5 = gridConfig.dotSize * 0.5
         val effectiveSize = gridConfig.dotSize * unitScale.coerceIn(0.5f, 1.0f)
         val offset = (gridConfig.dotSize - effectiveSize) / 2f
+        val startX = gridConfig.offsetX
+        val startY = gridConfig.offsetY
+        val cellSize = gridConfig.dotSize + gridConfig.spacing
 
         for (row in 0 until gridConfig.rows) {
             for (col in 0 until gridConfig.columns) {
-                if (dotIndex >= lifeState.totalYears) break
+                if (dotIndex >= gridState.totalItems) break
 
-                // Top-left of the grid cell
-                val cellX = gridConfig.offsetX + col * (gridConfig.dotSize + gridConfig.spacing)
-                val cellY = gridConfig.offsetY + row * (gridConfig.dotSize + gridConfig.spacing)
-
-                // Centered drawing coordinates
-                val x = cellX + offset
-                val y = cellY + offset
+                val x = startX + col * cellSize + offset
+                val y = startY + row * cellSize + offset
 
                 val color = when {
-                    dotIndex < lifeState.yearsLived -> colorScheme.pastYearsColor
-                    dotIndex == lifeState.currentYearIndex -> colorScheme.currentYearColor
+                    dotIndex < gridState.pastItems -> colorScheme.pastYearsColor
+                    dotIndex == gridState.currentIndex -> colorScheme.currentYearColor
                     else -> colorScheme.futureYearsColor
                 }
 
                 paint.color = color
 
-                // Apply pulse opacity only to current year
-                if (dotIndex == lifeState.currentYearIndex) {
-                    paint.alpha = (255 * currentYearOpacity).toInt()
+                if (dotIndex == gridState.currentIndex) {
+                    paint.alpha = (255 * currentItemOpacity).toInt()
                 } else {
                     paint.alpha = Color.alpha(color)
                 }
 
-                drawShape(canvas, x, y, effectiveSize)
+                shapeDrawer.draw(canvas, x, y, effectiveSize, paint)
 
                 dotIndex++
             }
         }
     }
 
-    private fun drawShape(canvas: Canvas, x: Float, y: Float, size: Float) {
-        when (unitShapeId) {
-            "circle" -> {
-                val radius = size / 2f
-                canvas.drawCircle(x + radius, y + radius, radius, paint)
-            }
-            "square" -> {
-                // Drawing a rhombus (rotated square) instead of a regular square
-                canvas.save()
-                canvas.rotate(45f, x + size / 2f, y + size / 2f)
-                val scale = 0.707f // 1/sqrt(2) to fit exactly inside the square bounds
-                val center = size / 2f
-                // We draw a centered rect then rotate
-                canvas.drawRect(x + center - (size * scale / 2), y + center - (size * scale / 2), x + center + (size * scale / 2), y + center + (size * scale / 2), paint)
-                canvas.restore()
-            }
-            "squircle" -> {
-                // Approximate squircle with very rounded rect (radius ~ 25%)
-                // or use a path if needed. For performance, large radius rect is close enough visually for small dots
-                // A true squircle has 'hyper-rounded' corners.
-                // Using a corner radius of 50% makes a circle.
-                // Using a corner radius of 0% makes a square.
-                // Squircle is often approximated by ~20-25% radius but with "smoother" corners.
-                // Android's drawRoundRect is just circular corners.
-                // For "Squircle", we'll use a corner radius of 20% of size.
-                val radius = size * 0.22f
-                canvas.drawRoundRect(x, y, x + size, y + size, radius, radius, paint)
-            }
-            "rounded_square" -> {
-                // Standard rounded square, match gridConfig or use fixed ratio
-                // Prior implementation used gridConfig.cornerRadius.
-                // Let's use a standard visual ratio, e.g. 15%
-                val radius = size * 0.15f
-                canvas.drawRoundRect(x, y, x + size, y + size, radius, radius, paint)
-            }
-            else -> {
-                // Default to rounded square
-                val radius = size * 0.15f
-                canvas.drawRoundRect(x, y, x + size, y + size, radius, radius, paint)
-            }
-        }
-    }
-
-    /**
-     * Updates the life state for the renderer.
-     * Call this when the user's age changes (e.g., on birthday).
-     */
-    fun updateLifeState(newLifeState: LifeState) {
-        lifeState = newLifeState
+    fun updateGridState(newState: GridState) {
+        gridState = newState
         gridConfig = calculateGrid()
     }
 
-    /**
-     * Updates the visual style settings.
-     */
     fun updateStyle(shapeId: String, scale: Float, paddingScale: Float = 0.05f) {
         this.unitShapeId = shapeId
         this.unitScale = scale
         this.containerPaddingScale = paddingScale
         gridConfig = calculateGrid()
+        updateShapeDrawer()
+    }
+
+    private fun updateShapeDrawer() {
+        shapeDrawer = when (unitShapeId) {
+            "circle" -> CircleDrawer()
+            "rhombus", "square" -> RhombusDrawer()
+            "squircle" -> SquircleDrawer()
+            else -> RoundedSquareDrawer()
+        }
+    }
+
+    private interface ShapeDrawer {
+        fun draw(canvas: Canvas, x: Float, y: Float, size: Float, paint: Paint)
+    }
+
+    private class CircleDrawer : ShapeDrawer {
+        override fun draw(canvas: Canvas, x: Float, y: Float, size: Float, paint: Paint) {
+            val radius = size / 2f
+            canvas.drawCircle(x + radius, y + radius, radius, paint)
+        }
+    }
+
+    private class RhombusDrawer : ShapeDrawer {
+        override fun draw(canvas: Canvas, x: Float, y: Float, size: Float, paint: Paint) {
+            canvas.save()
+            canvas.rotate(45f, x + size / 2f, y + size / 2f)
+            val scale = 0.707f
+            val center = size / 2f
+            val halfScaled = (size * scale) / 2f
+            canvas.drawRect(x + center - halfScaled, y + center - halfScaled,
+                            x + center + halfScaled, y + center + halfScaled, paint)
+            canvas.restore()
+        }
+    }
+
+    private class SquircleDrawer : ShapeDrawer {
+        override fun draw(canvas: Canvas, x: Float, y: Float, size: Float, paint: Paint) {
+            val radius = size * 0.22f
+            canvas.drawRoundRect(x, y, x + size, y + size, radius, radius, paint)
+        }
+    }
+
+    private class RoundedSquareDrawer : ShapeDrawer {
+        override fun draw(canvas: Canvas, x: Float, y: Float, size: Float, paint: Paint) {
+            val radius = size * 0.15f
+            canvas.drawRoundRect(x, y, x + size, y + size, radius, radius, paint)
+        }
     }
 }

@@ -46,8 +46,6 @@ class GridCalculatorTest {
         // 3. Grid dimensions calculation check
         // With 20% margin on each side, usable width is 60% of original.
         // With 5% margin on each side, usable width is 90% of original.
-        val usableWidthDefault = screenWidth * (1 - 2 * defaultMargin)
-        val usableWidthLarge = screenWidth * (1 - 2 * largeMargin)
 
         // This confirms the math inside GridCalculator is respecting the marginPercent
         // The dot size is constrained by width/height, so it must shrink.

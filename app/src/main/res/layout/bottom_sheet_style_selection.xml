@@ -58,11 +58,11 @@
             style="@style/Widget.Material3.Button.OutlinedButton" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnShapeSquare"
+            android:id="@+id/btnShapeRhombus"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/shape_square"
+            android:text="@string/shape_rhombus"
             style="@style/Widget.Material3.Button.OutlinedButton" />
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
