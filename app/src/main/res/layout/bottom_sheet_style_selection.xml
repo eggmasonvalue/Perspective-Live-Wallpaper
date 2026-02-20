@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/shape_circle"
-            style="?attr/materialButtonOutlinedStyle" />
+            style="@style/Widget.Material3.Button.OutlinedButton" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnShapeRounded"
@@ -55,7 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/shape_rounded"
-            style="?attr/materialButtonOutlinedStyle" />
+            style="@style/Widget.Material3.Button.OutlinedButton" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnShapeSquare"
@@ -63,7 +63,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/shape_square"
-            style="?attr/materialButtonOutlinedStyle" />
+            style="@style/Widget.Material3.Button.OutlinedButton" />
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
     <!-- Size Section -->
@@ -82,6 +82,24 @@
         android:valueTo="1.0"
         android:stepSize="0.05"
         android:value="1.0"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Padding Section -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/style_padding"
+        android:textAppearance="?attr/textAppearanceTitleSmall"
+        android:layout_marginBottom="4dp" />
+
+    <com.google.android.material.slider.Slider
+        android:id="@+id/paddingSlider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:valueFrom="0.0"
+        android:valueTo="0.2"
+        android:stepSize="0.01"
+        android:value="0.05"
         android:layout_marginBottom="24dp" />
 
     <!-- Color Scheme Section -->
@@ -112,7 +130,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Cancel"
-            style="?attr/materialButtonOutlinedStyle" />
+            style="@style/Widget.Material3.Button.OutlinedButton" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/applyButton"
@@ -120,7 +138,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="Apply"
-            style="?attr/materialButtonStyle" />
+            style="@style/Widget.Material3.Button" />
     </LinearLayout>
 
 </LinearLayout>

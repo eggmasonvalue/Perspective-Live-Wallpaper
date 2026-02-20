@@ -32,8 +32,8 @@ class StyleSelectionBottomSheet : BottomSheetDialogFragment() {
     private var selectedShapeId: String = "rounded_square"
     private var selectedScale: Float = 1.0f
     
-    // Callback: schema, shapeId, scale
-    private var onStyleApplied: ((ColorScheme, String, Float) -> Unit)? = null
+    private var selectedPaddingScale: Float = 0.05f
+    private var onStyleApplied: ((ColorScheme, String, Float, Float) -> Unit)? = null
 
     private val customColorLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -67,15 +67,19 @@ class StyleSelectionBottomSheet : BottomSheetDialogFragment() {
             val schemeId = args.getString(ARG_INITIAL_SCHEME_ID)
             selectedShapeId = args.getString(ARG_INITIAL_SHAPE_ID, "rounded_square")
             selectedScale = args.getFloat(ARG_INITIAL_SCALE, 1.0f)
+            selectedPaddingScale = args.getFloat(ARG_INITIAL_PADDING_SCALE, 0.05f)
             
             // Scheme will be set in setupColorGrid
         }
 
         setupShapeToggle(view)
         setupSizeSlider(view)
+        setupPaddingSlider(view)
         setupColorGrid(view)
         setupButtons(view)
     }
+
+    override fun getTheme(): Int = com.google.android.material.R.style.Theme_Material3_DayNight_BottomSheetDialog
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
@@ -124,6 +128,16 @@ class StyleSelectionBottomSheet : BottomSheetDialogFragment() {
         
         slider.addOnChangeListener { _, value, _ ->
             selectedScale = value
+        }
+    }
+
+    private fun setupPaddingSlider(view: View) {
+        val slider = view.findViewById<Slider>(R.id.paddingSlider)
+        if (slider != null) {
+            slider.value = selectedPaddingScale
+            slider.addOnChangeListener { _, value, _ ->
+                selectedPaddingScale = value
+            }
         }
     }
 
@@ -178,7 +192,7 @@ class StyleSelectionBottomSheet : BottomSheetDialogFragment() {
 
         view.findViewById<Button>(R.id.applyButton).setOnClickListener {
             selectedScheme?.let { scheme ->
-                onStyleApplied?.invoke(scheme, selectedShapeId, selectedScale)
+                onStyleApplied?.invoke(scheme, selectedShapeId, selectedScale, selectedPaddingScale)
             }
             dismiss()
         }
@@ -192,7 +206,7 @@ class StyleSelectionBottomSheet : BottomSheetDialogFragment() {
     /**
      * Sets the callback for when style is applied.
      */
-    fun setOnStyleAppliedListener(listener: (ColorScheme, String, Float) -> Unit) {
+    fun setOnStyleAppliedListener(listener: (ColorScheme, String, Float, Float) -> Unit) {
         onStyleApplied = listener
     }
 
@@ -200,6 +214,7 @@ class StyleSelectionBottomSheet : BottomSheetDialogFragment() {
         private const val ARG_INITIAL_SCHEME_ID = "initial_scheme_id"
         private const val ARG_INITIAL_SHAPE_ID = "initial_shape_id"
         private const val ARG_INITIAL_SCALE = "initial_scale"
+        private const val ARG_INITIAL_PADDING_SCALE = "initial_padding_scale"
 
         /**
          * Creates a new instance of the style sheet with initial settings.
@@ -207,7 +222,8 @@ class StyleSelectionBottomSheet : BottomSheetDialogFragment() {
         fun newInstance(
             initialSchemeId: String?,
             initialShapeId: String,
-            initialScale: Float
+            initialScale: Float,
+            initialPaddingScale: Float = 0.05f
         ): StyleSelectionBottomSheet {
             return StyleSelectionBottomSheet().apply {
                 arguments = Bundle().apply {
@@ -216,6 +232,7 @@ class StyleSelectionBottomSheet : BottomSheetDialogFragment() {
                     }
                     putString(ARG_INITIAL_SHAPE_ID, initialShapeId)
                     putFloat(ARG_INITIAL_SCALE, initialScale)
+                    putFloat(ARG_INITIAL_PADDING_SCALE, initialPaddingScale)
                 }
             }
         }

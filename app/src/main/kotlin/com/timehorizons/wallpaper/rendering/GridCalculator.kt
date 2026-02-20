@@ -11,7 +11,7 @@ import kotlin.math.sqrt
  * on screen, considering the screen's aspect ratio.
  */
 object GridCalculator {
-    
+
     /**
      * Calculates the optimal grid layout for a given number of dots on a screen.
      *
@@ -41,53 +41,53 @@ object GridCalculator {
         }
 
         val aspectRatio = screenWidth.toFloat() / screenHeight.toFloat()
-        
+
         // Find optimal rows/columns that match screen aspect ratio
         var bestRows = 1
         var bestCols = totalDots
         var bestRatioDiff = Float.MAX_VALUE
-        
+
         for (rows in 1..totalDots) {
             val cols = ceil(totalDots.toFloat() / rows).toInt()
             val gridRatio = cols.toFloat() / rows.toFloat()
             val ratioDiff = abs(gridRatio - aspectRatio)
-            
+
             if (ratioDiff < bestRatioDiff) {
                 bestRatioDiff = ratioDiff
                 bestRows = rows
                 bestCols = cols
             }
-            
+
             // Optimization: stop early if we're getting worse
             if (rows > sqrt(totalDots.toDouble()) * 1.5) break
         }
-        
+
         // Calculate dot size with margins
         val horizontalMargin = (screenWidth * marginPercent).toInt()
         val verticalMargin = (screenHeight * marginPercent).toInt()
-        
+
         val usableWidth = screenWidth - (2 * horizontalMargin)
         val usableHeight = screenHeight - (2 * verticalMargin)
-        
+
         // Calculate maximum dot size that fits
         val spacingPercent = 0.1f  // 10% spacing between dots
         val maxDotWidth = usableWidth.toFloat() / (bestCols + (bestCols - 1) * spacingPercent)
         val maxDotHeight = usableHeight.toFloat() / (bestRows + (bestRows - 1) * spacingPercent)
-        
+
         var dotSize = min(maxDotWidth, maxDotHeight)
-        
+
         // Safeguard against extremely small or negative dot size
         if (dotSize < 1f) dotSize = 1f
-        
+
         val spacing = dotSize * spacingPercent
-        
+
         // Calculate offsets to center the grid
         val gridWidth = (bestCols * dotSize) + ((bestCols - 1) * spacing)
         val gridHeight = (bestRows * dotSize) + ((bestRows - 1) * spacing)
-        
+
         val offsetX = (screenWidth - gridWidth) / 2f
         val offsetY = (screenHeight - gridHeight) / 2f
-        
+
         return GridConfig(
             rows = bestRows,
             columns = bestCols,
