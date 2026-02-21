@@ -67,12 +67,25 @@
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
     <!-- Size Section -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/style_size"
-        android:textAppearance="?attr/textAppearanceTitleSmall"
-        android:layout_marginBottom="4dp" />
+        android:orientation="horizontal"
+        android:layout_marginBottom="4dp">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/style_size"
+            android:textAppearance="?attr/textAppearanceTitleSmall" />
+        <TextView
+            android:id="@+id/sizeValueText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="100%"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="?attr/colorPrimary" />
+    </LinearLayout>
 
     <com.google.android.material.slider.Slider
         android:id="@+id/sizeSlider"
@@ -82,15 +95,29 @@
         android:valueTo="1.0"
         android:stepSize="0.05"
         android:value="1.0"
+        app:labelBehavior="gone"
         android:layout_marginBottom="16dp" />
 
     <!-- Padding Section -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/style_padding"
-        android:textAppearance="?attr/textAppearanceTitleSmall"
-        android:layout_marginBottom="4dp" />
+        android:orientation="horizontal"
+        android:layout_marginBottom="4dp">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/style_padding"
+            android:textAppearance="?attr/textAppearanceTitleSmall" />
+        <TextView
+            android:id="@+id/paddingValueText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="5%"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="?attr/colorPrimary" />
+    </LinearLayout>
 
     <com.google.android.material.slider.Slider
         android:id="@+id/paddingSlider"
@@ -100,6 +127,39 @@
         android:valueTo="0.2"
         android:stepSize="0.01"
         android:value="0.05"
+        app:labelBehavior="gone"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Blink Period Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="4dp">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/style_blink_period"
+            android:textAppearance="?attr/textAppearanceTitleSmall" />
+        <TextView
+            android:id="@+id/blinkPeriodValueText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2000ms"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="?attr/colorPrimary" />
+    </LinearLayout>
+
+    <com.google.android.material.slider.Slider
+        android:id="@+id/blinkPeriodSlider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:valueFrom="500"
+        android:valueTo="5000"
+        android:stepSize="100"
+        android:value="2000"
+        app:labelBehavior="gone"
         android:layout_marginBottom="24dp" />
 
     <!-- Color Scheme Section -->

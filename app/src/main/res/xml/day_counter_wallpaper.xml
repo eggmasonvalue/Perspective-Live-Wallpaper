@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <wallpaper
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:settingsActivity="com.timehorizons.wallpaper.settings.MainActivity"
+    android:settingsActivity="com.perspectivelive.wallpaper.settings.MainActivity"
     android:thumbnail="@mipmap/ic_launcher"
     android:description="@string/momentum_description" />

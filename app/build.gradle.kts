@@ -4,15 +4,15 @@ plugins {
 }
 
 android {
-    namespace = "com.timehorizons.wallpaper"
+    namespace = "com.perspectivelive.wallpaper"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.timehorizons.wallpaper"
+        applicationId = "com.perspectivelive.wallpaper"
         minSdk = 28
         targetSdk = 34
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.1.2"
     }
 
     signingConfigs {

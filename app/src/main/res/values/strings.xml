@@ -26,6 +26,7 @@
     <string name="style_shape">Shape</string>
     <string name="style_size">Size</string>
     <string name="style_padding">Container Padding</string>
+    <string name="style_blink_period">Breathing Cycle Time</string>
     <string name="shape_circle">Circle</string>
     <string name="shape_rounded">Rounded</string>
     <string name="shape_rhombus">Rhombus</string>
