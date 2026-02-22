@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Transform abstract time into a tangible visual landscape. Perspective - Live is a minimalist Android wallpaper that helps you visualize your life in years and days. Combat the quarter-life crisis with mindful time visualization.">
+    <meta name="keywords" content="life calendar, memento mori, quarter life crisis, productivity wallpaper, android live wallpaper, visual goal tracker, mindfulness app, time visualization, stoic philosophy">
+    <meta name="author" content="Perspective - Live">
+    <meta property="og:title" content="Perspective - Live | Visual Life Calendar">
+    <meta property="og:description" content="See the Big Picture. Live the Moment. A minimalist live wallpaper to visualize your life.">
+    <meta property="og:image" content="https://eggmasonvalue.github.io/Perspective-Live-Wallpaper/assets/icon.svg">
+    <meta property="og:url" content="https://eggmasonvalue.github.io/Perspective-Live-Wallpaper/">
+    <meta name="theme-color" content="#EAE7DC">
+    <title>Perspective - Live | Visual Life Calendar & Day Counter</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <div class="logo">
+                <i class="fa-solid fa-hourglass-half"></i> Perspective - Live
+            </div>
+            <nav>
+                <a href="#macro">Macro</a>
+                <a href="#micro">Micro</a>
+                <a href="https://github.com/eggmasonvalue/Perspective-Live-Wallpaper/releases/latest" class="btn-download-nav">Get App</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section: Macro View -->
+        <section id="hero" class="hero">
+            <div class="container hero-content">
+                <div class="text-content">
+                    <h1>See the Big Picture.<br>Live the Moment.</h1>
+                    <p class="subtitle">A minimalist live wallpaper that turns abstract time into a tangible landscape. Designed for those navigating the complexities of early adulthood.</p>
+                    <div class="cta-group">
+                        <a href="https://github.com/eggmasonvalue/Perspective-Live-Wallpaper/releases/latest" class="btn-primary"><i class="fa-brands fa-android"></i> Download APK</a>
+                        <a href="#features" class="btn-secondary">Learn More</a>
+                    </div>
+                </div>
+                <div class="visual-simulation" id="macro-simulation">
+                    <!-- Javascript will render grid here -->
+                    <div class="grid-container" id="life-grid"></div>
+                    <div class="caption">Each dot represents one year of your life.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="features">
+            <div class="container">
+                <h2>Two Modes of Perspective</h2>
+
+                <div class="feature-row" id="macro">
+                    <div class="feature-text">
+                        <h3>Macro: Life Calendar</h3>
+                        <p>Your life clock on your lock screen. Visualize how much life you've lived versus what you might have left. It's not about fear; it's about clarity.</p>
+                        <ul class="feature-list">
+                            <li><i class="fa-solid fa-check"></i> Visualizes years lived vs expected (Default 90).</li>
+                            <li><i class="fa-solid fa-check"></i> Gentle pulse animation for the current year.</li>
+                            <li><i class="fa-solid fa-check"></i> Grounding reminder of the passage of time.</li>
+                        </ul>
+                    </div>
+                    <div class="feature-visual">
+                         <!-- Placeholder for Macro Visual -->
+                         <div class="simulation-box macro-preview">
+                            <div class="mini-grid" id="mini-macro-grid"></div>
+                         </div>
+                    </div>
+                </div>
+
+                <div class="feature-row reverse" id="micro">
+                    <div class="feature-text">
+                        <h3>Micro: Day Counter</h3>
+                        <p>Focus your energy on the immediate future.</p>
+
+                        <div class="micro-modes">
+                            <div class="mode-card">
+                                <h4>No Tomorrow</h4>
+                                <p>A single breathing shape for today. A reminder to be present.</p>
+                            </div>
+                            <div class="mode-card">
+                                <h4>You vs. You (Yesterday)</h4>
+                                <p>Compete with your past self. Two shapes: Yesterday (static) vs Today (active).</p>
+                            </div>
+                            <div class="mode-card">
+                                <h4>Custom Event</h4>
+                                <p>Set a deadline. Visualize the days remaining until your next milestone.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="feature-visual micro-visuals">
+                        <div class="simulation-box micro-preview" id="micro-no-tomorrow">
+                            <div class="micro-label">No Tomorrow</div>
+                        </div>
+                        <div class="simulation-box micro-preview" id="micro-vs-yesterday">
+                            <div class="micro-label">Vs Yesterday</div>
+                        </div>
+                        <div class="simulation-box micro-preview" id="micro-custom">
+                            <div class="micro-label">Deadline Tracker</div>
+                            <div class="mini-grid" id="custom-event-grid"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Customization Section -->
+        <section id="customization" class="customization">
+            <div class="container">
+                <h2>Make it Yours</h2>
+                <p>Fine-tune the visuals to match your aesthetic.</p>
+                <div class="style-grid">
+                    <div class="style-item">
+                        <i class="fa-solid fa-shapes"></i>
+                        <h4>Shape Shifting</h4>
+                        <p>Choose between <strong>Circle</strong>, <strong>Rounded Square</strong>, or <strong>Rhombus</strong>.</p>
+                    </div>
+                    <div class="style-item">
+                        <i class="fa-solid fa-sliders"></i>
+                        <h4>Density & Scale</h4>
+                        <p>Adjust grid scale (50% - 100%) and margin padding to fit your screen perfectly.</p>
+                    </div>
+                    <div class="style-item">
+                        <i class="fa-solid fa-palette"></i>
+                        <h4>Color Schemes</h4>
+                        <p>Select from curated presets like "Iconic" or build a <strong>Custom Palette</strong> using the color picker.</p>
+                    </div>
+                    <div class="style-item">
+                        <i class="fa-brands fa-android"></i>
+                        <h4>System Harmony</h4>
+                        <p>The app generates a Material You palette so your system UI adapts to <em>your wallpaper</em>.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final CTA -->
+        <section class="final-cta">
+            <div class="container">
+                <h2>Ready to change your perspective?</h2>
+                <a href="https://github.com/eggmasonvalue/Perspective-Live-Wallpaper/releases/latest" class="btn-primary big-btn">Download Latest Release</a>
+                <p class="small-text">Open Source • No Ads • Privacy Focused</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Perspective - Live. Licensed under MIT.</p>
+            <div class="social-links">
+                <a href="https://github.com/eggmasonvalue/Perspective-Live-Wallpaper"><i class="fa-brands fa-github"></i> GitHub</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
