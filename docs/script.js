@@ -1,18 +1,27 @@
 document.addEventListener('DOMContentLoaded', () => {
     renderMacroGrid();
+    renderMiniMacroGrid();
     renderMicroNoTomorrow();
     renderMicroVsYesterday();
-    renderMiniMacroGrid();
 });
 
 function renderMacroGrid() {
     const gridContainer = document.getElementById('life-grid');
     if (!gridContainer) return;
 
-    const totalYears = 80;
-    const yearsLived = 26; // Simulate a 26-year-old
+    // Simulate standard human lifespan ~80-90 years
+    const totalYears = 90;
+    const yearsLived = 26; // Target demographic
 
-    // Create 80 dots
+    // To mimic the vertical phone layout (9:16 aspect ratio),
+    // we want more rows than columns.
+    // E.g., 7 columns is a common "week-like" width or just a good narrow number.
+    const cols = 7;
+
+    // Update CSS grid columns dynamically
+    gridContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+    // Create dots
     for (let i = 0; i < totalYears; i++) {
         const dot = document.createElement('div');
         dot.classList.add('year-dot');
@@ -21,7 +30,6 @@ function renderMacroGrid() {
             dot.classList.add('past');
         } else if (i === yearsLived) {
             dot.classList.add('current');
-            // Add a subtle title for hover
             dot.title = "Current Year";
         } else {
             dot.classList.add('future');
@@ -35,16 +43,17 @@ function renderMiniMacroGrid() {
     const gridContainer = document.getElementById('mini-macro-grid');
     if (!gridContainer) return;
 
-    // Smaller grid for feature preview
-    const totalYears = 40;
-    const yearsLived = 15;
+    // A smaller subset for the feature preview card
+    const totalYears = 60;
+    const yearsLived = 20;
+    const cols = 6;
+
+    gridContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
 
     for (let i = 0; i < totalYears; i++) {
         const dot = document.createElement('div');
         dot.classList.add('year-dot');
-        // Make them smaller via inline style or CSS class specific to mini
-        dot.style.width = '12px';
-        dot.style.height = '12px';
+        // Make them slightly smaller/adjusted for mini view if needed via CSS
 
         if (i < yearsLived) {
             dot.classList.add('past');
@@ -66,7 +75,7 @@ function renderMicroNoTomorrow() {
     shape.classList.add('shape-no-tomorrow');
 
     // Center it
-    shape.style.margin = '0 auto';
+    shape.style.margin = 'auto'; // Flexbox centering handles this too
 
     container.appendChild(shape);
 }
@@ -78,16 +87,17 @@ function renderMicroVsYesterday() {
     const vsContainer = document.createElement('div');
     vsContainer.classList.add('vs-container');
 
-    // Past Shape (Static)
+    // Past Shape (Static - Gray)
     const pastShape = document.createElement('div');
     pastShape.classList.add('shape-past');
     pastShape.title = "Yesterday";
 
-    // Present Shape (Pulsing)
+    // Present Shape (Pulsing - Red)
     const presentShape = document.createElement('div');
     presentShape.classList.add('shape-present');
     presentShape.title = "Today";
 
+    // Order: Past (top/left) vs Present (bottom/right) or stacked
     vsContainer.appendChild(pastShape);
     vsContainer.appendChild(presentShape);
 
