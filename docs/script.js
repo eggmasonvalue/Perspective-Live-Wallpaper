@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderMiniMacroGrid();
     renderMicroNoTomorrow();
     renderMicroVsYesterday();
+    renderMicroCustom();
 });
 
 function renderMacroGrid() {
@@ -15,7 +16,6 @@ function renderMacroGrid() {
 
     // To mimic the vertical phone layout (9:16 aspect ratio),
     // we want more rows than columns.
-    // E.g., 7 columns is a common "week-like" width or just a good narrow number.
     const cols = 7;
 
     // Update CSS grid columns dynamically
@@ -53,7 +53,6 @@ function renderMiniMacroGrid() {
     for (let i = 0; i < totalYears; i++) {
         const dot = document.createElement('div');
         dot.classList.add('year-dot');
-        // Make them slightly smaller/adjusted for mini view if needed via CSS
 
         if (i < yearsLived) {
             dot.classList.add('past');
@@ -97,9 +96,36 @@ function renderMicroVsYesterday() {
     presentShape.classList.add('shape-present');
     presentShape.title = "Today";
 
-    // Order: Past (top/left) vs Present (bottom/right) or stacked
+    // Order: Past (top) vs Present (bottom)
     vsContainer.appendChild(pastShape);
     vsContainer.appendChild(presentShape);
 
     container.appendChild(vsContainer);
+}
+
+function renderMicroCustom() {
+    const gridContainer = document.getElementById('custom-event-grid');
+    if (!gridContainer) return;
+
+    // Simulate a 30-day countdown
+    const totalDays = 30;
+    const daysPassed = 12;
+    const cols = 5; // Use 5 cols for weeks (mon-fri) or similar feel
+
+    gridContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+    for (let i = 0; i < totalDays; i++) {
+        const dot = document.createElement('div');
+        dot.classList.add('year-dot'); // Reuse macro dot styles for consistency
+
+        if (i < daysPassed) {
+            dot.classList.add('past');
+        } else if (i === daysPassed) {
+            dot.classList.add('current');
+            dot.title = "Today";
+        } else {
+            dot.classList.add('future');
+        }
+        gridContainer.appendChild(dot);
+    }
 }
