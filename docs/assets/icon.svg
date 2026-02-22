@@ -1,0 +1,16 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background: Minimalist Beige -->
+  <rect width="512" height="512" rx="100" fill="#EAE7DC" />
+
+  <!-- Path / Hourglass -->
+  <g transform="translate(256, 256)">
+    <!-- Top triangle (Past) - Muted Rust -->
+    <path d="M-150,-180 L150,-180 L0,0 Z" fill="#D8C3A5" opacity="0.8"/>
+
+    <!-- Bottom triangle (Future) - Sage Green -->
+    <path d="M0,0 L150,180 L-150,180 Z" fill="#8E8D8A" opacity="0.6"/>
+
+    <!-- Horizon Line / Present -->
+    <rect x="-160" y="-10" width="320" height="20" rx="10" fill="#E85A4F" />
+  </g>
+</svg>

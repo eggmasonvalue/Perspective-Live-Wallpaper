@@ -2,9 +2,12 @@
 
 **Perspective - Live** is a minimalist Live Wallpaper engine that transforms abstract time into a tangible visual landscape. Designed for those who live with intention, ambition, and a clear vision of the future.
 
+[![Website](https://img.shields.io/badge/website-perspective--live-orange.svg)](https://eggmasonvalue.github.io/Perspective-Live-Wallpaper/)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-Android-brightgreen.svg)
 ![Typography](https://img.shields.io/badge/typeface-Geist-black.svg)
+
+**[Visit the Website for a Live Demo](https://eggmasonvalue.github.io/Perspective-Live-Wallpaper/)**
 
 ## 🌌 The Concept
 
@@ -42,7 +45,7 @@ Make the horizon yours with the new **Style** engine:
 
 ## 🛠️ Usage
 
-1. **Install** the APK.
+1. **Install** the APK from the [Releases](https://github.com/eggmasonvalue/Perspective-Live-Wallpaper/releases/latest) page.
 2. **Open** the Perspective - Live app.
 3. Choose your **Macro** or **Micro** tab.
 4. Tap **Style** to customize shapes, sizes, padding, and colors.
