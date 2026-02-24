@@ -8,7 +8,7 @@ The application is split into two main components:
 
 ## Module Structure
 
--   **`com.timehorizons.wallpaper`**
+-   **`com.perspectivelive.wallpaper`**
     -   **`data`**: Data models and persistence.
         -   `UserPreferences`: Immutable data class holding settings.
         -   `PreferencesManager`: SharedPreferences wrapper.
@@ -23,6 +23,7 @@ The application is split into two main components:
         -   `ModuleRegistry`: Registry for accessing modules (primarily for Life Calendar).
     -   **`rendering`**: Graphics engine.
         -   `CanvasRenderer`: Draws the grid using Android Canvas with optimized ShapeDrawer strategy.
+        -   `GridCalculator`: Calculates optimal grid layouts (rows, columns, size) based on screen dimensions and dot count.
         -   `PulseAnimator`: Handles the "breathing" animation.
     -   **`service`**: Android WallpaperServices.
         -   `BaseWallpaperService`: Abstract base class encapsulating common lifecycle and rendering logic.
@@ -33,6 +34,8 @@ The application is split into two main components:
         -   `MainActivity`: Host activity.
         -   `SettingsViewModel`: Manages UI state and interacts with `PreferencesManager`.
         -   `StyleSelectionBottomSheet`: UI for customizing look (Shapes, Colors, Size).
+        -   `ColorCardAdapter`, `ColorSchemeAdapter`: Adapters for color scheme selection.
+        -   `CustomColorActivity`, `ColorPickerDialog`: UI for creating custom color schemes.
     -   **`utils`**: Utility classes.
         -   `ColorUtils`: Helper for color manipulation.
         -   `DateCalculator`: Helper for date calculations.
