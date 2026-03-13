@@ -4,6 +4,7 @@
 
 ### Fixed
 -   **CI/CD**: Fixed GitHub Actions release workflow permissions to resolve 403 error.
+-   **Code Health**: Removed unused `LayoutInflater` import in `ColorPickerDialog`.
 
 ## [v1.1.0]
 
