@@ -29,6 +29,10 @@ class CanvasRenderer(
 
     private var shapeDrawer: ShapeDrawer = RoundedSquareDrawer()
 
+    // Cache background color to reduce allocations in render loop
+    private var lastBgUpdateMillis: Long = 0L
+    private var cachedBgColor: Int = Color.BLACK
+
     init {
         gridConfig = calculateGrid()
         updateShapeDrawer()
@@ -44,13 +48,18 @@ class CanvasRenderer(
     }
 
     fun render(canvas: Canvas, currentItemOpacity: Float) {
-        val hour = LocalDateTime.now().hour
-        val bgColor = if (colorScheme.isDynamic) {
-            ColorUtils.adaptBackgroundForTimeOfDay(colorScheme.backgroundColor, hour)
-        } else {
-            colorScheme.backgroundColor
+        val currentTime = System.currentTimeMillis()
+        // Recompute background color every 10 seconds or if it's the first render
+        if (currentTime - lastBgUpdateMillis > 10_000L || lastBgUpdateMillis == 0L) {
+            val hour = LocalDateTime.now().hour
+            cachedBgColor = if (colorScheme.isDynamic) {
+                ColorUtils.adaptBackgroundForTimeOfDay(colorScheme.backgroundColor, hour)
+            } else {
+                colorScheme.backgroundColor
+            }
+            lastBgUpdateMillis = currentTime
         }
-        canvas.drawColor(bgColor)
+        canvas.drawColor(cachedBgColor)
 
         var dotIndex = 0
         val effectiveSize = gridConfig.dotSize * unitScale.coerceIn(0.5f, 1.0f)
