@@ -94,7 +94,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/edit_birth_date"
-                style="?attr/materialButtonStyle"
+                style="?attr/materialButtonOutlinedStyle"
                 android:layout_marginBottom="8dp"/>
             
             <com.google.android.material.button.MaterialButton
@@ -102,7 +102,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/edit_lifespan"
-                style="?attr/materialButtonStyle"
+                style="?attr/materialButtonOutlinedStyle"
                 android:layout_marginBottom="8dp"/>
             
             <com.google.android.material.button.MaterialButton
@@ -110,7 +110,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/change_color_scheme"
-                style="?attr/materialButtonStyle"
+                style="?attr/materialButtonOutlinedStyle"
                 android:layout_marginBottom="32dp"/>
             
             <com.google.android.material.button.MaterialButton
@@ -118,7 +118,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/apply_wallpaper"
-                style="?attr/materialButtonOutlinedStyle"/>
+                style="?attr/materialButtonStyle"/>
             
         </LinearLayout>
     </ScrollView>
@@ -212,7 +212,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/momentum_mode_no_tomorrow"
-                style="?attr/materialButtonStyle"
+                style="?attr/materialButtonOutlinedStyle"
                 android:layout_marginBottom="8dp"/>
             
             <com.google.android.material.button.MaterialButton
@@ -220,7 +220,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/momentum_mode_vs_yesterday"
-                style="?attr/materialButtonStyle"
+                style="?attr/materialButtonOutlinedStyle"
                 android:layout_marginBottom="8dp"/>
             
             <com.google.android.material.button.MaterialButton
@@ -228,7 +228,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/momentum_mode_custom"
-                style="?attr/materialButtonStyle"
+                style="?attr/materialButtonOutlinedStyle"
                 android:layout_marginBottom="8dp"/>
             
             <com.google.android.material.button.MaterialButton
@@ -236,7 +236,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/change_color_scheme"
-                style="?attr/materialButtonStyle"
+                style="?attr/materialButtonOutlinedStyle"
                 android:layout_marginBottom="24dp"/>
 
             <!-- Custom Objective Settings (shown when 'Objective' is active) -->
@@ -277,7 +277,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/apply_wallpaper"
-                style="?attr/materialButtonOutlinedStyle"/>
+                style="?attr/materialButtonStyle"/>
             
         </LinearLayout>
     </ScrollView>
