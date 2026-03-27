@@ -14,6 +14,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import com.perspectivelive.wallpaper.service.HealthConnectManager
+import com.perspectivelive.wallpaper.data.HealthCacheManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.tabs.TabLayout
 import com.perspectivelive.wallpaper.R
@@ -358,6 +362,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun saveAndLaunchDayCounterPicker() {
+        viewModel.savePreferences()
+
+        val prefs = viewModel.userPreferences.value ?: return
+        if (prefs.healthMetric != com.perspectivelive.wallpaper.service.HealthConnectManager.METRIC_NONE) {
+            val startDate = prefs.countdownStartDate ?: java.time.LocalDate.now()
+            val endDate = java.time.LocalDate.now()
+            lifecycleScope.launch {
+                val hcManager = com.perspectivelive.wallpaper.service.HealthConnectManager(this@MainActivity)
+                val data = hcManager.fetchAggregateData(prefs.healthMetric, startDate, endDate)
+                val cacheManager = com.perspectivelive.wallpaper.data.HealthCacheManager(this@MainActivity)
+                cacheManager.saveHealthCache(data)
+                launchDayCounterWallpaper()
+            }
+        } else {
+            launchDayCounterWallpaper()
+        }
+    }
+
+    private fun launchDayCounterWallpaper() {
         viewModel.savePreferences()
 
         val intent = Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER).apply {

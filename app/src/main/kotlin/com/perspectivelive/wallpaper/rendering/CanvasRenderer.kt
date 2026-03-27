@@ -33,9 +33,31 @@ class CanvasRenderer(
     private var lastBgUpdateMillis: Long = 0L
     private var cachedBgColor: Int = Color.BLACK
 
+    // Health Connect formatting cache
+    private var healthCache: Map<java.time.LocalDate, Float>? = null
+    private var healthGoal: Float = 10000f
+    private var healthMetric: String = "NONE"
+    private var showStatOverlay: Boolean = false
+    private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        textAlign = Paint.Align.CENTER
+        typeface = android.graphics.Typeface.DEFAULT_BOLD
+    }
+
     init {
         gridConfig = calculateGrid()
         updateShapeDrawer()
+    }
+
+    fun updateHealthData(
+        metric: String,
+        goal: Float,
+        showOverlay: Boolean,
+        cache: Map<java.time.LocalDate, Float>?
+    ) {
+        this.healthMetric = metric
+        this.healthGoal = goal
+        this.showStatOverlay = showOverlay
+        this.healthCache = cache
     }
 
     private fun calculateGrid(): GridConfig {
@@ -68,12 +90,22 @@ class CanvasRenderer(
         val startY = gridConfig.offsetY
         val cellSize = gridConfig.dotSize + gridConfig.spacing
 
+        // Precompute text styling if overlay is enabled
+        if (showStatOverlay && healthMetric != "NONE") {
+            textPaint.textSize = effectiveSize * 0.35f
+            textPaint.color = cachedBgColor
+            textPaint.alpha = 200 // Slight transparency for subtlety
+        }
+
         for (row in 0 until gridConfig.rows) {
             for (col in 0 until gridConfig.columns) {
                 if (dotIndex >= gridState.totalItems) break
 
                 val x = startX + col * cellSize + offset
                 val y = startY + row * cellSize + offset
+
+                // Map dot index to an actual date
+                val itemDate = gridState.startDate.plusDays(dotIndex.toLong())
 
                 val color = when {
                     dotIndex < gridState.pastItems -> colorScheme.pastYearsColor
@@ -83,16 +115,66 @@ class CanvasRenderer(
 
                 paint.color = color
 
+                var drawnText: String? = null
+
                 if (dotIndex == gridState.currentIndex) {
                     paint.alpha = (255 * currentItemOpacity).toInt()
+
+                    // Always pull today's value if overlay is on
+                    if (showStatOverlay && healthMetric != "NONE" && healthCache != null) {
+                        val value = healthCache?.get(itemDate)
+                        if (value != null) {
+                            drawnText = formatHealthText(value, healthMetric)
+                        }
+                    }
+                } else if (dotIndex < gridState.currentIndex && healthMetric != "NONE" && healthCache != null) {
+                    // Past Day Logic: Modify opacity based on progress
+                    val value = healthCache?.get(itemDate) ?: 0f
+                    val progress = (value / healthGoal).coerceIn(0f, 1f)
+
+                    // Base alpha of 20%, up to 100% of the past color's original alpha
+                    val originalAlpha = Color.alpha(color)
+                    val baseAlpha = (originalAlpha * 0.2f).toInt()
+                    val dynamicAlpha = baseAlpha + ((originalAlpha - baseAlpha) * progress).toInt()
+
+                    paint.alpha = dynamicAlpha
+
+                    if (showStatOverlay) {
+                        drawnText = formatHealthText(value, healthMetric)
+                    }
                 } else {
                     paint.alpha = Color.alpha(color)
                 }
 
                 shapeDrawer.draw(canvas, x, y, effectiveSize, paint)
 
+                // Draw text overlay if applicable
+                if (drawnText != null) {
+                    // Vertical center offset based on font metrics
+                    val yOffset = -(textPaint.descent() + textPaint.ascent()) / 2f
+                    canvas.drawText(
+                        drawnText,
+                        x + effectiveSize / 2f,
+                        y + effectiveSize / 2f + yOffset,
+                        textPaint
+                    )
+                }
+
                 dotIndex++
             }
+        }
+    }
+
+    private fun formatHealthText(value: Float, metric: String): String {
+        return when (metric) {
+            "STEPS" -> {
+                if (value >= 1000) String.format("%.1fk", value / 1000f)
+                else value.toInt().toString()
+            }
+            "CALORIES" -> "${value.toInt()}kcal"
+            "DISTANCE" -> String.format("%.1fkm", value)
+            "SLEEP" -> String.format("%.1fh", value)
+            else -> value.toInt().toString()
         }
     }
 
