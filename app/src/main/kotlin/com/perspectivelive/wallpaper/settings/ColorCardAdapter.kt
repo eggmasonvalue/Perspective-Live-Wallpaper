@@ -31,10 +31,15 @@ class ColorCardAdapter(
     class SchemeViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val card: MaterialCardView = view.findViewById(R.id.colorCard)
         val previewContainer: View = view.findViewById(R.id.previewContainer)
-        val boxTopLeft: View = view.findViewById(R.id.boxTopLeft)
-        val boxTopRight: View = view.findViewById(R.id.boxTopRight)
-        val boxBottomLeft: View = view.findViewById(R.id.boxBottomLeft)
-        val boxBottomRight: View = view.findViewById(R.id.boxBottomRight)
+        val box00: View = view.findViewById(R.id.box00)
+        val box01: View = view.findViewById(R.id.box01)
+        val box02: View = view.findViewById(R.id.box02)
+        val box10: View = view.findViewById(R.id.box10)
+        val box11: View = view.findViewById(R.id.box11)
+        val box12: View = view.findViewById(R.id.box12)
+        val box20: View = view.findViewById(R.id.box20)
+        val box21: View = view.findViewById(R.id.box21)
+        val box22: View = view.findViewById(R.id.box22)
         val schemeName: TextView = view.findViewById(R.id.schemeName)
         val checkmark: TextView = view.findViewById(R.id.checkmarkIcon)
     }
@@ -79,11 +84,18 @@ class ColorCardAdapter(
         setRoundedBackground(holder.previewContainer, scheme.backgroundColor, 12f)
 
         // Set 4 boxes in 2x2 grid: 3 past/future, 1 current (bottom-right)
-        val dotRadius = 8f
-        setRoundedBackground(holder.boxTopLeft, scheme.pastYearsColor, dotRadius)
-        setRoundedBackground(holder.boxTopRight, scheme.pastYearsColor, dotRadius)
-        setRoundedBackground(holder.boxBottomLeft, scheme.pastYearsColor, dotRadius)
-        setRoundedBackground(holder.boxBottomRight, scheme.currentYearColor, dotRadius)
+        val dotRadius = 6f
+        val past = scheme.pastYearsColor
+        val current = scheme.currentYearColor
+        setRoundedBackground(holder.box00, past, dotRadius)
+        setRoundedBackground(holder.box01, past, dotRadius)
+        setRoundedBackground(holder.box02, past, dotRadius)
+        setRoundedBackground(holder.box10, past, dotRadius)
+        setRoundedBackground(holder.box11, current, dotRadius)
+        setRoundedBackground(holder.box12, past, dotRadius)
+        setRoundedBackground(holder.box20, past, dotRadius)
+        setRoundedBackground(holder.box21, past, dotRadius)
+        setRoundedBackground(holder.box22, past, dotRadius)
 
         // Set scheme name
         holder.schemeName.text = scheme.name

@@ -2,8 +2,10 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/colorCard"
-    android:layout_width="match_parent"
+    android:layout_width="140dp"
     android:layout_height="wrap_content"
+    android:layout_marginEnd="16dp"
+    android:layout_marginBottom="8dp"
     android:clickable="true"
     android:focusable="true"
     app:cardElevation="2dp"
@@ -20,66 +22,60 @@
             android:orientation="vertical"
             android:padding="12dp">
 
-            <!-- 4-Box Miniature Wallpaper Preview (2x2 grid) -->
+            <!-- 3x3 Miniature Wallpaper Preview -->
             <FrameLayout
                 android:id="@+id/previewContainer"
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
                 android:layout_marginBottom="12dp"
-                android:padding="12dp">
+                android:padding="8dp">
 
-                <!-- 2x2 Grid: Top-left, Top-right, Bottom-left (past/future), Bottom-right (current) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:weightSum="3">
 
-                    <!-- Top Row: 2 past/future boxes -->
+                    <!-- Top Row -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="1"
                         android:orientation="horizontal"
-                        android:layout_marginBottom="4dp">
-
-                        <View
-                            android:id="@+id/boxTopLeft"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:layout_marginEnd="4dp" />
-
-                        <View
-                            android:id="@+id/boxTopRight"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
+                        android:layout_marginBottom="4dp"
+                        android:weightSum="3">
+                        <View android:id="@+id/box00" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_marginEnd="4dp" />
+                        <View android:id="@+id/box01" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_marginEnd="4dp" />
+                        <View android:id="@+id/box02" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" />
                     </LinearLayout>
 
-                    <!-- Bottom Row: 1 past/future (left), 1 current (right) -->
+                    <!-- Middle Row (Current is center) -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="1"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="4dp"
+                        android:weightSum="3">
+                        <View android:id="@+id/box10" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_marginEnd="4dp" />
+                        <View android:id="@+id/box11" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_marginEnd="4dp" />
+                        <View android:id="@+id/box12" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" />
+                    </LinearLayout>
 
-                        <View
-                            android:id="@+id/boxBottomLeft"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:layout_marginEnd="4dp" />
-
-                        <View
-                            android:id="@+id/boxBottomRight"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
+                    <!-- Bottom Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:orientation="horizontal"
+                        android:weightSum="3">
+                        <View android:id="@+id/box20" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_marginEnd="4dp" />
+                        <View android:id="@+id/box21" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_marginEnd="4dp" />
+                        <View android:id="@+id/box22" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" />
                     </LinearLayout>
                 </LinearLayout>
             </FrameLayout>
 
-            <!-- Scheme Name -->
             <TextView
                 android:id="@+id/schemeName"
                 android:layout_width="match_parent"
