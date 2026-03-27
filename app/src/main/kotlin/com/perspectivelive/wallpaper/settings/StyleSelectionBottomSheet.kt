@@ -205,8 +205,8 @@ class StyleSelectionBottomSheet : BottomSheetDialogFragment() {
              selectedScheme = schemes.find { it.id == "dark" }
         }
 
-        val spanCount = 3
-        recyclerView.layoutManager = GridLayoutManager(requireContext(), spanCount)
+
+        recyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(requireContext(), androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL, false)
         recyclerView.adapter = colorCardAdapter
     }
 
