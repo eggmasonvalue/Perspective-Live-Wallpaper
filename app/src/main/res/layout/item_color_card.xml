@@ -22,58 +22,19 @@
             android:orientation="vertical"
             android:padding="12dp">
 
-            <!-- 3x3 Miniature Wallpaper Preview -->
+            <!-- 16x9 Miniature Wallpaper Preview -->
             <FrameLayout
                 android:id="@+id/previewContainer"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
+                android:layout_height="160dp"
                 android:layout_marginBottom="12dp"
                 android:padding="8dp">
 
-                <LinearLayout
+                <com.perspectivelive.wallpaper.settings.PreviewCanvasView
+                    android:id="@+id/previewCanvas"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:weightSum="3">
-
-                    <!-- Top Row -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="4dp"
-                        android:weightSum="3">
-                        <View android:id="@+id/box00" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_marginEnd="4dp" />
-                        <View android:id="@+id/box01" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_marginEnd="4dp" />
-                        <View android:id="@+id/box02" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" />
-                    </LinearLayout>
-
-                    <!-- Middle Row (Current is center) -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="4dp"
-                        android:weightSum="3">
-                        <View android:id="@+id/box10" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_marginEnd="4dp" />
-                        <View android:id="@+id/box11" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_marginEnd="4dp" />
-                        <View android:id="@+id/box12" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" />
-                    </LinearLayout>
-
-                    <!-- Bottom Row -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:orientation="horizontal"
-                        android:weightSum="3">
-                        <View android:id="@+id/box20" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_marginEnd="4dp" />
-                        <View android:id="@+id/box21" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_marginEnd="4dp" />
-                        <View android:id="@+id/box22" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" />
-                    </LinearLayout>
-                </LinearLayout>
+                    android:layout_gravity="center" />
             </FrameLayout>
 
             <TextView

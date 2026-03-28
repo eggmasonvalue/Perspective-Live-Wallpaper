@@ -11,10 +11,6 @@ import com.google.android.material.card.MaterialCardView
 import com.perspectivelive.wallpaper.R
 import com.perspectivelive.wallpaper.data.ColorScheme
 
-/**
- * Adapter for displaying color schemes as cards in a grid.
- * Shows visual preview of colors and handles selection state.
- */
 class ColorCardAdapter(
     private val schemes: MutableList<ColorScheme>,
     private val onSchemeSelected: (ColorScheme) -> Unit,
@@ -22,44 +18,30 @@ class ColorCardAdapter(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var selectedSchemeId: String? = null
-    private val VIEW_TYPE_SCHEME = 0
-    private val VIEW_TYPE_CREATE_CUSTOM = 1
+    private val viewTypeScheme = 0
+    private val viewTypeCreateCustom = 1
 
-    /**
-     * ViewHolder for color scheme cards.
-     */
     class SchemeViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val card: MaterialCardView = view.findViewById(R.id.colorCard)
         val previewContainer: View = view.findViewById(R.id.previewContainer)
-        val box00: View = view.findViewById(R.id.box00)
-        val box01: View = view.findViewById(R.id.box01)
-        val box02: View = view.findViewById(R.id.box02)
-        val box10: View = view.findViewById(R.id.box10)
-        val box11: View = view.findViewById(R.id.box11)
-        val box12: View = view.findViewById(R.id.box12)
-        val box20: View = view.findViewById(R.id.box20)
-        val box21: View = view.findViewById(R.id.box21)
-        val box22: View = view.findViewById(R.id.box22)
+        val previewCanvas: PreviewCanvasView = view.findViewById(R.id.previewCanvas)
         val schemeName: TextView = view.findViewById(R.id.schemeName)
         val checkmark: TextView = view.findViewById(R.id.checkmarkIcon)
     }
 
-    /**
-     * ViewHolder for "Create Custom" card.
-     */
     class CreateCustomViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val card: MaterialCardView = view.findViewById(R.id.colorCard)
         val schemeName: TextView = view.findViewById(R.id.schemeName)
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (position < schemes.size) VIEW_TYPE_SCHEME else VIEW_TYPE_CREATE_CUSTOM
+        return if (position < schemes.size) viewTypeScheme else viewTypeCreateCustom
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            VIEW_TYPE_SCHEME -> {
+            viewTypeScheme -> {
                 val view = inflater.inflate(R.layout.item_color_card, parent, false)
                 SchemeViewHolder(view)
             }
@@ -83,21 +65,9 @@ class ColorCardAdapter(
         // Set preview container background color
         setRoundedBackground(holder.previewContainer, scheme.backgroundColor, 12f)
 
-        // Set 4 boxes in 2x2 grid: 3 past/future, 1 current (bottom-right)
-        val dotRadius = 6f
-        val past = scheme.pastYearsColor
-        val current = scheme.currentYearColor
-        setRoundedBackground(holder.box00, past, dotRadius)
-        setRoundedBackground(holder.box01, past, dotRadius)
-        setRoundedBackground(holder.box02, past, dotRadius)
-        setRoundedBackground(holder.box10, past, dotRadius)
-        setRoundedBackground(holder.box11, current, dotRadius)
-        setRoundedBackground(holder.box12, past, dotRadius)
-        setRoundedBackground(holder.box20, past, dotRadius)
-        setRoundedBackground(holder.box21, past, dotRadius)
-        setRoundedBackground(holder.box22, past, dotRadius)
+        // Set the lightweight canvas grid preview
+        holder.previewCanvas.setColors(scheme.pastYearsColor, scheme.currentYearColor, scheme.futureYearsColor)
 
-        // Set scheme name
         holder.schemeName.text = scheme.name
 
         // Set selected state
@@ -109,10 +79,7 @@ class ColorCardAdapter(
         // Click handler
         holder.card.setOnClickListener {
             selectedSchemeId = scheme.id
-
-            // Notify adapter to update selection states
             notifyDataSetChanged()
-
             onSchemeSelected(scheme)
         }
     }
@@ -120,7 +87,6 @@ class ColorCardAdapter(
     private fun bindCreateCustomCard(holder: CreateCustomViewHolder) {
         // Hide preview elements for create custom card
         holder.itemView.findViewById<View>(R.id.previewContainer)?.visibility = View.GONE
-
         holder.schemeName.text = "+ Create Custom"
         holder.schemeName.textSize = 16f
 
@@ -133,21 +99,14 @@ class ColorCardAdapter(
     }
 
     override fun getItemCount(): Int {
-        // Schemes + 1 for "Create Custom" card
         return schemes.size + 1
     }
 
-    /**
-     * Updates the selected scheme.
-     */
     fun setSelectedScheme(schemeId: String) {
         selectedSchemeId = schemeId
         notifyDataSetChanged()
     }
 
-    /**
-     * Adds or updates custom scheme in the list.
-     */
     fun updateCustomScheme(customScheme: ColorScheme) {
         val existingIndex = schemes.indexOfFirst { it.isCustom }
         if (existingIndex != -1) {

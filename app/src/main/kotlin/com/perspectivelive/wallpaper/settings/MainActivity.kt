@@ -258,10 +258,13 @@ class MainActivity : AppCompatActivity() {
             prefs.unitShapeId,
             prefs.unitScale,
             prefs.containerPaddingScale,
-            prefs.pulsePeriodMs
+            prefs.pulsePeriodMs,
+            prefs.healthMetric,
+            prefs.healthMetricGoal,
+            prefs.showStatOverlay
         )
-        bottomSheet.setOnStyleAppliedListener { scheme, shapeId, scale, padding, pulsePeriod ->
-            viewModel.updateColorScheme(scheme.id, shapeId, scale, padding, pulsePeriod)
+        bottomSheet.setOnStyleAppliedListener { scheme, shapeId, scale, padding, pulsePeriod, metric, goal, overlay ->
+            viewModel.updateColorScheme(scheme.id, shapeId, scale, padding, pulsePeriod, metric, goal, overlay)
         }
         bottomSheet.show(supportFragmentManager, "StyleSelectionBottomSheet")
     }
@@ -353,10 +356,13 @@ class MainActivity : AppCompatActivity() {
             prefs.unitShapeId,
             prefs.unitScale,
             prefs.containerPaddingScale,
-            prefs.pulsePeriodMs
+            prefs.pulsePeriodMs,
+            prefs.healthMetric,
+            prefs.healthMetricGoal,
+            prefs.showStatOverlay
         )
-        bottomSheet.setOnStyleAppliedListener { scheme, shapeId, scale, padding, pulsePeriod ->
-            viewModel.updateColorScheme(scheme.id, shapeId, scale, padding, pulsePeriod)
+        bottomSheet.setOnStyleAppliedListener { scheme, shapeId, scale, padding, pulsePeriod, metric, goal, overlay ->
+            viewModel.updateColorScheme(scheme.id, shapeId, scale, padding, pulsePeriod, metric, goal, overlay)
         }
         bottomSheet.show(supportFragmentManager, "StyleSelectionBottomSheet")
     }
@@ -372,6 +378,7 @@ class MainActivity : AppCompatActivity() {
                 val hcManager = com.perspectivelive.wallpaper.service.HealthConnectManager(this@MainActivity)
                 val data = hcManager.fetchAggregateData(prefs.healthMetric, startDate, endDate)
                 val cacheManager = com.perspectivelive.wallpaper.data.HealthCacheManager(this@MainActivity)
+                cacheManager.clearCache()
                 cacheManager.saveHealthCache(data)
                 launchDayCounterWallpaper()
             }
