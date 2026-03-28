@@ -7,6 +7,9 @@ import android.text.StaticLayout
 import android.text.TextPaint
 import android.text.Layout
 import android.os.Build
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.RelativeSizeSpan
 import com.perspectivelive.wallpaper.data.ColorScheme
 import com.perspectivelive.wallpaper.data.GridConfig
 import com.perspectivelive.wallpaper.data.GridState
@@ -128,7 +131,7 @@ class CanvasRenderer(
         }
 
         paint.color = color
-        var drawnText: String? = null
+        var drawnText: CharSequence? = null
 
         if (p.dotIndex == gridState.currentIndex) {
             paint.alpha = (255 * p.currentItemOpacity).toInt()
@@ -178,17 +181,28 @@ class CanvasRenderer(
         }
     }
 
-    private fun formatHealthText(value: Float, metric: String): String {
-        return when (metric) {
+    private fun formatHealthText(value: Float, metric: String): CharSequence {
+        val (text, suffix) = when (metric) {
             "STEPS" -> {
-                if (value >= 1000) String.format("%.1fk", value / 1000f)
-                else value.toInt().toString()
+                if (value >= 1000) Pair(String.format("%.1f", value / 1000f), "k")
+                else Pair(value.toInt().toString(), "")
             }
-            "CALORIES" -> "${value.toInt()}kcal"
-            "DISTANCE" -> String.format("%.1fkm", value)
-            "SLEEP" -> String.format("%.1fh", value)
-            else -> value.toInt().toString()
+            "CALORIES" -> Pair(value.toInt().toString(), " kcal")
+            "DISTANCE" -> Pair(String.format("%.1f", value), " km")
+            "SLEEP" -> Pair(String.format("%.1f", value), "h")
+            else -> Pair(value.toInt().toString(), "")
         }
+
+        if (suffix.isEmpty()) return text
+
+        val spannable = SpannableString(text + suffix)
+        spannable.setSpan(
+            RelativeSizeSpan(0.6f),
+            text.length,
+            spannable.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        return spannable
     }
 
     fun updateGridState(newState: GridState) {

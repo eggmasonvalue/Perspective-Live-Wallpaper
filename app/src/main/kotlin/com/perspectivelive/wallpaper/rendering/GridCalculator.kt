@@ -40,24 +40,16 @@ object GridCalculator {
             )
         }
 
-        // Account for system navigation bar (approx 48dp -> 144px for density 3.0)
-        // Hardcoding a top padding and bottom padding shift can fix visual centering issues
-        // Since we don't have direct WindowInsets from WallpaperService without WindowManager,
-        // we can adjust the visual center slightly upwards to compensate for the bottom navigation bar.
-        val statusBarHeight = (screenHeight * 0.04f).toInt()
-        val navigationBarHeight = (screenHeight * 0.08f).toInt()
-
-        val visualHeight = screenHeight - statusBarHeight - navigationBarHeight
-
-        val aspectRatio = screenWidth.toFloat() / visualHeight.toFloat()
+        val aspectRatio = screenWidth.toFloat() / screenHeight.toFloat()
 
         // Find optimal rows/columns that match screen aspect ratio
         var bestRows = 1
         var bestCols = totalDots
         var bestRatioDiff = Float.MAX_VALUE
 
-        for (rows in 1..totalDots) {
-            val cols = ceil(totalDots.toFloat() / rows).toInt()
+        // Iterate by columns to get exact rows
+        for (cols in 1..totalDots) {
+            val rows = ceil(totalDots.toFloat() / cols).toInt()
             val gridRatio = cols.toFloat() / rows.toFloat()
             val ratioDiff = abs(gridRatio - aspectRatio)
 
@@ -67,16 +59,15 @@ object GridCalculator {
                 bestCols = cols
             }
 
-            // Optimization: stop early if we're getting worse
-            if (rows > sqrt(totalDots.toDouble()) * 1.5) break
+            if (cols > sqrt(totalDots.toDouble()) * 2.0) break
         }
 
         // Calculate dot size with margins
         val horizontalMargin = (screenWidth * marginPercent).toInt()
-        val verticalMargin = (visualHeight * marginPercent).toInt()
+        val verticalMargin = (screenHeight * marginPercent).toInt()
 
         val usableWidth = screenWidth - (2 * horizontalMargin)
-        val usableHeight = visualHeight - (2 * verticalMargin)
+        val usableHeight = screenHeight - (2 * verticalMargin)
 
         // Calculate maximum dot size that fits
         val spacingPercent = 0.1f  // 10% spacing between dots
@@ -90,12 +81,14 @@ object GridCalculator {
 
         val spacing = dotSize * spacingPercent
 
-        // Calculate offsets to center the grid within the visual area
+        // The key to exact vertical centering:
+        // 1. Grid width/height derived directly from bestCols/bestRows
+        // 2. Offsets derived directly from screenWidth/screenHeight, taking the exact empty space
         val gridWidth = (bestCols * dotSize) + ((bestCols - 1) * spacing)
         val gridHeight = (bestRows * dotSize) + ((bestRows - 1) * spacing)
 
         val offsetX = (screenWidth - gridWidth) / 2f
-        val offsetY = statusBarHeight + (visualHeight - gridHeight) / 2f
+        val offsetY = (screenHeight - gridHeight) / 2f
 
         return GridConfig(
             rows = bestRows,
