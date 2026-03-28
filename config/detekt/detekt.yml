@@ -127,10 +127,10 @@ complexity:
     active: true
     threshold: 600
   LongMethod:
-    active: false
+    active: true
     threshold: 60
   LongParameterList:
-    active: false
+    active: true
     functionThreshold: 6
     constructorThreshold: 7
     ignoreDefaultParameters: false
@@ -144,7 +144,7 @@ complexity:
     threshold: 3
     ignoreArgumentsMatchingNames: false
   NestedBlockDepth:
-    active: false
+    active: true
     threshold: 4
   NestedScopeFunctions:
     active: false
@@ -215,7 +215,7 @@ empty-blocks:
   EmptyForBlock:
     active: true
   EmptyFunctionBlock:
-    active: false
+    active: true
     ignoreOverridden: false
   EmptyIfBlock:
     active: true
@@ -296,7 +296,7 @@ exceptions:
       - 'Throwable'
     allowedExceptionNameRegex: '_|(ignore|expected).*'
   TooGenericExceptionThrown:
-    active: false
+    active: true
     exceptionNames:
       - 'Error'
       - 'Exception'
@@ -459,7 +459,7 @@ potential-bugs:
   InvalidRange:
     active: true
   IteratorHasNextCallsNextMethod:
-    active: false
+    active: true
   IteratorNotThrowingNoSuchElementException:
     active: true
   LateinitUsage:

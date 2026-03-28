@@ -83,26 +83,17 @@ class SettingsViewModel(private val preferencesManager: PreferencesManager) : Vi
         _userPreferences.value = current.copy(expectedLifespan = lifespan)
     }
 
-    fun updateColorScheme(
-        schemeId: String,
-        shapeId: String,
-        scale: Float,
-        paddingScale: Float = 0.05f,
-        pulsePeriodMs: Long = 2000L,
-        healthMetric: String = com.perspectivelive.wallpaper.service.HealthConnectManager.METRIC_NONE,
-        healthGoal: Float = 10000f,
-        showStatOverlay: Boolean = false
-    ) {
+    fun updateColorScheme(config: com.perspectivelive.wallpaper.data.StyleConfig) {
         val current = _userPreferences.value ?: return
         _userPreferences.value = current.copy(
-            colorSchemeId = schemeId,
-            unitShapeId = shapeId,
-            unitScale = scale,
-            containerPaddingScale = paddingScale,
-            pulsePeriodMs = pulsePeriodMs,
-            healthMetric = healthMetric,
-            healthMetricGoal = healthGoal,
-            showStatOverlay = showStatOverlay
+            colorSchemeId = config.schemeId,
+            unitShapeId = config.shapeId,
+            unitScale = config.scale,
+            containerPaddingScale = config.paddingScale,
+            pulsePeriodMs = config.pulsePeriodMs,
+            healthMetric = config.healthMetric,
+            healthMetricGoal = config.healthGoal,
+            showStatOverlay = config.showStatOverlay
         )
     }
 

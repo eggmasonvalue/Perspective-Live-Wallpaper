@@ -138,8 +138,12 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            override fun onTabUnselected(tab: TabLayout.Tab?) {}
-            override fun onTabReselected(tab: TabLayout.Tab?) {}
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+                // No action needed on unselect
+            }
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+                // No action needed on reselect
+            }
         })
     }
 
@@ -253,18 +257,19 @@ class MainActivity : AppCompatActivity() {
     private fun showColorSchemeDialog() {
         val prefs = viewModel.userPreferences.value ?: return
 
-        val bottomSheet = StyleSelectionBottomSheet.newInstance(
-            prefs.colorSchemeId,
-            prefs.unitShapeId,
-            prefs.unitScale,
-            prefs.containerPaddingScale,
-            prefs.pulsePeriodMs,
-            prefs.healthMetric,
-            prefs.healthMetricGoal,
-            prefs.showStatOverlay
+        val config = com.perspectivelive.wallpaper.data.StyleConfig(
+            schemeId = prefs.colorSchemeId,
+            shapeId = prefs.unitShapeId,
+            scale = prefs.unitScale,
+            paddingScale = prefs.containerPaddingScale,
+            pulsePeriodMs = prefs.pulsePeriodMs,
+            healthMetric = prefs.healthMetric,
+            healthGoal = prefs.healthMetricGoal,
+            showStatOverlay = prefs.showStatOverlay
         )
-        bottomSheet.setOnStyleAppliedListener { scheme, shapeId, scale, padding, pulsePeriod, metric, goal, overlay ->
-            viewModel.updateColorScheme(scheme.id, shapeId, scale, padding, pulsePeriod, metric, goal, overlay)
+        val bottomSheet = StyleSelectionBottomSheet.newInstance(config)
+        bottomSheet.setOnStyleAppliedListener { scheme, newConfig ->
+            viewModel.updateColorScheme(newConfig)
         }
         bottomSheet.show(supportFragmentManager, "StyleSelectionBottomSheet")
     }
@@ -351,18 +356,19 @@ class MainActivity : AppCompatActivity() {
     private fun showDayCounterColorSchemeDialog() {
         val prefs = viewModel.userPreferences.value ?: return
 
-        val bottomSheet = StyleSelectionBottomSheet.newInstance(
-            prefs.colorSchemeId,
-            prefs.unitShapeId,
-            prefs.unitScale,
-            prefs.containerPaddingScale,
-            prefs.pulsePeriodMs,
-            prefs.healthMetric,
-            prefs.healthMetricGoal,
-            prefs.showStatOverlay
+        val config = com.perspectivelive.wallpaper.data.StyleConfig(
+            schemeId = prefs.colorSchemeId,
+            shapeId = prefs.unitShapeId,
+            scale = prefs.unitScale,
+            paddingScale = prefs.containerPaddingScale,
+            pulsePeriodMs = prefs.pulsePeriodMs,
+            healthMetric = prefs.healthMetric,
+            healthGoal = prefs.healthMetricGoal,
+            showStatOverlay = prefs.showStatOverlay
         )
-        bottomSheet.setOnStyleAppliedListener { scheme, shapeId, scale, padding, pulsePeriod, metric, goal, overlay ->
-            viewModel.updateColorScheme(scheme.id, shapeId, scale, padding, pulsePeriod, metric, goal, overlay)
+        val bottomSheet = StyleSelectionBottomSheet.newInstance(config)
+        bottomSheet.setOnStyleAppliedListener { scheme, newConfig ->
+            viewModel.updateColorScheme(newConfig)
         }
         bottomSheet.show(supportFragmentManager, "StyleSelectionBottomSheet")
     }

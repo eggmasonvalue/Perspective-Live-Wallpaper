@@ -58,8 +58,12 @@ class ColorPickerDialog(
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 updateColor()
             }
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                // Not needed for color updates
+            }
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                // Not needed for color updates
+            }
         }
 
         redSeekBar.max = 255

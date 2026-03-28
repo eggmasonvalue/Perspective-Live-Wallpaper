@@ -44,8 +44,11 @@ class HealthConnectManager(private val context: Context) {
             val client = HealthConnectClient.getOrCreate(context)
             val granted = client.permissionController.getGrantedPermissions()
             granted.contains(permission)
-        } catch (e: Exception) {
-            Log.e(TAG, "Error checking permission", e)
+        } catch (e: IllegalStateException) {
+            Log.e(TAG, "Health Connect Client not available", e)
+            false
+        } catch (e: SecurityException) {
+            Log.e(TAG, "Error checking permission due to security", e)
             false
         }
     }
@@ -65,63 +68,75 @@ class HealthConnectManager(private val context: Context) {
             val timeRangeFilter = TimeRangeFilter.between(startDateTime, endDateTime)
 
             when (metric) {
-                METRIC_STEPS -> {
-                    val request = AggregateGroupByPeriodRequest(
-                        metrics = setOf(StepsRecord.COUNT_TOTAL),
-                        timeRangeFilter = timeRangeFilter,
-                        timeRangeSlicer = Period.ofDays(1)
-                    )
-                    val response = client.aggregateGroupByPeriod(request)
-                    for (bucket in response) {
-                        val date = bucket.startTime.atZone(ZoneId.systemDefault()).toLocalDate()
-                        val steps = bucket.result[StepsRecord.COUNT_TOTAL] ?: 0L
-                        result[date] = steps.toFloat()
-                    }
-                }
-                METRIC_CALORIES -> {
-                    val request = AggregateGroupByPeriodRequest(
-                        metrics = setOf(TotalCaloriesBurnedRecord.ENERGY_TOTAL),
-                        timeRangeFilter = timeRangeFilter,
-                        timeRangeSlicer = Period.ofDays(1)
-                    )
-                    val response = client.aggregateGroupByPeriod(request)
-                    for (bucket in response) {
-                        val date = bucket.startTime.atZone(ZoneId.systemDefault()).toLocalDate()
-                        val kcal = bucket.result[TotalCaloriesBurnedRecord.ENERGY_TOTAL]?.inKilocalories ?: 0.0
-                        result[date] = kcal.toFloat()
-                    }
-                }
-                METRIC_DISTANCE -> {
-                    val request = AggregateGroupByPeriodRequest(
-                        metrics = setOf(DistanceRecord.DISTANCE_TOTAL),
-                        timeRangeFilter = timeRangeFilter,
-                        timeRangeSlicer = Period.ofDays(1)
-                    )
-                    val response = client.aggregateGroupByPeriod(request)
-                    for (bucket in response) {
-                        val date = bucket.startTime.atZone(ZoneId.systemDefault()).toLocalDate()
-                        val meters = bucket.result[DistanceRecord.DISTANCE_TOTAL]?.inMeters ?: 0.0
-                        result[date] = (meters / 1000.0).toFloat()
-                    }
-                }
-                METRIC_SLEEP -> {
-                    val request = AggregateGroupByPeriodRequest(
-                        metrics = setOf(SleepSessionRecord.SLEEP_DURATION_TOTAL),
-                        timeRangeFilter = timeRangeFilter,
-                        timeRangeSlicer = Period.ofDays(1)
-                    )
-                    val response = client.aggregateGroupByPeriod(request)
-                    for (bucket in response) {
-                        val date = bucket.startTime.atZone(ZoneId.systemDefault()).toLocalDate()
-                        val durationMillis = bucket.result[SleepSessionRecord.SLEEP_DURATION_TOTAL]?.toMillis() ?: 0L
-                        result[date] = (durationMillis / (1000f * 60f * 60f))
-                    }
-                }
+                METRIC_STEPS -> fetchSteps(client, timeRangeFilter, result)
+                METRIC_CALORIES -> fetchCalories(client, timeRangeFilter, result)
+                METRIC_DISTANCE -> fetchDistance(client, timeRangeFilter, result)
+                METRIC_SLEEP -> fetchSleep(client, timeRangeFilter, result)
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error fetching data", e)
+        } catch (e: SecurityException) {
+            Log.e(TAG, "SecurityException fetching data", e)
+        } catch (e: IllegalStateException) {
+            Log.e(TAG, "IllegalStateException fetching data", e)
+        } catch (e: android.os.RemoteException) {
+            Log.e(TAG, "RemoteException fetching data", e)
         }
 
         return result
+    }
+
+    private suspend fun fetchSteps(client: HealthConnectClient, filter: TimeRangeFilter, result: MutableMap<LocalDate, Float>) {
+        val request = AggregateGroupByPeriodRequest(
+            metrics = setOf(StepsRecord.COUNT_TOTAL),
+            timeRangeFilter = filter,
+            timeRangeSlicer = Period.ofDays(1)
+        )
+        val response = client.aggregateGroupByPeriod(request)
+        for (bucket in response) {
+            val date = bucket.startTime.atZone(ZoneId.systemDefault()).toLocalDate()
+            val steps = bucket.result[StepsRecord.COUNT_TOTAL] ?: 0L
+            result[date] = steps.toFloat()
+        }
+    }
+
+    private suspend fun fetchCalories(client: HealthConnectClient, filter: TimeRangeFilter, result: MutableMap<LocalDate, Float>) {
+        val request = AggregateGroupByPeriodRequest(
+            metrics = setOf(TotalCaloriesBurnedRecord.ENERGY_TOTAL),
+            timeRangeFilter = filter,
+            timeRangeSlicer = Period.ofDays(1)
+        )
+        val response = client.aggregateGroupByPeriod(request)
+        for (bucket in response) {
+            val date = bucket.startTime.atZone(ZoneId.systemDefault()).toLocalDate()
+            val kcal = bucket.result[TotalCaloriesBurnedRecord.ENERGY_TOTAL]?.inKilocalories ?: 0.0
+            result[date] = kcal.toFloat()
+        }
+    }
+
+    private suspend fun fetchDistance(client: HealthConnectClient, filter: TimeRangeFilter, result: MutableMap<LocalDate, Float>) {
+        val request = AggregateGroupByPeriodRequest(
+            metrics = setOf(DistanceRecord.DISTANCE_TOTAL),
+            timeRangeFilter = filter,
+            timeRangeSlicer = Period.ofDays(1)
+        )
+        val response = client.aggregateGroupByPeriod(request)
+        for (bucket in response) {
+            val date = bucket.startTime.atZone(ZoneId.systemDefault()).toLocalDate()
+            val meters = bucket.result[DistanceRecord.DISTANCE_TOTAL]?.inMeters ?: 0.0
+            result[date] = (meters / 1000.0).toFloat()
+        }
+    }
+
+    private suspend fun fetchSleep(client: HealthConnectClient, filter: TimeRangeFilter, result: MutableMap<LocalDate, Float>) {
+        val request = AggregateGroupByPeriodRequest(
+            metrics = setOf(SleepSessionRecord.SLEEP_DURATION_TOTAL),
+            timeRangeFilter = filter,
+            timeRangeSlicer = Period.ofDays(1)
+        )
+        val response = client.aggregateGroupByPeriod(request)
+        for (bucket in response) {
+            val date = bucket.startTime.atZone(ZoneId.systemDefault()).toLocalDate()
+            val durationMillis = bucket.result[SleepSessionRecord.SLEEP_DURATION_TOTAL]?.toMillis() ?: 0L
+            result[date] = (durationMillis / (1000f * 60f * 60f))
+        }
     }
 }

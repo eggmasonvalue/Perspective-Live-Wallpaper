@@ -61,7 +61,7 @@ class PreferencesManager(context: Context) {
 
         val lastCheckStr = prefs.getString(KEY_LAST_BIRTHDAY_CHECK, null)
         val lastCheck = if (lastCheckStr != null) {
-            try { LocalDate.parse(lastCheckStr) } catch (e: Exception) { null }
+            try { LocalDate.parse(lastCheckStr) } catch (e: java.time.format.DateTimeParseException) { null }
         } else null
 
         val isOnboardingComplete = prefs.getBoolean(KEY_ONBOARDING_COMPLETE, false)
@@ -69,14 +69,14 @@ class PreferencesManager(context: Context) {
         // Day Counter fields
         val eventDateStr = prefs.getString(KEY_EVENT_DATE, null)
         val eventDate = if (eventDateStr != null) {
-            try { LocalDate.parse(eventDateStr) } catch (e: Exception) { null }
+            try { LocalDate.parse(eventDateStr) } catch (e: java.time.format.DateTimeParseException) { null }
         } else null
 
         val eventName = prefs.getString(KEY_EVENT_NAME, null)
 
         val startDateStr = prefs.getString(KEY_COUNTDOWN_START_DATE, null)
         val countdownStartDate = if (startDateStr != null) {
-            try { LocalDate.parse(startDateStr) } catch (e: Exception) { null }
+            try { LocalDate.parse(startDateStr) } catch (e: java.time.format.DateTimeParseException) { null }
         } else null
 
         val isDayCounterOnboardingComplete = prefs.getBoolean(KEY_DAY_COUNTER_ONBOARDING_COMPLETE, false)

@@ -25,19 +25,23 @@ class HealthCacheManager(context: Context) {
         try {
             val allEntries = prefs.all
             for ((key, value) in allEntries) {
-                if (value is Float) {
-                    try {
-                        val date = LocalDate.parse(key)
-                        result[date] = value
-                    } catch (e: Exception) {
-                        Log.w(TAG, "Invalid date format in cache: \$key")
-                    }
-                }
+                parseAndAddEntry(key, value, result)
             }
-        } catch (e: Exception) {
+        } catch (e: ClassCastException) {
             Log.e(TAG, "Error reading health cache", e)
         }
         return result
+    }
+
+    private fun parseAndAddEntry(key: String, value: Any?, result: MutableMap<LocalDate, Float>) {
+        if (value is Float) {
+            try {
+                val date = LocalDate.parse(key)
+                result[date] = value
+            } catch (e: java.time.format.DateTimeParseException) {
+                Log.w(TAG, "Invalid date format in cache: $key", e)
+            }
+        }
     }
 
     /**
@@ -50,8 +54,8 @@ class HealthCacheManager(context: Context) {
                 editor.putFloat(date.toString(), value)
             }
             editor.apply()
-        } catch (e: Exception) {
-            Log.e(TAG, "Error saving health cache", e)
+        } catch (e: SecurityException) {
+            Log.e(TAG, "Error saving health cache due to security/storage issue", e)
         }
     }
 

@@ -70,17 +70,7 @@ class CanvasRenderer(
     }
 
     fun render(canvas: Canvas, currentItemOpacity: Float) {
-        val currentTime = System.currentTimeMillis()
-        // Recompute background color every 10 seconds or if it's the first render
-        if (currentTime - lastBgUpdateMillis > 10_000L || lastBgUpdateMillis == 0L) {
-            val hour = LocalDateTime.now().hour
-            cachedBgColor = if (colorScheme.isDynamic) {
-                ColorUtils.adaptBackgroundForTimeOfDay(colorScheme.backgroundColor, hour)
-            } else {
-                colorScheme.backgroundColor
-            }
-            lastBgUpdateMillis = currentTime
-        }
+        updateBackgroundCache()
         canvas.drawColor(cachedBgColor)
 
         var dotIndex = 0
@@ -103,65 +93,64 @@ class CanvasRenderer(
 
                 val x = startX + col * cellSize + offset
                 val y = startY + row * cellSize + offset
-
-                // Map dot index to an actual date
                 val itemDate = gridState.startDate.plusDays(dotIndex.toLong())
 
-                val color = when {
-                    dotIndex < gridState.pastItems -> colorScheme.pastYearsColor
-                    dotIndex == gridState.currentIndex -> colorScheme.currentYearColor
-                    else -> colorScheme.futureYearsColor
-                }
-
-                paint.color = color
-
-                var drawnText: String? = null
-
-                if (dotIndex == gridState.currentIndex) {
-                    paint.alpha = (255 * currentItemOpacity).toInt()
-
-                    // Always pull today's value if overlay is on
-                    if (showStatOverlay && healthMetric != "NONE" && healthCache != null) {
-                        val value = healthCache?.get(itemDate)
-                        if (value != null) {
-                            drawnText = formatHealthText(value, healthMetric)
-                        }
-                    }
-                } else if (dotIndex < gridState.currentIndex && healthMetric != "NONE" && healthCache != null) {
-                    // Past Day Logic: Modify opacity based on progress
-                    val value = healthCache?.get(itemDate) ?: 0f
-                    val progress = (value / healthGoal).coerceIn(0f, 1f)
-
-                    // Base alpha of 20%, up to 100% of the past color's original alpha
-                    val originalAlpha = Color.alpha(color)
-                    val baseAlpha = (originalAlpha * 0.2f).toInt()
-                    val dynamicAlpha = baseAlpha + ((originalAlpha - baseAlpha) * progress).toInt()
-
-                    paint.alpha = dynamicAlpha
-
-                    if (showStatOverlay) {
-                        drawnText = formatHealthText(value, healthMetric)
-                    }
-                } else {
-                    paint.alpha = Color.alpha(color)
-                }
-
-                shapeDrawer.draw(canvas, x, y, effectiveSize, paint)
-
-                // Draw text overlay if applicable
-                if (drawnText != null) {
-                    // Vertical center offset based on font metrics
-                    val yOffset = -(textPaint.descent() + textPaint.ascent()) / 2f
-                    canvas.drawText(
-                        drawnText,
-                        x + effectiveSize / 2f,
-                        y + effectiveSize / 2f + yOffset,
-                        textPaint
-                    )
-                }
+                val params = RenderItemParams(canvas, dotIndex, x, y, effectiveSize, itemDate, currentItemOpacity)
+                drawGridItem(params)
 
                 dotIndex++
             }
+        }
+    }
+
+    private fun updateBackgroundCache() {
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastBgUpdateMillis > 10_000L || lastBgUpdateMillis == 0L) {
+            val hour = LocalDateTime.now().hour
+            cachedBgColor = if (colorScheme.isDynamic) {
+                ColorUtils.adaptBackgroundForTimeOfDay(colorScheme.backgroundColor, hour)
+            } else {
+                colorScheme.backgroundColor
+            }
+            lastBgUpdateMillis = currentTime
+        }
+    }
+
+    private fun drawGridItem(p: RenderItemParams) {
+        val color = when {
+            p.dotIndex < gridState.pastItems -> colorScheme.pastYearsColor
+            p.dotIndex == gridState.currentIndex -> colorScheme.currentYearColor
+            else -> colorScheme.futureYearsColor
+        }
+
+        paint.color = color
+        var drawnText: String? = null
+
+        if (p.dotIndex == gridState.currentIndex) {
+            paint.alpha = (255 * p.currentItemOpacity).toInt()
+            if (showStatOverlay && healthMetric != "NONE" && healthCache != null) {
+                healthCache?.get(p.itemDate)?.let { value ->
+                    drawnText = formatHealthText(value, healthMetric)
+                }
+            }
+        } else if (p.dotIndex < gridState.currentIndex && healthMetric != "NONE" && healthCache != null) {
+            val value = healthCache?.get(p.itemDate) ?: 0f
+            val progress = (value / healthGoal).coerceIn(0f, 1f)
+
+            val originalAlpha = Color.alpha(color)
+            val baseAlpha = (originalAlpha * 0.2f).toInt()
+            paint.alpha = baseAlpha + ((originalAlpha - baseAlpha) * progress).toInt()
+
+            if (showStatOverlay) drawnText = formatHealthText(value, healthMetric)
+        } else {
+            paint.alpha = Color.alpha(color)
+        }
+
+        shapeDrawer.draw(p.canvas, p.x, p.y, p.size, paint)
+
+        drawnText?.let { text ->
+            val yOffset = -(textPaint.descent() + textPaint.ascent()) / 2f
+            p.canvas.drawText(text, p.x + p.size / 2f, p.y + p.size / 2f + yOffset, textPaint)
         }
     }
 

@@ -46,7 +46,7 @@ class StyleSelectionBottomSheet : BottomSheetDialogFragment() {
     private var selectedHealthGoal: Float = 10000f
     private var selectedShowStatOverlay: Boolean = false
 
-    private var onStyleApplied: ((ColorScheme, String, Float, Float, Long, String, Float, Boolean) -> Unit)? = null
+    private var onStyleApplied: ((ColorScheme, com.perspectivelive.wallpaper.data.StyleConfig) -> Unit)? = null
 
     private val healthPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -166,8 +166,12 @@ class StyleSelectionBottomSheet : BottomSheetDialogFragment() {
         val goalInput = view.findViewById<TextInputEditText>(R.id.goalInputEdit)
         goalInput.setText(selectedHealthGoal.toInt().toString())
         goalInput.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // Not needed for simple float parsing
+            }
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Not needed for simple float parsing
+            }
             override fun afterTextChanged(s: Editable?) {
                 val value = s?.toString()?.toFloatOrNull()
                 if (value != null && value > 0) {
@@ -324,7 +328,17 @@ class StyleSelectionBottomSheet : BottomSheetDialogFragment() {
 
         view.findViewById<Button>(R.id.applyButton).setOnClickListener {
             selectedScheme?.let { scheme ->
-                onStyleApplied?.invoke(scheme, selectedShapeId, selectedScale, selectedPaddingScale, selectedPulsePeriodMs, selectedHealthMetric, selectedHealthGoal, selectedShowStatOverlay)
+                val config = com.perspectivelive.wallpaper.data.StyleConfig(
+                    schemeId = scheme.id,
+                    shapeId = selectedShapeId,
+                    scale = selectedScale,
+                    paddingScale = selectedPaddingScale,
+                    pulsePeriodMs = selectedPulsePeriodMs,
+                    healthMetric = selectedHealthMetric,
+                    healthGoal = selectedHealthGoal,
+                    showStatOverlay = selectedShowStatOverlay
+                )
+                onStyleApplied?.invoke(scheme, config)
             }
             dismiss()
         }
@@ -338,7 +352,7 @@ class StyleSelectionBottomSheet : BottomSheetDialogFragment() {
     /**
      * Sets the callback for when style is applied.
      */
-    fun setOnStyleAppliedListener(listener: (ColorScheme, String, Float, Float, Long, String, Float, Boolean) -> Unit) {
+    fun setOnStyleAppliedListener(listener: (ColorScheme, com.perspectivelive.wallpaper.data.StyleConfig) -> Unit) {
         onStyleApplied = listener
     }
 
@@ -355,28 +369,17 @@ class StyleSelectionBottomSheet : BottomSheetDialogFragment() {
         /**
          * Creates a new instance of the style sheet with initial settings.
          */
-        fun newInstance(
-            initialSchemeId: String?,
-            initialShapeId: String,
-            initialScale: Float,
-            initialPaddingScale: Float = 0.05f,
-            initialPulsePeriodMs: Long = 2000L,
-            initialHealthMetric: String = HealthConnectManager.METRIC_NONE,
-            initialHealthGoal: Float = 10000f,
-            initialShowStatOverlay: Boolean = false
-        ): StyleSelectionBottomSheet {
+        fun newInstance(config: com.perspectivelive.wallpaper.data.StyleConfig): StyleSelectionBottomSheet {
             return StyleSelectionBottomSheet().apply {
                 arguments = Bundle().apply {
-                    if (initialSchemeId != null) {
-                        putString(ARG_INITIAL_SCHEME_ID, initialSchemeId)
-                    }
-                    putString(ARG_INITIAL_SHAPE_ID, initialShapeId)
-                    putFloat(ARG_INITIAL_SCALE, initialScale)
-                    putFloat(ARG_INITIAL_PADDING_SCALE, initialPaddingScale)
-                    putLong(ARG_INITIAL_PULSE_PERIOD_MS, initialPulsePeriodMs)
-                    putString(ARG_INITIAL_HEALTH_METRIC, initialHealthMetric)
-                    putFloat(ARG_INITIAL_HEALTH_GOAL, initialHealthGoal)
-                    putBoolean(ARG_INITIAL_STAT_OVERLAY, initialShowStatOverlay)
+                    putString(ARG_INITIAL_SCHEME_ID, config.schemeId)
+                    putString(ARG_INITIAL_SHAPE_ID, config.shapeId)
+                    putFloat(ARG_INITIAL_SCALE, config.scale)
+                    putFloat(ARG_INITIAL_PADDING_SCALE, config.paddingScale)
+                    putLong(ARG_INITIAL_PULSE_PERIOD_MS, config.pulsePeriodMs)
+                    putString(ARG_INITIAL_HEALTH_METRIC, config.healthMetric)
+                    putFloat(ARG_INITIAL_HEALTH_GOAL, config.healthGoal)
+                    putBoolean(ARG_INITIAL_STAT_OVERLAY, config.showStatOverlay)
                 }
             }
         }
