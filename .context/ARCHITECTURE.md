@@ -16,6 +16,7 @@ The application is split into two main components:
         -   `GridConfig`: Defines layout properties (rows, columns, size, spacing).
         -   `ColorScheme`, `ColorSchemeProvider`, `CustomColorScheme`: Handle color palettes (Iconic, System, Custom).
         -   `DayCounterMode`: Constants for day counter logic.
+        -   `HealthCacheManager`: Persists historical Health Connect data in SharedPreferences.
     -   **`modules`**: Business logic for counting.
         -   `CountdownModule`: Interface for counting logic.
         -   `DayCounterModule`: Logic for Micro tab (days).
@@ -28,7 +29,8 @@ The application is split into two main components:
     -   **`service`**: Android WallpaperServices.
         -   `BaseWallpaperService`: Abstract base class encapsulating common lifecycle and rendering logic.
         -   `LifeCalendarService`: Service for Macro mode (extends BaseWallpaperService). Uses `GridState.calculate` which delegates to `LifeCalendarModule`.
-        -   `DayCounterService`: Service for Micro mode (extends BaseWallpaperService). Uses `DayCounterModule` directly.
+        -   `DayCounterService`: Service for Micro mode (extends BaseWallpaperService). Uses `DayCounterModule` directly. Handles background sync of Health Connect data.
+        -   `HealthConnectManager`: Encapsulates Health Connect API permissions and aggregate data fetching.
         -   `MidnightScheduler`: Schedules daily updates via AlarmManager and BroadcastReceiver.
     -   **`settings`**: UI Layer (MVVM).
         -   `MainActivity`: Host activity.

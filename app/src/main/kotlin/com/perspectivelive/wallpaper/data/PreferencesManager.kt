@@ -40,6 +40,11 @@ class PreferencesManager(context: Context) {
         private const val KEY_UNIT_SCALE = "unit_scale"
         private const val KEY_CONTAINER_PADDING_SCALE = "container_padding_scale"
         private const val KEY_PULSE_PERIOD_MS = "pulse_period_ms"
+
+        // Health Connect keys
+        private const val KEY_HEALTH_METRIC = "health_metric"
+        private const val KEY_HEALTH_GOAL = "health_goal"
+        private const val KEY_SHOW_STAT_OVERLAY = "show_stat_overlay"
     }
 
     /**
@@ -61,7 +66,7 @@ class PreferencesManager(context: Context) {
 
         val lastCheckStr = prefs.getString(KEY_LAST_BIRTHDAY_CHECK, null)
         val lastCheck = if (lastCheckStr != null) {
-            try { LocalDate.parse(lastCheckStr) } catch (e: Exception) { null }
+            try { LocalDate.parse(lastCheckStr) } catch (e: java.time.format.DateTimeParseException) { null }
         } else null
 
         val isOnboardingComplete = prefs.getBoolean(KEY_ONBOARDING_COMPLETE, false)
@@ -69,14 +74,14 @@ class PreferencesManager(context: Context) {
         // Day Counter fields
         val eventDateStr = prefs.getString(KEY_EVENT_DATE, null)
         val eventDate = if (eventDateStr != null) {
-            try { LocalDate.parse(eventDateStr) } catch (e: Exception) { null }
+            try { LocalDate.parse(eventDateStr) } catch (e: java.time.format.DateTimeParseException) { null }
         } else null
 
         val eventName = prefs.getString(KEY_EVENT_NAME, null)
 
         val startDateStr = prefs.getString(KEY_COUNTDOWN_START_DATE, null)
         val countdownStartDate = if (startDateStr != null) {
-            try { LocalDate.parse(startDateStr) } catch (e: Exception) { null }
+            try { LocalDate.parse(startDateStr) } catch (e: java.time.format.DateTimeParseException) { null }
         } else null
 
         val isDayCounterOnboardingComplete = prefs.getBoolean(KEY_DAY_COUNTER_ONBOARDING_COMPLETE, false)
@@ -86,6 +91,9 @@ class PreferencesManager(context: Context) {
         val containerPaddingScale = prefs.getFloat(KEY_CONTAINER_PADDING_SCALE, 0.05f)
         val unitScale = prefs.getFloat(KEY_UNIT_SCALE, 1.0f)
         val pulsePeriodMs = prefs.getLong(KEY_PULSE_PERIOD_MS, 2000L)
+        val healthMetric = prefs.getString(KEY_HEALTH_METRIC, "NONE") ?: "NONE"
+        val healthGoal = prefs.getFloat(KEY_HEALTH_GOAL, 10000f)
+        val showStatOverlay = prefs.getBoolean(KEY_SHOW_STAT_OVERLAY, false)
 
         return UserPreferences(
             birthDate = birthDate,
@@ -101,7 +109,10 @@ class PreferencesManager(context: Context) {
             unitShapeId = unitShapeId,
             unitScale = unitScale,
             containerPaddingScale = containerPaddingScale,
-            pulsePeriodMs = pulsePeriodMs
+            pulsePeriodMs = pulsePeriodMs,
+            healthMetric = healthMetric,
+            healthMetricGoal = healthGoal,
+            showStatOverlay = showStatOverlay
         )
     }
 
@@ -136,6 +147,11 @@ class PreferencesManager(context: Context) {
             putString(KEY_UNIT_SHAPE_ID, preferences.unitShapeId)
             putFloat(KEY_UNIT_SCALE, preferences.unitScale)
             putLong(KEY_PULSE_PERIOD_MS, preferences.pulsePeriodMs)
+
+            // Health fields
+            putString(KEY_HEALTH_METRIC, preferences.healthMetric)
+            putFloat(KEY_HEALTH_GOAL, preferences.healthMetricGoal)
+            putBoolean(KEY_SHOW_STAT_OVERLAY, preferences.showStatOverlay)
 
             apply()
         }

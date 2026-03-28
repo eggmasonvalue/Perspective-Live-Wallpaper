@@ -25,6 +25,9 @@ Focus your energy on the immediate future.
     - **"There is no tomorrow"**: one visible shape for today (breathing).
     - **"You vs. You (yesterday)"**: Two visible shapes - one for today (breathing) and one for yesterday.
     - **"Custom"**: classic deadline tracking.
+- **Health Connect Integration**: Link your daily physical effort directly into the grid.
+    - **Metrics**: Track **Steps**, **Calories**, **Distance**, or **Sleep**.
+    - **Visualization**: Past days automatically map their fill opacity to your daily goal progress. The current day retains its signature pulse animation. Add an optional, subtle typographic overlay to see the raw metric inside the shape.
 
 ## ✨ Features
 

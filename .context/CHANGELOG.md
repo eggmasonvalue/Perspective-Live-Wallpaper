@@ -1,6 +1,9 @@
 # Changelog
 
 ## [Unreleased]
+n### Added
+-   **Health Connect**: The "Micro" (Day Counter) mode now integrates with Android Health Connect to display daily aggregate metrics (Steps, Calories, Distance, Sleep) as varying opacities and subtle text overlays for past days, while retaining the signature breathing animation for the current day.
+-   **Color Presets**: Added four new health-optimized color schemes (Steps Green, Vitality Orange, Distance Purple, Deep Sleep Blue) to the single unified horizontal carousel.
 
 ### Fixed
 -   **CI/CD**: Fixed GitHub Actions release workflow permissions to resolve 403 error.

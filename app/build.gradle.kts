@@ -49,5 +49,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
     implementation("androidx.activity:activity-ktx:1.8.2")
+
+    // Health Connect
+    implementation("androidx.health.connect:connect-client:1.1.0-alpha07")
+
     testImplementation("junit:junit:4.13.2")
 }

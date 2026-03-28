@@ -47,8 +47,9 @@ object GridCalculator {
         var bestCols = totalDots
         var bestRatioDiff = Float.MAX_VALUE
 
-        for (rows in 1..totalDots) {
-            val cols = ceil(totalDots.toFloat() / rows).toInt()
+        // Iterate by columns to get exact rows
+        for (cols in 1..totalDots) {
+            val rows = ceil(totalDots.toFloat() / cols).toInt()
             val gridRatio = cols.toFloat() / rows.toFloat()
             val ratioDiff = abs(gridRatio - aspectRatio)
 
@@ -58,8 +59,7 @@ object GridCalculator {
                 bestCols = cols
             }
 
-            // Optimization: stop early if we're getting worse
-            if (rows > sqrt(totalDots.toDouble()) * 1.5) break
+            if (cols > sqrt(totalDots.toDouble()) * 2.0) break
         }
 
         // Calculate dot size with margins
@@ -81,7 +81,9 @@ object GridCalculator {
 
         val spacing = dotSize * spacingPercent
 
-        // Calculate offsets to center the grid
+        // The key to exact vertical centering:
+        // 1. Grid width/height derived directly from bestCols/bestRows
+        // 2. Offsets derived directly from screenWidth/screenHeight, taking the exact empty space
         val gridWidth = (bestCols * dotSize) + ((bestCols - 1) * spacing)
         val gridHeight = (bestRows * dotSize) + ((bestRows - 1) * spacing)
 

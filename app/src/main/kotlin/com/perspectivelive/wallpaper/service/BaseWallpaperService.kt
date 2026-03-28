@@ -1,6 +1,7 @@
 package com.perspectivelive.wallpaper.service
 
 import android.app.WallpaperColors
+import kotlinx.coroutines.launch
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -94,7 +95,7 @@ abstract class BaseWallpaperService : WallpaperService() {
                 super.onSurfaceChanged(holder, format, width, height)
                 surfaceWidth = width
                 surfaceHeight = height
-                initializeRenderer()
+                initializeRendererAsync()
             } catch (e: Exception) {
                 Log.e(TAG, "Error in onSurfaceChanged", e)
             }
@@ -132,7 +133,7 @@ abstract class BaseWallpaperService : WallpaperService() {
                 if (visible) {
                     animator.reset()
                     if (!isSafeMode) {
-                        initializeRenderer()
+                        initializeRendererAsync()
                     }
                     scheduleNextFrame()
                     scheduler.scheduleMidnightCheck()
@@ -167,12 +168,25 @@ abstract class BaseWallpaperService : WallpaperService() {
         override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
             // Re-initialize renderer if style/content preferences change
             handler.post {
-                initializeRenderer()
+                initializeRendererAsync()
                 scheduleNextFrame()
             }
         }
 
-        protected open fun initializeRenderer() {
+        protected open fun initializeRendererAsync() {
+            kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.IO).launch {
+                val prefs = preferencesManager.getPreferences()
+                var cache: Map<java.time.LocalDate, Float>? = null
+                if (prefs.healthMetric != com.perspectivelive.wallpaper.service.HealthConnectManager.METRIC_NONE) {
+                    cache = com.perspectivelive.wallpaper.data.HealthCacheManager(this@BaseWallpaperService).getHealthCache()
+                }
+                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                    initializeRenderer(cache)
+                }
+            }
+        }
+
+        protected open fun initializeRenderer(healthCache: Map<java.time.LocalDate, Float>? = null) {
             try {
                 if (!hasPreferences()) {
                     drawPlaceholder()
@@ -197,6 +211,14 @@ abstract class BaseWallpaperService : WallpaperService() {
                     preferences.containerPaddingScale
                 )
 
+                if (preferences.healthMetric != com.perspectivelive.wallpaper.service.HealthConnectManager.METRIC_NONE) {
+                    renderer?.updateHealthData(
+                        preferences.healthMetric,
+                        preferences.healthMetricGoal,
+                        preferences.showStatOverlay,
+                        healthCache
+                    )
+                }
                 consecutiveErrors = 0
                 isSafeMode = false
 

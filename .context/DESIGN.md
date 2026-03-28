@@ -10,6 +10,7 @@
 - [x] "You vs. You" (Vs Yesterday) preset.
 - [x] Custom Event countdown.
 - [x] Dynamic date calculation logic.
+- [x] Health Connect Integration (Steps, Calories, Distance, Sleep).
 
 ## Customization
 - [x] Shapes: Circle, Rounded Square, Rhombus.

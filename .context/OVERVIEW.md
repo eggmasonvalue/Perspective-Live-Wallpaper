@@ -4,7 +4,7 @@
 
 ## Core Features
 - **Macro (Life Calendar)**: Visualizes life in years on a grid.
-- **Micro (Day Counter)**: Visualizes days until an event or "No Tomorrow" mode.
+- **Micro (Day Counter)**: Visualizes days until an event or "No Tomorrow" mode. Integrates seamlessly with Android Health Connect to track and visualize daily metrics (Steps, Calories, Distance, Sleep) directly within the geometric timeline.
 - **Deep Customization**: Shapes (Circle, Rounded Square, Rhombus), Density, Padding, Colors (Iconic Scheme and more).
 - **Material You**: Adapts to system colors (Monet).
 - **Typography**: Uses the **Geist** typeface for a modern, crisp look.
@@ -25,5 +25,6 @@
 - `androidx.lifecycle:lifecycle-viewmodel-ktx`
 - `androidx.lifecycle:lifecycle-livedata-ktx`
 - `androidx.activity:activity-ktx`
+- `androidx.health.connect:connect-client`
 - `junit:junit:4.13.2` (Test)
 - `io.gitlab.arturbosch.detekt` (Linting)

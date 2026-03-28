@@ -2,8 +2,10 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/colorCard"
-    android:layout_width="match_parent"
+    android:layout_width="140dp"
     android:layout_height="wrap_content"
+    android:layout_marginEnd="16dp"
+    android:layout_marginBottom="8dp"
     android:clickable="true"
     android:focusable="true"
     app:cardElevation="2dp"
@@ -20,66 +22,21 @@
             android:orientation="vertical"
             android:padding="12dp">
 
-            <!-- 4-Box Miniature Wallpaper Preview (2x2 grid) -->
+            <!-- 16x9 Miniature Wallpaper Preview -->
             <FrameLayout
                 android:id="@+id/previewContainer"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
+                android:layout_height="160dp"
                 android:layout_marginBottom="12dp"
-                android:padding="12dp">
+                android:padding="8dp">
 
-                <!-- 2x2 Grid: Top-left, Top-right, Bottom-left (past/future), Bottom-right (current) -->
-                <LinearLayout
+                <com.perspectivelive.wallpaper.settings.PreviewCanvasView
+                    android:id="@+id/previewCanvas"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical">
-
-                    <!-- Top Row: 2 past/future boxes -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="4dp">
-
-                        <View
-                            android:id="@+id/boxTopLeft"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:layout_marginEnd="4dp" />
-
-                        <View
-                            android:id="@+id/boxTopRight"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-                    </LinearLayout>
-
-                    <!-- Bottom Row: 1 past/future (left), 1 current (right) -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:orientation="horizontal">
-
-                        <View
-                            android:id="@+id/boxBottomLeft"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:layout_marginEnd="4dp" />
-
-                        <View
-                            android:id="@+id/boxBottomRight"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1" />
-                    </LinearLayout>
-                </LinearLayout>
+                    android:layout_gravity="center" />
             </FrameLayout>
 
-            <!-- Scheme Name -->
             <TextView
                 android:id="@+id/schemeName"
                 android:layout_width="match_parent"

@@ -14,6 +14,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import com.perspectivelive.wallpaper.service.HealthConnectManager
+import com.perspectivelive.wallpaper.data.HealthCacheManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.tabs.TabLayout
 import com.perspectivelive.wallpaper.R
@@ -134,8 +138,12 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            override fun onTabUnselected(tab: TabLayout.Tab?) {}
-            override fun onTabReselected(tab: TabLayout.Tab?) {}
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+                // No action needed on unselect
+            }
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+                // No action needed on reselect
+            }
         })
     }
 
@@ -249,15 +257,19 @@ class MainActivity : AppCompatActivity() {
     private fun showColorSchemeDialog() {
         val prefs = viewModel.userPreferences.value ?: return
 
-        val bottomSheet = StyleSelectionBottomSheet.newInstance(
-            prefs.colorSchemeId,
-            prefs.unitShapeId,
-            prefs.unitScale,
-            prefs.containerPaddingScale,
-            prefs.pulsePeriodMs
+        val config = com.perspectivelive.wallpaper.data.StyleConfig(
+            schemeId = prefs.colorSchemeId,
+            shapeId = prefs.unitShapeId,
+            scale = prefs.unitScale,
+            paddingScale = prefs.containerPaddingScale,
+            pulsePeriodMs = prefs.pulsePeriodMs,
+            healthMetric = prefs.healthMetric,
+            healthGoal = prefs.healthMetricGoal,
+            showStatOverlay = prefs.showStatOverlay
         )
-        bottomSheet.setOnStyleAppliedListener { scheme, shapeId, scale, padding, pulsePeriod ->
-            viewModel.updateColorScheme(scheme.id, shapeId, scale, padding, pulsePeriod)
+        val bottomSheet = StyleSelectionBottomSheet.newInstance(config)
+        bottomSheet.setOnStyleAppliedListener { scheme, newConfig ->
+            viewModel.updateColorScheme(newConfig)
         }
         bottomSheet.show(supportFragmentManager, "StyleSelectionBottomSheet")
     }
@@ -344,20 +356,48 @@ class MainActivity : AppCompatActivity() {
     private fun showDayCounterColorSchemeDialog() {
         val prefs = viewModel.userPreferences.value ?: return
 
-        val bottomSheet = StyleSelectionBottomSheet.newInstance(
-            prefs.colorSchemeId,
-            prefs.unitShapeId,
-            prefs.unitScale,
-            prefs.containerPaddingScale,
-            prefs.pulsePeriodMs
+        val config = com.perspectivelive.wallpaper.data.StyleConfig(
+            schemeId = prefs.colorSchemeId,
+            shapeId = prefs.unitShapeId,
+            scale = prefs.unitScale,
+            paddingScale = prefs.containerPaddingScale,
+            pulsePeriodMs = prefs.pulsePeriodMs,
+            healthMetric = prefs.healthMetric,
+            healthGoal = prefs.healthMetricGoal,
+            showStatOverlay = prefs.showStatOverlay
         )
-        bottomSheet.setOnStyleAppliedListener { scheme, shapeId, scale, padding, pulsePeriod ->
-            viewModel.updateColorScheme(scheme.id, shapeId, scale, padding, pulsePeriod)
+        val bottomSheet = StyleSelectionBottomSheet.newInstance(config)
+        bottomSheet.setOnStyleAppliedListener { scheme, newConfig ->
+            viewModel.updateColorScheme(newConfig)
         }
         bottomSheet.show(supportFragmentManager, "StyleSelectionBottomSheet")
     }
 
     private fun saveAndLaunchDayCounterPicker() {
+        viewModel.savePreferences()
+
+        val prefs = viewModel.userPreferences.value ?: return
+        if (prefs.healthMetric != com.perspectivelive.wallpaper.service.HealthConnectManager.METRIC_NONE) {
+            val startDate = prefs.countdownStartDate ?: java.time.LocalDate.now()
+            val endDate = java.time.LocalDate.now()
+            lifecycleScope.launch {
+                try {
+                    val hcManager = com.perspectivelive.wallpaper.service.HealthConnectManager(this@MainActivity)
+                    val data = hcManager.fetchAggregateData(prefs.healthMetric, startDate, endDate)
+                    val cacheManager = com.perspectivelive.wallpaper.data.HealthCacheManager(this@MainActivity)
+                    cacheManager.clearCache()
+                    cacheManager.saveHealthCache(data)
+                } catch (e: IllegalStateException) {
+                    // Health Connect not available, ignore and just launch
+                }
+                launchDayCounterWallpaper()
+            }
+        } else {
+            launchDayCounterWallpaper()
+        }
+    }
+
+    private fun launchDayCounterWallpaper() {
         viewModel.savePreferences()
 
         val intent = Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER).apply {

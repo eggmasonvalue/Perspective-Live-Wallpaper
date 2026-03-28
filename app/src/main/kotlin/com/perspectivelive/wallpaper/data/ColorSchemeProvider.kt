@@ -53,6 +53,44 @@ object ColorSchemeProvider {
             isDynamic = true
         ),
 
+        // Health Connect Presets (4)
+        ColorScheme(
+            id = "health_steps",
+            name = "Steps Green",
+            backgroundColor = 0xFFF1F8E9.toInt(),
+            pastYearsColor = 0xFFAED581.toInt(),
+            currentYearColor = 0xFF558B2F.toInt(),
+            futureYearsColor = 0x4DAED581.toInt(),
+            isDynamic = false
+        ),
+        ColorScheme(
+            id = "health_calories",
+            name = "Vitality Orange",
+            backgroundColor = 0xFFFFF3E0.toInt(),
+            pastYearsColor = 0xFFFFB74D.toInt(),
+            currentYearColor = 0xFFE65100.toInt(),
+            futureYearsColor = 0x4DFFB74D.toInt(),
+            isDynamic = false
+        ),
+        ColorScheme(
+            id = "health_distance",
+            name = "Distance Purple",
+            backgroundColor = 0xFFF3E5F5.toInt(),
+            pastYearsColor = 0xFFBA68C8.toInt(),
+            currentYearColor = 0xFF6A1B9A.toInt(),
+            futureYearsColor = 0x4DBA68C8.toInt(),
+            isDynamic = false
+        ),
+        ColorScheme(
+            id = "health_sleep",
+            name = "Deep Sleep Blue",
+            backgroundColor = 0xFFE3F2FD.toInt(),
+            pastYearsColor = 0xFF64B5F6.toInt(),
+            currentYearColor = 0xFF1565C0.toInt(),
+            futureYearsColor = 0x4D64B5F6.toInt(),
+            isDynamic = false
+        ),
+
         // Dark Themes (5)
         ColorScheme(
             id = "midnight_ocean",
@@ -119,9 +157,19 @@ object ColorSchemeProvider {
     
     /**
      * Returns all available schemes.
+     * Orders them: Default (Iconic) -> Health -> Others
      */
     fun getAllSchemes(): List<ColorScheme> {
-        return schemes
+        val iconic = schemes.find { it.id == "sage_garden" }
+        val health = schemes.filter { it.id.startsWith("health_") }
+        val rest = schemes.filter { it.id != "sage_garden" && !it.id.startsWith("health_") }
+
+        val ordered = mutableListOf<ColorScheme>()
+        if (iconic != null) ordered.add(iconic)
+        ordered.addAll(health)
+        ordered.addAll(rest)
+
+        return ordered
     }
     
     /**
