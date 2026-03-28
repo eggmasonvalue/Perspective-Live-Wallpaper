@@ -277,7 +277,7 @@ nav a {
 /* Micro Mode Cards */
 .micro-modes {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 cards now */
+    grid-template-columns: repeat(2, 1fr); /* 4 cards now, 2x2 grid */
     gap: 1rem;
     margin-top: 2rem;
 }
@@ -505,4 +505,88 @@ footer .container {
         flex-direction: column;
         gap: 1rem;
     }
+}
+
+/* Health Connect Highlight Card */
+.mode-card.highlight-card {
+    border-color: var(--primary-color);
+    background: rgba(232, 90, 79, 0.05); /* very light primary color */
+}
+
+.mode-card.highlight-card h4 {
+    color: var(--primary-color);
+}
+
+/* Health Connect Visual Simulation Specifics */
+.rhombus-grid {
+    display: grid;
+    gap: 8px; /* Slightly tighter gap for rhombus to fit */
+    width: 80%; /* Shrink width to fit rhombus rotation */
+    margin: 0 auto;
+    padding: 10px;
+    /* Basic alignment */
+    justify-items: center;
+    align-items: center;
+}
+
+.health-shape {
+    width: 25px;
+    height: 25px;
+    transform: rotate(45deg); /* Rhombus shape */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px; /* Slight rounded corners for rhombus */
+    transition: opacity 0.3s ease;
+}
+
+.health-shape span {
+    transform: rotate(-45deg); /* Un-rotate text so it's readable horizontally */
+    font-size: 0.65rem;
+    font-weight: bold;
+    color: white; /* Overlay text color */
+}
+
+/* Coloring and Animations for Health Connect */
+.health-shape.past {
+    background-color: #8E8D8A; /* Default past color, or maybe green to match the "Steps" theme */
+}
+
+/* To give a "Health" feel matching the screenshot, let's use a green base for past */
+#micro-health .health-shape.past {
+    background-color: #9CCC65; /* A pleasant green */
+}
+
+#micro-health .health-shape.current {
+    background-color: var(--primary-color); /* The pulsing red current day */
+    animation: gentlePulse 2s infinite ease-in-out;
+}
+
+.health-shape.future {
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color); /* Outline for future */
+    opacity: 0.3; /* very faint future */
+}
+
+/* Tweak the container background to simulate lock screen for health preview */
+#micro-health {
+    background: linear-gradient(to bottom, #f0f4eb, #ffffff);
+    border: 1px solid var(--primary-color); /* Tie to highlight card */
+}
+
+/* Make sure text within current day is readable if we use red */
+.health-shape.current span {
+    color: white;
+}
+
+@keyframes gentlePulse {
+    0% { transform: scale(1) rotate(45deg); opacity: 1; }
+    50% { transform: scale(1.1) rotate(45deg); opacity: 0.7; }
+    100% { transform: scale(1) rotate(45deg); opacity: 1; }
+}
+
+/* Ensure text stays high contrast and doesn't get scaled/faded too much */
+.health-shape.current span {
+    font-weight: 800; /* Extra bold for better readability */
+    text-shadow: 0px 0px 2px rgba(0,0,0,0.5); /* Slight shadow to pop against the background */
 }
