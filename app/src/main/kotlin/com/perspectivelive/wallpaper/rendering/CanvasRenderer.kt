@@ -15,7 +15,6 @@ import com.perspectivelive.wallpaper.data.GridConfig
 import com.perspectivelive.wallpaper.data.GridState
 import com.perspectivelive.wallpaper.utils.ColorUtils
 import java.time.LocalDateTime
-import kotlin.math.min
 
 /**
  * Renders the grid on a Canvas.
@@ -156,28 +155,42 @@ class CanvasRenderer(
         shapeDrawer.draw(p.canvas, p.x, p.y, p.size, paint)
 
         drawnText?.let { text ->
-            // Use StaticLayout to handle text wrapping.
-            // The maximum bounding box width inside the shape is the inner square of a circle
-            // To be completely safe and avoid bleeding, we use the inscribed square: size * (1 / sqrt(2)) approx size * 0.707
-            val safeBounds = p.size * 0.70f
-            val maxTextWidth = safeBounds.toInt()
+            // Use StaticLayout to measure the exact bounding box of the text.
+            // Using a huge width to force it to be a single line.
+            val maxSingleLineWidth = 10000
 
             val staticLayout = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                StaticLayout.Builder.obtain(text, 0, text.length, textPaint, maxTextWidth)
-                    .setAlignment(Layout.Alignment.ALIGN_CENTER) // Ensure multiline wraps are centered internally
+                StaticLayout.Builder.obtain(text, 0, text.length, textPaint, maxSingleLineWidth)
+                    .setAlignment(Layout.Alignment.ALIGN_NORMAL)
                     .setLineSpacing(0f, 1f)
                     .setIncludePad(false)
                     .build()
             } else {
                 @Suppress("DEPRECATION")
-                StaticLayout(text, textPaint, maxTextWidth, Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false)
+                StaticLayout(text, textPaint, maxSingleLineWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false)
             }
 
-            p.canvas.save()
+            // Calculate the actual exact width of the rendered text line.
+            // Since it's forced on one line, max line width is the text width.
+            var actualTextWidth = 0f
+            for (i in 0 until staticLayout.lineCount) {
+                val lineWidth = staticLayout.getLineWidth(i)
+                if (lineWidth > actualTextWidth) {
+                    actualTextWidth = lineWidth
+                }
+            }
 
-            // If the text height exceeds our safe bounds, scale it down.
-            // This guarantees the text never bleeds out vertically either.
-            val scaleFactor = if (staticLayout.height > safeBounds) safeBounds / staticLayout.height else 1.0f
+            val actualTextHeight = staticLayout.height.toFloat()
+
+            // Safe inner bounds (inscribed square)
+            val safeBounds = p.size * 0.707f
+
+            // Calculate scale to perfectly fit both dimensions
+            val scaleX = if (actualTextWidth > safeBounds) safeBounds / actualTextWidth else 1.0f
+            val scaleY = if (actualTextHeight > safeBounds) safeBounds / actualTextHeight else 1.0f
+            val scaleFactor = kotlin.math.min(scaleX, scaleY)
+
+            p.canvas.save()
 
             // Translate to the absolute center of the shape
             p.canvas.translate(p.x + p.size / 2f, p.y + p.size / 2f)
@@ -187,7 +200,7 @@ class CanvasRenderer(
             }
 
             // Offset the drawing operation by half the layout's width and height so it's perfectly centered
-            p.canvas.translate(-maxTextWidth / 2f, -staticLayout.height / 2f)
+            p.canvas.translate(-actualTextWidth / 2f, -actualTextHeight / 2f)
 
             staticLayout.draw(p.canvas)
             p.canvas.restore()
@@ -195,17 +208,15 @@ class CanvasRenderer(
     }
 
     private fun formatHealthText(value: Float, metric: String): CharSequence {
-        // We use a zero-width space (\u200B) between the value and the suffix.
-        // This acts as a completely invisible line break opportunity for StaticLayout
-        // without introducing physical empty spaces when drawn on a single line.
+        // No spaces, no newlines. Completely contiguous text strings to ensure single-line layout.
         val (text, suffix) = when (metric) {
             "STEPS" -> {
-                if (value >= 1000) Pair(String.format("%.1f", value / 1000f), "\u200Bk")
+                if (value >= 1000) Pair(String.format("%.1f", value / 1000f), "k")
                 else Pair(value.toInt().toString(), "")
             }
-            "CALORIES" -> Pair(value.toInt().toString(), "\u200Bkcal")
-            "DISTANCE" -> Pair(String.format("%.1f", value), "\u200Bkm")
-            "SLEEP" -> Pair(String.format("%.1f", value), "\u200Bh")
+            "CALORIES" -> Pair(value.toInt().toString(), "kcal")
+            "DISTANCE" -> Pair(String.format("%.1f", value), "km")
+            "SLEEP" -> Pair(String.format("%.1f", value), "h")
             else -> Pair(value.toInt().toString(), "")
         }
 
