@@ -15,6 +15,7 @@ import com.perspectivelive.wallpaper.data.GridConfig
 import com.perspectivelive.wallpaper.data.GridState
 import com.perspectivelive.wallpaper.utils.ColorUtils
 import java.time.LocalDateTime
+import kotlin.math.min
 
 /**
  * Renders the grid on a Canvas.
@@ -46,7 +47,6 @@ class CanvasRenderer(
     private var healthMetric: String = "NONE"
     private var showStatOverlay: Boolean = false
     private val textPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
-        textAlign = Paint.Align.CENTER
         typeface = android.graphics.Typeface.DEFAULT_BOLD
     }
 
@@ -89,7 +89,7 @@ class CanvasRenderer(
 
         // Precompute text styling if overlay is enabled
         if (showStatOverlay && healthMetric != "NONE") {
-            textPaint.textSize = effectiveSize * 0.35f
+            textPaint.textSize = effectiveSize * 0.40f
             textPaint.color = cachedBgColor
             textPaint.alpha = 200 // Slight transparency for subtlety
         }
@@ -156,40 +156,56 @@ class CanvasRenderer(
         shapeDrawer.draw(p.canvas, p.x, p.y, p.size, paint)
 
         drawnText?.let { text ->
-            // Use StaticLayout to handle text wrapping properly.
-            // Using a slightly smaller width than the full shape width to prevent edge bleeding.
-            val TEXT_WIDTH_PADDING = 0.9f
-            val textWidthPadding = TEXT_WIDTH_PADDING
-            val textWidth = (p.size * textWidthPadding).toInt()
+            // Use StaticLayout to handle text wrapping.
+            // The maximum bounding box width inside the shape is the inner square of a circle
+            // To be completely safe and avoid bleeding, we use the inscribed square: size * (1 / sqrt(2)) approx size * 0.707
+            val safeBounds = p.size * 0.70f
+            val maxTextWidth = safeBounds.toInt()
 
             val staticLayout = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                StaticLayout.Builder.obtain(text, 0, text.length, textPaint, textWidth)
-                    .setAlignment(Layout.Alignment.ALIGN_NORMAL) // Align normal because we translate center X
+                StaticLayout.Builder.obtain(text, 0, text.length, textPaint, maxTextWidth)
+                    .setAlignment(Layout.Alignment.ALIGN_CENTER) // Ensure multiline wraps are centered internally
                     .setLineSpacing(0f, 1f)
                     .setIncludePad(false)
                     .build()
             } else {
                 @Suppress("DEPRECATION")
-                StaticLayout(text, textPaint, textWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false)
+                StaticLayout(text, textPaint, maxTextWidth, Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false)
             }
 
             p.canvas.save()
-            // Translate to center X, and calculate start Y to center the block vertically
-            p.canvas.translate(p.x + p.size / 2f, p.y + (p.size - staticLayout.height) / 2f)
+
+            // If the text height exceeds our safe bounds, scale it down.
+            // This guarantees the text never bleeds out vertically either.
+            val scaleFactor = if (staticLayout.height > safeBounds) safeBounds / staticLayout.height else 1.0f
+
+            // Translate to the absolute center of the shape
+            p.canvas.translate(p.x + p.size / 2f, p.y + p.size / 2f)
+
+            if (scaleFactor < 1.0f) {
+                p.canvas.scale(scaleFactor, scaleFactor)
+            }
+
+            // Offset the drawing operation by half the layout's width and height so it's perfectly centered
+            p.canvas.translate(-maxTextWidth / 2f, -staticLayout.height / 2f)
+
             staticLayout.draw(p.canvas)
             p.canvas.restore()
         }
     }
 
     private fun formatHealthText(value: Float, metric: String): CharSequence {
+        // We use a zero-width space (\u200B) between the value and the suffix.
+        // This acts as a completely invisible line break opportunity for StaticLayout
+        // without introducing physical empty spaces when drawn on a single line.
         val (text, suffix) = when (metric) {
             "STEPS" -> {
-                if (value >= 1000) Pair(String.format("%.1f", value / 1000f), "k")
+                if (value >= 1000) Pair(String.format("%.1f", value / 1000f), "\u200Bk")
                 else Pair(value.toInt().toString(), "")
             }
-            "CALORIES" -> Pair(value.toInt().toString(), " kcal")
-            "DISTANCE" -> Pair(String.format("%.1f", value), " km")
-            "SLEEP" -> Pair(String.format("%.1f", value), "h")
+            "CALORIES" -> Pair(value.toInt().toString(), "\u200Bkcal")
+            "DISTANCE" -> Pair(String.format("%.1f", value), "\u200Bkm")
+            "SLEEP" -> Pair(String.format("%.1f", value), "\u200Bh")
             else -> Pair(value.toInt().toString(), "")
         }
 
