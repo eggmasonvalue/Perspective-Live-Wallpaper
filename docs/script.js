@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderMicroNoTomorrow();
     renderMicroVsYesterday();
     renderMicroCustom();
+    renderMicroHealth();
 });
 
 function renderMacroGrid() {
@@ -123,6 +124,79 @@ function renderMicroCustom() {
         } else if (i === daysPassed) {
             dot.classList.add('current');
             dot.title = "Today";
+        } else {
+            dot.classList.add('future');
+        }
+        gridContainer.appendChild(dot);
+    }
+}
+
+function renderMicroHealth() {
+    const gridContainer = document.getElementById('health-event-grid');
+    if (!gridContainer) return;
+
+    // Simulate Health Connect Data
+    const totalDays = 30; // One month view
+    const daysPassed = 24; // Current day is the 25th
+    const cols = 5; // 5 columns
+
+    // Simulate varying opacities for past days (based on goal progress)
+    // and labels
+    const data = [
+        { val: "10.8k", opacity: 0.9 },
+        { val: "16.9k", opacity: 1.0 },
+        { val: "13.8k", opacity: 0.95 },
+        { val: "14.3k", opacity: 0.98 },
+        { val: "2.2k",  opacity: 0.2 },
+        { val: "3.4k",  opacity: 0.3 },
+        { val: "2.4k",  opacity: 0.25 },
+        { val: "4.0k",  opacity: 0.4 },
+        { val: "12.8k", opacity: 0.9 },
+        { val: "19.8k", opacity: 1.0 },
+        { val: "13.2k", opacity: 0.95 },
+        { val: "8.3k",  opacity: 0.8 },
+        { val: "9.5k",  opacity: 0.95 },
+        { val: "8.9k",  opacity: 0.85 },
+        { val: "13.2k", opacity: 0.98 },
+        { val: "20.5k", opacity: 1.0 },
+        { val: "6.1k",  opacity: 0.6 },
+        { val: "13.4k", opacity: 0.95 },
+        { val: "1.2k",  opacity: 0.1 },
+        { val: "1.5k",  opacity: 0.15 },
+        { val: "10.3k", opacity: 0.9 },
+        { val: "8.9k",  opacity: 0.85 },
+        { val: "10.4k", opacity: 0.92 },
+        { val: "10.4k", opacity: 0.92 },
+    ];
+
+    gridContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    gridContainer.classList.add('rhombus-grid'); // Special class for rhombus health style
+
+    for (let i = 0; i < totalDays; i++) {
+        const dot = document.createElement('div');
+        dot.classList.add('health-shape');
+
+        if (i < daysPassed) {
+            dot.classList.add('past');
+            // Apply variable opacity
+            const opacity = data[i] ? data[i].opacity : 0.5;
+            dot.style.opacity = opacity;
+
+            // Add text overlay
+            const label = document.createElement('span');
+            label.textContent = data[i] ? data[i].val : "";
+            dot.appendChild(label);
+
+        } else if (i === daysPassed) {
+            dot.classList.add('current');
+            dot.title = "Today";
+            dot.style.opacity = 1.0; // Pulse animation handles full opacity, but base is 1
+
+            // Current day label
+            const label = document.createElement('span');
+            label.textContent = "14"; // Day of month or current metric
+            dot.appendChild(label);
+
         } else {
             dot.classList.add('future');
         }
