@@ -25,6 +25,7 @@ import com.google.android.material.materialswitch.MaterialSwitch
 import com.perspectivelive.wallpaper.service.HealthConnectManager
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
+import androidx.health.connect.client.PermissionController
 import android.text.Editable
 import android.text.TextWatcher
 
@@ -49,15 +50,16 @@ class StyleSelectionBottomSheet : BottomSheetDialogFragment() {
     private var onStyleApplied: ((ColorScheme, com.perspectivelive.wallpaper.data.StyleConfig) -> Unit)? = null
 
     private val healthPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        val allGranted = permissions.values.all { it }
-        if (allGranted) {
-            updateHealthUI()
-        } else {
-            view?.findViewById<MaterialButtonToggleGroup>(R.id.healthMetricToggleGroup)?.check(R.id.btnMetricNone)
-            selectedHealthMetric = HealthConnectManager.METRIC_NONE
-            updateHealthUI()
+        PermissionController.createRequestPermissionResultContract()
+    ) { grantedPermissions ->
+        HealthConnectManager.getRequiredPermission(selectedHealthMetric)?.let { perm ->
+            if (grantedPermissions.contains(perm)) {
+                updateHealthUI()
+            } else {
+                view?.findViewById<MaterialButtonToggleGroup>(R.id.healthMetricToggleGroup)?.check(R.id.btnMetricNone)
+                selectedHealthMetric = HealthConnectManager.METRIC_NONE
+                updateHealthUI()
+            }
         }
     }
 
@@ -195,7 +197,7 @@ class StyleSelectionBottomSheet : BottomSheetDialogFragment() {
                 val hcManager = HealthConnectManager(requireContext())
                 if (!hcManager.hasPermissions(selectedHealthMetric)) {
                     HealthConnectManager.getRequiredPermission(selectedHealthMetric)?.let { perm ->
-                        healthPermissionLauncher.launch(arrayOf(perm))
+                        healthPermissionLauncher.launch(setOf(perm))
                     }
                 } else {
                     updateHealthUI()
