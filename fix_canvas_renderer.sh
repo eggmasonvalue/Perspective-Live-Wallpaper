@@ -1,3 +1,5 @@
+#!/bin/bash
+cat << 'INNER_EOF' > app/src/main/kotlin/com/perspectivelive/wallpaper/rendering/CanvasRenderer.kt
 package com.perspectivelive.wallpaper.rendering
 
 import android.graphics.Canvas
@@ -155,9 +157,7 @@ class CanvasRenderer(
         drawnText?.let { text ->
             // Use StaticLayout to handle text wrapping properly.
             // Using a slightly smaller width than the full shape width to prevent edge bleeding.
-            val TEXT_WIDTH_PADDING = 0.9f
-            val textWidthPadding = TEXT_WIDTH_PADDING
-            val textWidth = (p.size * textWidthPadding).toInt()
+            val textWidth = (p.size * 0.9f).toInt()
 
             val staticLayout = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 StaticLayout.Builder.obtain(text, 0, text.length, textPaint, textWidth)
@@ -251,3 +251,4 @@ class CanvasRenderer(
         }
     }
 }
+INNER_EOF

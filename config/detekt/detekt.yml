@@ -105,7 +105,7 @@ complexity:
     includePrivateDeclarations: false
     ignoreOverloaded: false
   CyclomaticComplexMethod:
-    active: false
+    active: true
     threshold: 15
     ignoreSingleWhenExpression: false
     ignoreSimpleWhenEntries: false
@@ -165,7 +165,7 @@ complexity:
     excludeStringsWithLessThan5Characters: true
     ignoreStringsRegex: '$^'
   TooManyFunctions:
-    active: false
+    active: true
     excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**']
     thresholdInFiles: 11
     thresholdInClasses: 11
@@ -256,7 +256,7 @@ exceptions:
     active: true
     ignoreLabeled: false
   SwallowedException:
-    active: false
+    active: true
     ignoredExceptionTypes:
       - 'InterruptedException'
       - 'MalformedURLException'
@@ -283,7 +283,7 @@ exceptions:
   ThrowingNewInstanceOfSameException:
     active: true
   TooGenericExceptionCaught:
-    active: false
+    active: true
     excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**']
     exceptionNames:
       - 'ArrayIndexOutOfBoundsException'
@@ -452,7 +452,7 @@ potential-bugs:
       - 'java.util.stream.*Stream'
     ignoreFunctionCall: []
   ImplicitDefaultLocale:
-    active: false
+    active: true
   ImplicitUnitReturnType:
     active: false
     allowExplicitReturnType: true
@@ -607,7 +607,7 @@ style:
     active: true
     maxJumpCount: 1
   MagicNumber:
-    active: false
+    active: true
     excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/*.kts']
     ignoreNumbers:
       - '-1'
@@ -630,7 +630,7 @@ style:
     active: false
     maxChainedCalls: 5
   MaxLineLength:
-    active: false
+    active: true
     maxLineLength: 120
     excludePackageStatements: true
     excludeImportStatements: true

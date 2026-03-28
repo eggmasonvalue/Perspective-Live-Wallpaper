@@ -1,3 +1,5 @@
+#!/bin/bash
+cat << 'INNER_EOF' > app/src/main/kotlin/com/perspectivelive/wallpaper/rendering/GridCalculator.kt
 package com.perspectivelive.wallpaper.rendering
 
 import com.perspectivelive.wallpaper.data.GridConfig
@@ -108,3 +110,4 @@ object GridCalculator {
         )
     }
 }
+INNER_EOF
