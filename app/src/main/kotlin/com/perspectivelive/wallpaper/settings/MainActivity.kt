@@ -381,11 +381,15 @@ class MainActivity : AppCompatActivity() {
             val startDate = prefs.countdownStartDate ?: java.time.LocalDate.now()
             val endDate = java.time.LocalDate.now()
             lifecycleScope.launch {
-                val hcManager = com.perspectivelive.wallpaper.service.HealthConnectManager(this@MainActivity)
-                val data = hcManager.fetchAggregateData(prefs.healthMetric, startDate, endDate)
-                val cacheManager = com.perspectivelive.wallpaper.data.HealthCacheManager(this@MainActivity)
-                cacheManager.clearCache()
-                cacheManager.saveHealthCache(data)
+                try {
+                    val hcManager = com.perspectivelive.wallpaper.service.HealthConnectManager(this@MainActivity)
+                    val data = hcManager.fetchAggregateData(prefs.healthMetric, startDate, endDate)
+                    val cacheManager = com.perspectivelive.wallpaper.data.HealthCacheManager(this@MainActivity)
+                    cacheManager.clearCache()
+                    cacheManager.saveHealthCache(data)
+                } catch (e: IllegalStateException) {
+                    // Health Connect not available, ignore and just launch
+                }
                 launchDayCounterWallpaper()
             }
         } else {

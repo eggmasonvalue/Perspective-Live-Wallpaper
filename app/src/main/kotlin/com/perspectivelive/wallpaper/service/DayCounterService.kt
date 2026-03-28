@@ -76,7 +76,7 @@ class DayCounterService : BaseWallpaperService() {
                             initializeRendererAsync()
                         }
                     }
-                } catch (e: Exception) {
+                } catch (e: IllegalStateException) {
                     // Ignore transient errors
                 }
             }
@@ -106,7 +106,7 @@ class DayCounterService : BaseWallpaperService() {
                             // Let the renderer pick up the new day's 0 value and yesterday's finalized value
                             initializeRendererAsync()
                         }
-                    } catch (e: Exception) {
+                    } catch (e: IllegalStateException) {
                         // Ignore
                     }
                 }

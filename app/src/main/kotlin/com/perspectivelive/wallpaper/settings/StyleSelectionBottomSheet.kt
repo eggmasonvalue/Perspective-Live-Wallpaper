@@ -191,12 +191,19 @@ class StyleSelectionBottomSheet : BottomSheetDialogFragment() {
 
     private fun checkHealthPermissionsAndApply() {
         lifecycleScope.launch {
-            val hcManager = HealthConnectManager(requireContext())
-            if (!hcManager.hasPermissions(selectedHealthMetric)) {
-                HealthConnectManager.getRequiredPermission(selectedHealthMetric)?.let { perm ->
-                    healthPermissionLauncher.launch(arrayOf(perm))
+            try {
+                val hcManager = HealthConnectManager(requireContext())
+                if (!hcManager.hasPermissions(selectedHealthMetric)) {
+                    HealthConnectManager.getRequiredPermission(selectedHealthMetric)?.let { perm ->
+                        healthPermissionLauncher.launch(arrayOf(perm))
+                    }
+                } else {
+                    updateHealthUI()
                 }
-            } else {
+            } catch (e: IllegalStateException) {
+                // Health Connect not available/installed on device
+                view?.findViewById<MaterialButtonToggleGroup>(R.id.healthMetricToggleGroup)?.check(R.id.btnMetricNone)
+                selectedHealthMetric = HealthConnectManager.METRIC_NONE
                 updateHealthUI()
             }
         }
