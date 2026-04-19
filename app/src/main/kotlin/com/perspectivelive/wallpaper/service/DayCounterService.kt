@@ -16,6 +16,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
 
+private data class HealthLoadState(
+    val renderCache: Map<LocalDate, Float>,
+    val requiresFullBackfill: Boolean,
+    val shouldRefreshImmediately: Boolean
+)
+
 /**
  * Wallpaper service for the Day Counter feature.
  * Extends BaseWallpaperService to reuse common lifecycle and rendering behavior.
@@ -42,12 +48,6 @@ class DayCounterService : BaseWallpaperService() {
     }
 
     inner class DayCounterEngine : BaseEngine() {
-
-        private data class HealthLoadState(
-            val renderCache: Map<LocalDate, Float>,
-            val requiresFullBackfill: Boolean,
-            val shouldRefreshImmediately: Boolean
-        )
 
         private val dayCounterModule = DayCounterModule()
         private val healthCacheManager by lazy { HealthCacheManager(this@DayCounterService) }
