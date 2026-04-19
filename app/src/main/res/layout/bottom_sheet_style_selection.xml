@@ -167,94 +167,101 @@
         app:labelBehavior="gone"
         android:layout_marginBottom="24dp" />
 
-    <!-- Daily Health Metrics Section -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Daily Health Metric"
-        android:textAppearance="?attr/textAppearanceTitleSmall"
-        android:layout_marginBottom="8dp" />
-
-    <HorizontalScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbars="none"
-        android:layout_marginBottom="16dp">
-
-    <com.google.android.material.button.MaterialButtonToggleGroup
-        android:id="@+id/healthMetricToggleGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:singleSelection="true"
-        app:selectionRequired="true"
-        android:gravity="center">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnMetricNone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="None"
-            style="@style/Widget.Material3.Button.OutlinedButton" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnMetricSteps"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Steps"
-            style="@style/Widget.Material3.Button.OutlinedButton" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnMetricCalories"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Cals"
-            style="@style/Widget.Material3.Button.OutlinedButton" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnMetricDistance"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Dist"
-            style="@style/Widget.Material3.Button.OutlinedButton" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnMetricSleep"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Sleep"
-            style="@style/Widget.Material3.Button.OutlinedButton" />
-    </com.google.android.material.button.MaterialButtonToggleGroup>
-
-    </HorizontalScrollView>
-
     <LinearLayout
-        android:id="@+id/healthGoalContainer"
+        android:id="@+id/healthSectionContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="gone">
+        android:orientation="vertical">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/goalInputLayout"
+        <!-- Daily Health Metrics Section -->
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Daily Goal"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+            android:layout_marginBottom="8dp"
+            android:text="Daily Health Metric"
+            android:textAppearance="?attr/textAppearanceTitleSmall" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/goalInputEdit"
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:scrollbars="none">
+
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/healthMetricToggleGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                app:selectionRequired="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnMetricNone"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="None" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnMetricSteps"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Steps" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnMetricCalories"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Cals" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnMetricDistance"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Dist" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnMetricSleep"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sleep" />
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        </HorizontalScrollView>
+
+        <LinearLayout
+            android:id="@+id/healthGoalContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/goalInputLayout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="numberDecimal" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:hint="Daily Goal">
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/switchStatOverlay"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="16dp"
-            android:text="Show stat overlay" />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/goalInputEdit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/switchStatOverlay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                android:text="Show stat overlay" />
+        </LinearLayout>
     </LinearLayout>
 
     <!-- Color Scheme Section -->

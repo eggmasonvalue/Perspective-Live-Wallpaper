@@ -17,14 +17,15 @@ class DayCounterModule : CountdownModule {
     override val displayName: String = "Day Counter"
 
     override fun calculateTotalItems(preferences: UserPreferences): Int {
-        val startDate = getStartDate(preferences)
-        val eventDate = getEventDate(preferences)
+        val today = LocalDate.now()
+        val startDate = getEffectiveStartDate(preferences, today)
+        val eventDate = getEffectiveEventDate(preferences, today)
         val days = ChronoUnit.DAYS.between(startDate, eventDate).toInt()
         return maxOf(1, days + 1) // +1 to include both start and end dates
     }
 
     override fun calculatePastItems(preferences: UserPreferences, currentDate: LocalDate): Int {
-        val startDate = getStartDate(preferences)
+        val startDate = getEffectiveStartDate(preferences, currentDate)
         if (currentDate.isBefore(startDate)) return 0
         val daysElapsed = ChronoUnit.DAYS.between(startDate, currentDate).toInt()
         return maxOf(0, daysElapsed)
@@ -47,19 +48,25 @@ class DayCounterModule : CountdownModule {
         return !eventDate.isBefore(startDate)
     }
 
-    private fun getStartDate(preferences: UserPreferences): LocalDate {
+    fun getEffectiveStartDate(
+        preferences: UserPreferences,
+        currentDate: LocalDate = LocalDate.now()
+    ): LocalDate {
         return when (preferences.dayCounterMode) {
-            DayCounterMode.NO_TOMORROW -> LocalDate.now()
-            DayCounterMode.VS_YESTERDAY -> LocalDate.now().minusDays(1)
-            else -> preferences.countdownStartDate ?: LocalDate.now()
+            DayCounterMode.NO_TOMORROW -> currentDate
+            DayCounterMode.VS_YESTERDAY -> currentDate.minusDays(1)
+            else -> preferences.countdownStartDate ?: currentDate
         }
     }
 
-    private fun getEventDate(preferences: UserPreferences): LocalDate {
+    fun getEffectiveEventDate(
+        preferences: UserPreferences,
+        currentDate: LocalDate = LocalDate.now()
+    ): LocalDate {
         return when (preferences.dayCounterMode) {
-            DayCounterMode.NO_TOMORROW -> LocalDate.now()
-            DayCounterMode.VS_YESTERDAY -> LocalDate.now()
-            else -> preferences.eventDate ?: LocalDate.now().plusDays(30)
+            DayCounterMode.NO_TOMORROW -> currentDate
+            DayCounterMode.VS_YESTERDAY -> currentDate
+            else -> preferences.eventDate ?: currentDate.plusDays(30)
         }
     }
 }

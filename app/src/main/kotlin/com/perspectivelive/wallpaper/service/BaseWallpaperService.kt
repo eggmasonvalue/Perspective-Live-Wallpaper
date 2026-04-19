@@ -60,9 +60,11 @@ abstract class BaseWallpaperService : WallpaperService() {
                 super.onCreate(surfaceHolder)
 
                 preferencesManager = PreferencesManager(this@BaseWallpaperService)
-                val pulsePeriod = if (preferencesManager.hasPreferences()) {
-                    try { preferencesManager.getPreferences().pulsePeriodMs } catch (e: Exception) { 2000L }
-                } else 2000L
+                val pulsePeriod = try {
+                    preferencesManager.getPreferences().pulsePeriodMs
+                } catch (e: Exception) {
+                    2000L
+                }
                 animator = PulseAnimator(pulsePeriod)
                 scheduler = MidnightScheduler(this@BaseWallpaperService)
 
@@ -175,13 +177,8 @@ abstract class BaseWallpaperService : WallpaperService() {
 
         protected open fun initializeRendererAsync() {
             kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.IO).launch {
-                val prefs = preferencesManager.getPreferences()
-                var cache: Map<java.time.LocalDate, Float>? = null
-                if (prefs.healthMetric != com.perspectivelive.wallpaper.service.HealthConnectManager.METRIC_NONE) {
-                    cache = com.perspectivelive.wallpaper.data.HealthCacheManager(this@BaseWallpaperService).getHealthCache()
-                }
                 kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                    initializeRenderer(cache)
+                    initializeRenderer()
                 }
             }
         }
@@ -210,15 +207,6 @@ abstract class BaseWallpaperService : WallpaperService() {
                     preferences.unitScale,
                     preferences.containerPaddingScale
                 )
-
-                if (preferences.healthMetric != com.perspectivelive.wallpaper.service.HealthConnectManager.METRIC_NONE) {
-                    renderer?.updateHealthData(
-                        preferences.healthMetric,
-                        preferences.healthMetricGoal,
-                        preferences.showStatOverlay,
-                        healthCache
-                    )
-                }
                 consecutiveErrors = 0
                 isSafeMode = false
 
@@ -311,7 +299,7 @@ abstract class BaseWallpaperService : WallpaperService() {
         private val updateReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 if (intent?.action == MidnightReceiver.ACTION_UPDATE_WALLPAPER) {
-                    if (preferencesManager.hasPreferences()) {
+                    if (hasPreferences()) {
                         performMidnightUpdate(preferencesManager.getPreferences())
                         scheduler.scheduleMidnightCheck()
                     }
