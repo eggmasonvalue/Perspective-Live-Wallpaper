@@ -11,6 +11,9 @@
 - [x] Custom Event countdown.
 - [x] Dynamic date calculation logic.
 - [x] Health Connect Integration (Steps, Calories, Distance, Sleep).
+- [x] Visible-only throttled Health Connect refresh for the present day.
+- [x] Midnight health closeout sync for day transitions.
+- [x] Day-counter-only health controls in style settings.
 
 ## Customization
 - [x] Shapes: Circle, Rounded Square, Rhombus.
@@ -26,3 +29,4 @@
 - [x] BaseWallpaperService refactoring for code reuse.
 - [x] Optimized CanvasRenderer (Strategy Pattern, reduced allocations).
 - [x] Linting with Detekt.
+- [x] Health cache metadata validation and metric-aware reuse.

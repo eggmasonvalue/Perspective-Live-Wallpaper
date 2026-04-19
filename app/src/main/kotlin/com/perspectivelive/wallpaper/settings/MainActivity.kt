@@ -14,10 +14,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
-import com.perspectivelive.wallpaper.service.HealthConnectManager
-import com.perspectivelive.wallpaper.data.HealthCacheManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.tabs.TabLayout
 import com.perspectivelive.wallpaper.R
@@ -267,7 +263,7 @@ class MainActivity : AppCompatActivity() {
             healthGoal = prefs.healthMetricGoal,
             showStatOverlay = prefs.showStatOverlay
         )
-        val bottomSheet = StyleSelectionBottomSheet.newInstance(config)
+        val bottomSheet = StyleSelectionBottomSheet.newInstance(config, enableHealthSettings = false)
         bottomSheet.setOnStyleAppliedListener { scheme, newConfig ->
             viewModel.updateColorScheme(newConfig)
         }
@@ -366,7 +362,7 @@ class MainActivity : AppCompatActivity() {
             healthGoal = prefs.healthMetricGoal,
             showStatOverlay = prefs.showStatOverlay
         )
-        val bottomSheet = StyleSelectionBottomSheet.newInstance(config)
+        val bottomSheet = StyleSelectionBottomSheet.newInstance(config, enableHealthSettings = true)
         bottomSheet.setOnStyleAppliedListener { scheme, newConfig ->
             viewModel.updateColorScheme(newConfig)
         }
@@ -375,26 +371,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun saveAndLaunchDayCounterPicker() {
         viewModel.savePreferences()
-
-        val prefs = viewModel.userPreferences.value ?: return
-        if (prefs.healthMetric != com.perspectivelive.wallpaper.service.HealthConnectManager.METRIC_NONE) {
-            val startDate = prefs.countdownStartDate ?: java.time.LocalDate.now()
-            val endDate = java.time.LocalDate.now()
-            lifecycleScope.launch {
-                try {
-                    val hcManager = com.perspectivelive.wallpaper.service.HealthConnectManager(this@MainActivity)
-                    val data = hcManager.fetchAggregateData(prefs.healthMetric, startDate, endDate)
-                    val cacheManager = com.perspectivelive.wallpaper.data.HealthCacheManager(this@MainActivity)
-                    cacheManager.clearCache()
-                    cacheManager.saveHealthCache(data)
-                } catch (e: IllegalStateException) {
-                    // Health Connect not available, ignore and just launch
-                }
-                launchDayCounterWallpaper()
-            }
-        } else {
-            launchDayCounterWallpaper()
-        }
+        launchDayCounterWallpaper()
     }
 
     private fun launchDayCounterWallpaper() {

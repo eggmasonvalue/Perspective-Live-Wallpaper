@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -46,6 +45,7 @@ class StyleSelectionBottomSheet : BottomSheetDialogFragment() {
     private var selectedHealthMetric: String = HealthConnectManager.METRIC_NONE
     private var selectedHealthGoal: Float = 10000f
     private var selectedShowStatOverlay: Boolean = false
+    private var enableHealthSettings: Boolean = true
 
     private var onStyleApplied: ((ColorScheme, com.perspectivelive.wallpaper.data.StyleConfig) -> Unit)? = null
 
@@ -99,6 +99,7 @@ class StyleSelectionBottomSheet : BottomSheetDialogFragment() {
             selectedHealthMetric = args.getString(ARG_INITIAL_HEALTH_METRIC, HealthConnectManager.METRIC_NONE)
             selectedHealthGoal = args.getFloat(ARG_INITIAL_HEALTH_GOAL, 10000f)
             selectedShowStatOverlay = args.getBoolean(ARG_INITIAL_STAT_OVERLAY, false)
+            enableHealthSettings = args.getBoolean(ARG_ENABLE_HEALTH_SETTINGS, true)
 
             // Scheme will be set in setupColorGrid
         }
@@ -134,6 +135,11 @@ class StyleSelectionBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun setupHealthToggle(view: View) {
+        if (!enableHealthSettings) {
+            view.findViewById<View>(R.id.healthSectionContainer)?.visibility = View.GONE
+            return
+        }
+
         val toggleGroup = view.findViewById<MaterialButtonToggleGroup>(R.id.healthMetricToggleGroup)
 
         val initialBtnId = when (selectedHealthMetric) {
@@ -374,11 +380,15 @@ class StyleSelectionBottomSheet : BottomSheetDialogFragment() {
         private const val ARG_INITIAL_HEALTH_METRIC = "initial_health_metric"
         private const val ARG_INITIAL_HEALTH_GOAL = "initial_health_goal"
         private const val ARG_INITIAL_STAT_OVERLAY = "initial_stat_overlay"
+        private const val ARG_ENABLE_HEALTH_SETTINGS = "enable_health_settings"
 
         /**
          * Creates a new instance of the style sheet with initial settings.
          */
-        fun newInstance(config: com.perspectivelive.wallpaper.data.StyleConfig): StyleSelectionBottomSheet {
+        fun newInstance(
+            config: com.perspectivelive.wallpaper.data.StyleConfig,
+            enableHealthSettings: Boolean = true
+        ): StyleSelectionBottomSheet {
             return StyleSelectionBottomSheet().apply {
                 arguments = Bundle().apply {
                     putString(ARG_INITIAL_SCHEME_ID, config.schemeId)
@@ -389,6 +399,7 @@ class StyleSelectionBottomSheet : BottomSheetDialogFragment() {
                     putString(ARG_INITIAL_HEALTH_METRIC, config.healthMetric)
                     putFloat(ARG_INITIAL_HEALTH_GOAL, config.healthGoal)
                     putBoolean(ARG_INITIAL_STAT_OVERLAY, config.showStatOverlay)
+                    putBoolean(ARG_ENABLE_HEALTH_SETTINGS, enableHealthSettings)
                 }
             }
         }

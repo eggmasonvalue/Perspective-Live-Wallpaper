@@ -66,6 +66,30 @@ class DayCounterModuleTest {
     }
 
     @Test
+    fun testEffectiveStartDate_NoTomorrowUsesCurrentDate() {
+        val currentDate = LocalDate.of(2026, 4, 20)
+        val prefs = UserPreferences(
+            birthDate = LocalDate.of(1990, 1, 1),
+            dayCounterMode = DayCounterMode.NO_TOMORROW
+        )
+
+        assertEquals(currentDate, module.getEffectiveStartDate(prefs, currentDate))
+        assertEquals(currentDate, module.getEffectiveEventDate(prefs, currentDate))
+    }
+
+    @Test
+    fun testEffectiveStartDate_VsYesterdayTracksCurrentDate() {
+        val currentDate = LocalDate.of(2026, 4, 20)
+        val prefs = UserPreferences(
+            birthDate = LocalDate.of(1990, 1, 1),
+            dayCounterMode = DayCounterMode.VS_YESTERDAY
+        )
+
+        assertEquals(currentDate.minusDays(1), module.getEffectiveStartDate(prefs, currentDate))
+        assertEquals(currentDate, module.getEffectiveEventDate(prefs, currentDate))
+    }
+
+    @Test
     fun testStaticMode_Standard() {
         val today = LocalDate.now()
         val future = today.plusDays(10)

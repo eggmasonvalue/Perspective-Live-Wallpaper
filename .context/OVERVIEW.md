@@ -4,11 +4,15 @@
 
 ## Core Features
 - **Macro (Life Calendar)**: Visualizes life in years on a grid.
-- **Micro (Day Counter)**: Visualizes days until an event or "No Tomorrow" mode. Integrates seamlessly with Android Health Connect to track and visualize daily metrics (Steps, Calories, Distance, Sleep) directly within the geometric timeline.
+- **Micro (Day Counter)**: Visualizes days until an event or "No Tomorrow" mode. Integrates with Android Health Connect to track and visualize daily metrics (Steps, Calories, Distance, Sleep) directly within the geometric timeline, with runtime refreshes handled by the wallpaper service while visible.
 - **Deep Customization**: Shapes (Circle, Rounded Square, Rhombus), Density, Padding, Colors (Iconic Scheme and more).
 - **Material You**: Adapts to system colors (Monet).
 - **Typography**: Uses the **Geist** typeface for a modern, crisp look.
 - **Performance**: Zero battery drain when not visible; native Canvas rendering.
+
+## Operational Notes
+- **Health Refreshing**: Health data is a day-counter-only feature. The wallpaper loads cached aggregates immediately, refreshes the present-day window while visible on a throttled cadence, and performs a boundary sync around midnight.
+- **Cache Metadata**: Health cache entries now store metric and coverage metadata so the service can detect stale or mismatched data before rendering.
 
 ## Tech Stack
 - **Language**: Kotlin
