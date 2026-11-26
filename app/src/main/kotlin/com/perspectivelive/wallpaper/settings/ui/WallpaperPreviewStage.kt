@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -38,12 +39,14 @@ import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -85,10 +88,14 @@ import kotlin.math.sin
 private const val DEFAULT_PHONE_ASPECT_RATIO = 9f / 20f
 private const val MIN_ASPECT_RATIO = 0.38f
 private const val MAX_ASPECT_RATIO = 0.65f
-private const val STAGE_HEIGHT_DP = 288
+private const val STAGE_HEIGHT_DP = 240
+private const val STAGE_PADDING_DP = 12
+private const val STAGE_CONTENT_GAP_DP = 16
+private const val STAGE_CONTROL_HEIGHT_DP = 40
+private const val STAGE_CONTROL_GAP_DP = 10
 private const val NEUTRAL_MAT_DARK = 0xFF1A1A1A
 private const val NEUTRAL_MAT_LIGHT = 0xFFEFEFEF
-private const val MINI_PREVIEW_CORNER_DP = 22
+private const val MINI_PREVIEW_CORNER_DP = 16
 private const val STAGE_CORNER_DP = 28
 private const val PULSE_MIN_ALPHA = 0.25f
 private const val PULSE_ALPHA_SPAN = 0.75f
@@ -203,8 +210,8 @@ fun WallpaperPreviewStage(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(STAGE_HEIGHT_DP.dp)
-                .padding(14.dp),
-            horizontalArrangement = Arrangement.spacedBy(14.dp),
+                .padding(STAGE_PADDING_DP.dp),
+            horizontalArrangement = Arrangement.spacedBy(STAGE_CONTENT_GAP_DP.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Left: Exact device-aspect-ratio live wallpaper preview (tap to expand 1:1)
@@ -235,8 +242,7 @@ fun WallpaperPreviewStage(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
-                    .padding(vertical = 2.dp),
-                verticalArrangement = Arrangement.SpaceBetween
+                    .padding(top = 4.dp)
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     Text(
@@ -254,35 +260,39 @@ fun WallpaperPreviewStage(
                     )
                 }
 
-                // Paired Light / Dark Preview Toggle
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text(
-                        text = "PAIRED VARIANT",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    PairedVariantSelector(
-                        previewDark = previewDark,
-                        onPreviewDarkChange = onPreviewDarkChange
-                    )
-                }
+                Spacer(Modifier.weight(1f))
 
-                // Full Screen 1:1 CTA
-                FilledTonalButton(
-                    onClick = onExpandFullscreen,
-                    modifier = Modifier.fillMaxWidth(),
-                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+                // Bottom-anchored action cluster with matched 40dp control heights and flush bottom alignment
+                CompositionLocalProvider(
+                    LocalMinimumInteractiveComponentSize provides STAGE_CONTROL_HEIGHT_DP.dp
                 ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Fullscreen,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(Modifier.width(6.dp))
-                    Text(
-                        text = "Full Screen 1:1",
-                        style = MaterialTheme.typography.labelLarge
-                    )
+                    Column(verticalArrangement = Arrangement.spacedBy(STAGE_CONTROL_GAP_DP.dp)) {
+                        PairedVariantSelector(
+                            previewDark = previewDark,
+                            onPreviewDarkChange = onPreviewDarkChange
+                        )
+
+                        FilledTonalButton(
+                            onClick = onExpandFullscreen,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(min = STAGE_CONTROL_HEIGHT_DP.dp),
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Fullscreen,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            Text(
+                                text = "Full Screen 1:1",
+                                style = MaterialTheme.typography.labelLarge,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -304,36 +314,44 @@ private fun PairedVariantSelector(
             onCheckedChange = { if (it) onPreviewDarkChange(true) },
             modifier = Modifier
                 .weight(1f)
-                .height(34.dp)
+                .heightIn(min = STAGE_CONTROL_HEIGHT_DP.dp)
                 .semantics { role = Role.RadioButton },
             shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
-            contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp)
+            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
         ) {
             Icon(
                 imageVector = Icons.Rounded.DarkMode,
                 contentDescription = null,
-                modifier = Modifier.size(14.dp)
+                modifier = Modifier.size(15.dp)
             )
             Spacer(Modifier.width(ToggleButtonDefaults.IconSpacing))
-            Text(text = "Dark", style = MaterialTheme.typography.labelSmall)
+            Text(
+                text = "Dark",
+                style = MaterialTheme.typography.labelMedium,
+                maxLines = 1
+            )
         }
         ToggleButton(
             checked = !previewDark,
             onCheckedChange = { if (it) onPreviewDarkChange(false) },
             modifier = Modifier
                 .weight(1f)
-                .height(34.dp)
+                .heightIn(min = STAGE_CONTROL_HEIGHT_DP.dp)
                 .semantics { role = Role.RadioButton },
             shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
-            contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp)
+            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
         ) {
             Icon(
                 imageVector = Icons.Rounded.LightMode,
                 contentDescription = null,
-                modifier = Modifier.size(14.dp)
+                modifier = Modifier.size(15.dp)
             )
             Spacer(Modifier.width(ToggleButtonDefaults.IconSpacing))
-            Text(text = "Light", style = MaterialTheme.typography.labelSmall)
+            Text(
+                text = "Light",
+                style = MaterialTheme.typography.labelMedium,
+                maxLines = 1
+            )
         }
     }
 }
