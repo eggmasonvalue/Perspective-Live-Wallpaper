@@ -6,7 +6,7 @@ Source tree layout, module responsibilities, and runtime data flows for Perspect
 
 The application comprises two core subsystems:
 
-1. **Configuration UI (`settings`)**: An Activity and BottomSheet-based MVVM interface for configuring wallpaper modes (Macro and Micro), color schemes, geometry, and health tracking.
+1. **Configuration UI (`settings`)**: A Jetpack Compose + Material 3 Expressive 1.5.0 MVVM studio interface (`ComponentActivity` + `StateFlow`) with a pinned true-aspect live wallpaper preview, Horizon/Palette/Craft decks, floating toolbar + split button dock, and Android 17 EyeDropper custom palette modal.
 2. **Live Wallpaper Engine (`service` & `rendering`)**: Android `WallpaperService` implementations rendering real-time geometric timelines to the system wallpaper surface via Canvas.
 
 ## Source Map
@@ -21,7 +21,7 @@ Root namespace: `com.perspectivelive.wallpaper` in `app/src/main/kotlin/com/pers
 | `modules` | Domain business logic and date countdown calculations | `CountdownModule`, `DayCounterModule`, `LifeCalendarModule`, `ModuleRegistry` |
 | `rendering` | Canvas drawing, geometry layout, and animation drivers | `CanvasRenderer`, `GridCalculator`, `PulseAnimator` |
 | `service` | Android `WallpaperService` lifecycles and background sync | `BaseWallpaperService`, `LifeCalendarService`, `DayCounterService`, `HealthConnectManager`, `MidnightScheduler` |
-| `settings` | UI layer, ViewModel, bottom sheets, color pickers | `MainActivity`, `SettingsViewModel`, `StyleSelectionBottomSheet`, `PreviewCanvasView`, `ColorCardAdapter`, `ColorSchemeAdapter`, `CustomColorActivity`, `ColorPickerDialog` |
+| `settings` | Jetpack Compose M3 Expressive studio, theme, ViewModel, live preview, and EyeDropper custom aura sheet | `MainActivity`, `SettingsViewModel`, `PerspectiveTheme`, `PerspectiveStudioScreen`, `WallpaperPreviewStage`, `HorizonPanel`, `PalettePanel`, `CraftPanel`, `CustomAuraSheet`, `StudioFloatingDock`, `StudioUiModels` |
 | `utils` | Date arithmetic and color manipulation utilities | `DateCalculator`, `ColorUtils`, `OklchColor` |
 
 ### Key Project Assets & Configs
@@ -39,12 +39,12 @@ Root namespace: `com.perspectivelive.wallpaper` in `app/src/main/kotlin/com/pers
 
 ```mermaid
 flowchart LR
-    User([User Interaction]) --> UI[MainActivity / StyleSelectionBottomSheet]
-    UI --> VM[SettingsViewModel]
+    User([User Interaction]) --> UI[PerspectiveStudioScreen / Panels]
+    UI --> VM[SettingsViewModel / StateFlow]
     VM --> PM[PreferencesManager]
     PM --> SP[(SharedPreferences)]
-    VM --> PV[PreviewCanvasView]
-    PV --> CR[CanvasRenderer]
+    VM --> PV[WallpaperPreviewStage / LiveWallpaperCanvas]
+    PV --> GC[GridCalculator]
 ```
 
 ### 2. Wallpaper Lifecycle & Rendering Flow

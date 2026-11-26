@@ -1,410 +1,185 @@
 package com.perspectivelive.wallpaper.settings
 
-import android.app.AlertDialog
-import android.app.DatePickerDialog
+import android.app.Activity
 import android.app.WallpaperManager
 import android.content.ComponentName
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
-import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.NumberPicker
-import android.widget.ScrollView
-import android.widget.TextView
-import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.tabs.TabLayout
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.health.connect.client.PermissionController
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.perspectivelive.wallpaper.R
-import com.perspectivelive.wallpaper.data.ColorSchemeProvider
-import com.perspectivelive.wallpaper.data.DayCounterMode
 import com.perspectivelive.wallpaper.data.PreferencesManager
-import com.perspectivelive.wallpaper.data.ProceduralThemeGenerator
-import com.perspectivelive.wallpaper.data.StyleConfig
-import com.perspectivelive.wallpaper.data.UserPreferences
 import com.perspectivelive.wallpaper.service.DayCounterService
+import com.perspectivelive.wallpaper.service.HealthConnectManager
 import com.perspectivelive.wallpaper.service.LifeCalendarService
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
+import com.perspectivelive.wallpaper.settings.theme.PerspectiveTheme
+import com.perspectivelive.wallpaper.settings.ui.CustomColorSlot
+import com.perspectivelive.wallpaper.settings.ui.HealthMetricSpec
+import com.perspectivelive.wallpaper.settings.ui.PerspectiveStudioScreen
+import com.perspectivelive.wallpaper.settings.ui.StudioActions
+import com.perspectivelive.wallpaper.settings.ui.WallpaperMode
+import kotlinx.coroutines.launch
 
 /**
- * Settings screen for Time Horizons wallpaper.
- * Provides tabs to switch between Count to Life and Count to Day modes.
+ * Companion studio Activity for Perspective - Live built with Jetpack Compose
+ * and Material 3 Expressive 1.5.0 targeting Android 17 (API 37).
  */
-class MainActivity : AppCompatActivity() {
+class MainActivity : ComponentActivity() {
 
     private val viewModel: SettingsViewModel by viewModels {
         SettingsViewModelFactory(PreferencesManager(this))
     }
 
-    // Tab and sections
-    private lateinit var modeTabLayout: TabLayout
-    private lateinit var lifeCalendarSection: ScrollView
-    private lateinit var dayCounterSection: ScrollView
+    private var pendingHealthSpec: HealthMetricSpec? = null
+    private var pendingEyeDropperSlot: CustomColorSlot? = null
+    private var sampledColorState by mutableStateOf<Pair<CustomColorSlot, Int>?>(null)
 
-    // Life Calendar views
-    private lateinit var currentBirthDate: TextView
-    private lateinit var currentLifespan: TextView
-    private lateinit var currentColorScheme: TextView
-    private lateinit var editBirthDateButton: Button
-    private lateinit var editLifespanButton: Button
-    private lateinit var changeColorSchemeButton: Button
-    private lateinit var applyWallpaperButton: Button
+    private val snackbarHostState = SnackbarHostState()
 
-    // Momentum views
-    private lateinit var dcEventName: TextView
-    private lateinit var dcEventDate: TextView
-    private lateinit var dcDaysRemaining: TextView
-    private lateinit var dcColorScheme: TextView
-    private lateinit var noTomorrowButton: Button
-    private lateinit var vsYesterdayButton: Button
-    private lateinit var customObjectiveButton: Button
-    private lateinit var customObjectiveLayout: View
-    private lateinit var dcEditEventNameButton: Button
-    private lateinit var dcEditEventDateButton: Button
-    private lateinit var dcEditStartDateButton: Button
-    private lateinit var dcChangeColorSchemeButton: Button
-    private lateinit var applyDayCounterButton: Button
+    private val healthPermissionLauncher = registerForActivityResult(
+        PermissionController.createRequestPermissionResultContract()
+    ) { grantedPermissions ->
+        val spec = pendingHealthSpec ?: return@registerForActivityResult
+        pendingHealthSpec = null
+        val required = HealthConnectManager.getRequiredPermission(spec.id)
+        if (required == null || grantedPermissions.contains(required)) {
+            viewModel.updateHealthMetric(spec.id, spec.defaultGoal)
+        } else {
+            showSnackbar("Health Connect permission is required for ${spec.label}")
+        }
+    }
 
-    private val dateFormatter = DateTimeFormatter.ofPattern("MMMM d, yyyy")
+    private val eyeDropperLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val slot = pendingEyeDropperSlot ?: return@registerForActivityResult
+        pendingEyeDropperSlot = null
+        if (result.resultCode == Activity.RESULT_OK) {
+            val pickedColor = result.data?.getIntExtra(Intent.EXTRA_COLOR, Color.BLACK)
+                ?: return@registerForActivityResult
+            sampledColorState = slot to pickedColor
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        enableEdgeToEdge()
 
-        initViews()
-        setupTabs()
-        setupButtons()
+        setContent {
+            PerspectiveTheme {
+                val prefs by viewModel.userPreferences.collectAsStateWithLifecycle()
+                val customColors by viewModel.customColors.collectAsStateWithLifecycle()
 
-        // Observe ViewModel state
-        viewModel.userPreferences.observe(this) { prefs ->
-            displayLifeCalendarSettings(prefs)
-            displayDayCounterSettings(prefs)
+                val actions = remember(viewModel) {
+                    StudioActions(
+                        onBirthDateSelected = { date ->
+                            if (!viewModel.updateBirthDate(date)) {
+                                showSnackbar(getString(R.string.birth_date_validation_error))
+                            }
+                        },
+                        onLifespanChanged = viewModel::updateExpectedLifespan,
+                        onSelectNoTomorrow = viewModel::setNoTomorrowMode,
+                        onSelectVsYesterday = viewModel::setVsYesterdayMode,
+                        onSelectCustomObjective = viewModel::setCustomObjectiveMode,
+                        onEventNameChanged = viewModel::updateEventName,
+                        onStartDateSelected = { date ->
+                            if (!viewModel.updateStartDate(date)) {
+                                showSnackbar("Start date cannot be after target date")
+                            }
+                        },
+                        onTargetDateSelected = { date ->
+                            if (!viewModel.updateEventDate(date)) {
+                                showSnackbar(getString(R.string.event_date_validation_error))
+                            }
+                        },
+                        onHealthMetricSelected = ::handleHealthMetricSelected,
+                        onHealthGoalChanged = viewModel::updateHealthGoal,
+                        onShowStatOverlayChanged = viewModel::updateShowStatOverlay,
+                        onSchemeSelected = viewModel::selectColorScheme,
+                        onDailyRotationChanged = viewModel::setDailyRotationEnabled,
+                        onSaveCustomAura = viewModel::saveCustomColors,
+                        onShapeSelected = viewModel::updateUnitShape,
+                        onScaleChanged = viewModel::updateUnitScale,
+                        onPaddingChanged = viewModel::updateContainerPaddingScale,
+                        onPulsePeriodChanged = viewModel::updatePulsePeriod,
+                        onLaunchEyeDropper = ::launchEyeDropper,
+                        onApplyWallpaper = ::applyWallpaper
+                    )
+                }
+
+                PerspectiveStudioScreen(
+                    prefs = prefs,
+                    customColors = customColors,
+                    sampledColor = sampledColorState,
+                    onConsumeSampledColor = { sampledColorState = null },
+                    snackbarHostState = snackbarHostState,
+                    actions = actions
+                )
+            }
         }
     }
 
-    private fun initViews() {
-        // Tabs and sections
-        modeTabLayout = findViewById(R.id.modeTabLayout)
-        lifeCalendarSection = findViewById(R.id.lifeCalendarSection)
-        dayCounterSection = findViewById(R.id.dayCounterSection)
-
-        // Life Calendar
-        currentBirthDate = findViewById(R.id.currentBirthDate)
-        currentLifespan = findViewById(R.id.currentLifespan)
-        currentColorScheme = findViewById(R.id.currentColorScheme)
-        editBirthDateButton = findViewById(R.id.editBirthDateButton)
-        editLifespanButton = findViewById(R.id.editLifespanButton)
-        changeColorSchemeButton = findViewById(R.id.changeColorSchemeButton)
-        applyWallpaperButton = findViewById(R.id.applyWallpaperButton)
-
-        // Day Counter
-        dcEventName = findViewById(R.id.dcEventName)
-        dcEventDate = findViewById(R.id.dcEventDate)
-        dcDaysRemaining = findViewById(R.id.dcDaysRemaining)
-        dcColorScheme = findViewById(R.id.dcColorScheme)
-        noTomorrowButton = findViewById(R.id.noTomorrowButton)
-        vsYesterdayButton = findViewById(R.id.vsYesterdayButton)
-        customObjectiveButton = findViewById(R.id.customObjectiveButton)
-        customObjectiveLayout = findViewById(R.id.customObjectiveLayout)
-        dcEditEventNameButton = findViewById(R.id.dcEditEventNameButton)
-        dcEditEventDateButton = findViewById(R.id.dcEditEventDateButton)
-        dcEditStartDateButton = findViewById(R.id.dcEditStartDateButton)
-        dcChangeColorSchemeButton = findViewById(R.id.dcChangeColorSchemeButton)
-        applyDayCounterButton = findViewById(R.id.applyDayCounterButton)
-    }
-
-    private fun setupTabs() {
-        modeTabLayout.addTab(modeTabLayout.newTab().setText("Macro"))
-        modeTabLayout.addTab(modeTabLayout.newTab().setText("Micro"))
-
-        modeTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                when (tab?.position) {
-                    0 -> {
-                        lifeCalendarSection.visibility = View.VISIBLE
-                        dayCounterSection.visibility = View.GONE
-                    }
-                    1 -> {
-                        lifeCalendarSection.visibility = View.GONE
-                        dayCounterSection.visibility = View.VISIBLE
-                    }
-                }
-            }
-
-            override fun onTabUnselected(tab: TabLayout.Tab?) {
-                // No action needed on unselect
-            }
-            override fun onTabReselected(tab: TabLayout.Tab?) {
-                // No action needed on reselect
-            }
-        })
-    }
-
-    private fun displayLifeCalendarSettings(prefs: UserPreferences) {
-        currentBirthDate.text = "Birth Date: ${prefs.birthDate.format(dateFormatter)}"
-        currentLifespan.text = "Expected Lifespan: ${prefs.expectedLifespan} years"
-
-        val isDark = ColorSchemeProvider.isSystemDarkMode(this)
-        val baseSchemeName = ColorSchemeProvider.getScheme(prefs.colorSchemeId, isDark, PreferencesManager(this)).name
-        val displaySchemeText = if (prefs.isDailyRotationEnabled) {
-            val rotatedId = ColorSchemeProvider.getRotatedSchemeId()
-            val rotatedName = ColorSchemeProvider.getScheme(rotatedId, isDark, PreferencesManager(this)).name
-            "Color Scheme: Daily Rotation ($rotatedName)"
-        } else if (prefs.colorSchemeId == ColorSchemeProvider.ATMOSPHERE_SCHEME_ID) {
-            val mood = ProceduralThemeGenerator.getMoodName()
-            "Color Scheme: Atmosphere ($mood)"
-        } else {
-            "Color Scheme: $baseSchemeName"
+    private fun handleHealthMetricSelected(spec: HealthMetricSpec) {
+        if (spec.id == HealthConnectManager.METRIC_NONE) {
+            viewModel.updateHealthMetric(HealthConnectManager.METRIC_NONE)
+            return
         }
-        currentColorScheme.text = displaySchemeText
-    }
-
-    private fun displayDayCounterSettings(prefs: UserPreferences) {
-        if (prefs.dayCounterMode == DayCounterMode.NO_TOMORROW) {
-            dcEventName.text = "Event: ${prefs.eventName ?: "No Tomorrow"}"
-            dcEventDate.text = "Event Date: Today (Dynamic)"
-            dcDaysRemaining.text = "Days Remaining: 0"
-        } else if (prefs.dayCounterMode == DayCounterMode.VS_YESTERDAY) {
-            dcEventName.text = "Event: ${prefs.eventName ?: "Rise Above"}"
-            dcEventDate.text = "Event Date: Today (vs Yesterday)"
-            dcDaysRemaining.text = "Days Remaining: 1"
-        } else {
-            dcEventName.text = "Event: ${prefs.eventName ?: "Not set"}"
-            dcEventDate.text = "Event Date: ${prefs.eventDate?.format(dateFormatter) ?: "Not set"}"
-
-            val eventDate = prefs.eventDate
-            if (eventDate != null) {
-                val daysRemaining = ChronoUnit.DAYS.between(LocalDate.now(), eventDate)
-                if (daysRemaining < 0) {
-                    dcDaysRemaining.text = "Days Past: ${-daysRemaining}"
-                } else {
-                    dcDaysRemaining.text = "Days Remaining: $daysRemaining"
-                }
+        lifecycleScope.launch {
+            val manager = HealthConnectManager(this@MainActivity)
+            if (manager.hasPermissions(spec.id)) {
+                viewModel.updateHealthMetric(spec.id, spec.defaultGoal)
             } else {
-                dcDaysRemaining.text = "Days Remaining: --"
+                val perm = HealthConnectManager.getRequiredPermission(spec.id)
+                if (perm != null) {
+                    pendingHealthSpec = spec
+                    healthPermissionLauncher.launch(setOf(perm))
+                } else {
+                    viewModel.updateHealthMetric(spec.id, spec.defaultGoal)
+                }
             }
         }
-
-        val isDark = ColorSchemeProvider.isSystemDarkMode(this)
-        val baseSchemeName = ColorSchemeProvider.getScheme(prefs.colorSchemeId, isDark, PreferencesManager(this)).name
-        val displaySchemeText = if (prefs.isDailyRotationEnabled) {
-            val rotatedId = ColorSchemeProvider.getRotatedSchemeId()
-            val rotatedName = ColorSchemeProvider.getScheme(rotatedId, isDark, PreferencesManager(this)).name
-            "Color Scheme: Daily Rotation ($rotatedName)"
-        } else if (prefs.colorSchemeId == ColorSchemeProvider.ATMOSPHERE_SCHEME_ID) {
-            val mood = ProceduralThemeGenerator.getMoodName()
-            "Color Scheme: Atmosphere ($mood)"
-        } else {
-            "Color Scheme: $baseSchemeName"
-        }
-        dcColorScheme.text = displaySchemeText
     }
 
-    private fun setupButtons() {
-        // Life Calendar buttons
-        editBirthDateButton.setOnClickListener { showDatePickerDialog() }
-        editLifespanButton.setOnClickListener { showLifespanDialog() }
-        changeColorSchemeButton.setOnClickListener { showColorSchemeDialog() }
-        applyWallpaperButton.setOnClickListener { saveAndLaunchLifeCalendarPicker() }
-
-        // Momentum buttons
-        noTomorrowButton.setOnClickListener {
-            viewModel.setNoTomorrowMode()
-            customObjectiveLayout.visibility = View.GONE
-        }
-        vsYesterdayButton.setOnClickListener {
-            viewModel.setVsYesterdayMode()
-            customObjectiveLayout.visibility = View.GONE
-        }
-        customObjectiveButton.setOnClickListener { toggleCustomObjective() }
-        dcEditEventNameButton.setOnClickListener { showEventNameDialog() }
-        dcEditEventDateButton.setOnClickListener { showEventDatePickerDialog() }
-        dcEditStartDateButton.setOnClickListener { showStartDatePickerDialog() }
-        dcChangeColorSchemeButton.setOnClickListener { showDayCounterColorSchemeDialog() }
-        applyDayCounterButton.setOnClickListener { saveAndLaunchDayCounterPicker() }
+    private fun launchEyeDropper(slot: CustomColorSlot) {
+        pendingEyeDropperSlot = slot
+        val intent = Intent(Intent.ACTION_OPEN_EYE_DROPPER)
+        runCatching { eyeDropperLauncher.launch(intent) }
+            .onFailure {
+                pendingEyeDropperSlot = null
+                showSnackbar("System EyeDropper is unavailable on this display")
+            }
     }
 
-    // ===== Life Calendar Methods =====
-
-    private fun showDatePickerDialog() {
-        val prefs = viewModel.userPreferences.value ?: return
-        val currentDate = prefs.birthDate
-
-        DatePickerDialog(
-            this,
-            { _, year, month, dayOfMonth ->
-                val newBirthDate = LocalDate.of(year, month + 1, dayOfMonth)
-                if (!viewModel.updateBirthDate(newBirthDate)) {
-                    Toast.makeText(this, R.string.birth_date_validation_error, Toast.LENGTH_SHORT).show()
-                }
-            },
-            currentDate.year,
-            currentDate.monthValue - 1,
-            currentDate.dayOfMonth
-        ).show()
-    }
-
-    private fun showLifespanDialog() {
-        val prefs = viewModel.userPreferences.value ?: return
-
-        val dialog = BottomSheetDialog(this)
-        val view = layoutInflater.inflate(R.layout.dialog_lifespan_picker, null)
-
-        val numberPicker = view.findViewById<NumberPicker>(R.id.lifespanNumberPicker)
-        val saveButton = view.findViewById<Button>(R.id.saveButton)
-
-        numberPicker.minValue = 1
-        numberPicker.maxValue = 120
-        numberPicker.value = prefs.expectedLifespan
-        numberPicker.wrapSelectorWheel = false
-
-        saveButton.setOnClickListener {
-            viewModel.updateExpectedLifespan(numberPicker.value)
-            dialog.dismiss()
-        }
-
-        dialog.setContentView(view)
-        dialog.show()
-    }
-
-    private fun showColorSchemeDialog() {
-        val prefs = viewModel.userPreferences.value ?: return
-
-        val config = StyleConfig(
-            schemeId = prefs.colorSchemeId,
-            shapeId = prefs.unitShapeId,
-            scale = prefs.unitScale,
-            paddingScale = prefs.containerPaddingScale,
-            pulsePeriodMs = prefs.pulsePeriodMs,
-            healthMetric = prefs.healthMetric,
-            healthGoal = prefs.healthMetricGoal,
-            showStatOverlay = prefs.showStatOverlay,
-            isDailyRotationEnabled = prefs.isDailyRotationEnabled
-        )
-        val bottomSheet = StyleSelectionBottomSheet.newInstance(config, enableHealthSettings = false)
-        bottomSheet.setOnStyleAppliedListener { _, newConfig ->
-            viewModel.updateColorScheme(newConfig)
-        }
-        bottomSheet.show(supportFragmentManager, "StyleSelectionBottomSheet")
-    }
-
-    private fun saveAndLaunchLifeCalendarPicker() {
+    private fun applyWallpaper(mode: WallpaperMode) {
         viewModel.savePreferences()
-
+        val serviceClass = when (mode) {
+            WallpaperMode.MACRO -> LifeCalendarService::class.java
+            WallpaperMode.MICRO -> DayCounterService::class.java
+        }
         val intent = Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER).apply {
             putExtra(
                 WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
-                ComponentName(this@MainActivity, LifeCalendarService::class.java)
+                ComponentName(this@MainActivity, serviceClass)
             )
         }
         startActivity(intent)
     }
 
-    // ===== Momentum Methods =====
-
-    private fun toggleCustomObjective() {
-        customObjectiveLayout.visibility = if (customObjectiveLayout.visibility == View.VISIBLE) {
-            View.GONE
-        } else {
-            View.VISIBLE
+    private fun showSnackbar(message: String) {
+        lifecycleScope.launch {
+            snackbarHostState.showSnackbar(message)
         }
-    }
-
-    private fun showEventNameDialog() {
-        val prefs = viewModel.userPreferences.value ?: return
-
-        val editText = EditText(this)
-        editText.setText(prefs.eventName ?: "")
-        editText.hint = getString(R.string.event_name_hint)
-
-        AlertDialog.Builder(this)
-            .setTitle(R.string.event_name_label)
-            .setView(editText)
-            .setPositiveButton("Save") { _, _ ->
-                val newName = editText.text.toString().trim()
-                if (newName.isNotEmpty()) {
-                    viewModel.updateEventName(newName)
-                }
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
-    }
-
-    private fun showEventDatePickerDialog() {
-        val prefs = viewModel.userPreferences.value ?: return
-        val currentDate = prefs.eventDate ?: LocalDate.now()
-
-        DatePickerDialog(
-            this,
-            { _, year, month, dayOfMonth ->
-                val newDate = LocalDate.of(year, month + 1, dayOfMonth)
-                if (!viewModel.updateEventDate(newDate)) {
-                    Toast.makeText(this, R.string.event_date_validation_error, Toast.LENGTH_SHORT).show()
-                }
-            },
-            currentDate.year,
-            currentDate.monthValue - 1,
-            currentDate.dayOfMonth
-        ).show()
-    }
-
-    private fun showStartDatePickerDialog() {
-        val prefs = viewModel.userPreferences.value ?: return
-        val currentDate = prefs.countdownStartDate ?: LocalDate.now()
-
-        DatePickerDialog(
-            this,
-            { _, year, month, dayOfMonth ->
-                val newDate = LocalDate.of(year, month + 1, dayOfMonth)
-                if (!viewModel.updateStartDate(newDate)) {
-                    Toast.makeText(this, "Start date cannot be after event date", Toast.LENGTH_SHORT).show()
-                }
-            },
-            currentDate.year,
-            currentDate.monthValue - 1,
-            currentDate.dayOfMonth
-        ).show()
-    }
-
-    private fun showDayCounterColorSchemeDialog() {
-        val prefs = viewModel.userPreferences.value ?: return
-
-        val config = StyleConfig(
-            schemeId = prefs.colorSchemeId,
-            shapeId = prefs.unitShapeId,
-            scale = prefs.unitScale,
-            paddingScale = prefs.containerPaddingScale,
-            pulsePeriodMs = prefs.pulsePeriodMs,
-            healthMetric = prefs.healthMetric,
-            healthGoal = prefs.healthMetricGoal,
-            showStatOverlay = prefs.showStatOverlay,
-            isDailyRotationEnabled = prefs.isDailyRotationEnabled
-        )
-        val bottomSheet = StyleSelectionBottomSheet.newInstance(config, enableHealthSettings = true)
-        bottomSheet.setOnStyleAppliedListener { _, newConfig ->
-            viewModel.updateColorScheme(newConfig)
-        }
-        bottomSheet.show(supportFragmentManager, "StyleSelectionBottomSheet")
-    }
-
-    private fun saveAndLaunchDayCounterPicker() {
-        viewModel.savePreferences()
-        launchDayCounterWallpaper()
-    }
-
-    private fun launchDayCounterWallpaper() {
-        viewModel.savePreferences()
-
-        val intent = Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER).apply {
-            putExtra(
-                WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
-                ComponentName(this@MainActivity, DayCounterService::class.java)
-            )
-        }
-        startActivity(intent)
     }
 }

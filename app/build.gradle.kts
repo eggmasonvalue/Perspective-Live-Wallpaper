@@ -1,18 +1,22 @@
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.compose")
 }
 
 android {
     namespace = "com.perspectivelive.wallpaper"
-    compileSdk = 34
+    compileSdk {
+        version = release(37) {
+            minorApiLevel = 1
+        }
+    }
 
     defaultConfig {
         applicationId = "com.perspectivelive.wallpaper"
-        minSdk = 28
-        targetSdk = 34
-        versionCode = 2
-        versionName = "2.3.1"
+        minSdk = 37
+        targetSdk = 37
+        versionCode = 3
+        versionName = "3.0.0"
     }
 
     signingConfigs {
@@ -27,31 +31,42 @@ android {
 
     buildTypes {
         release {
-            // Fallback to debug signing if release keystore is missing (common in CI for non-release builds or open source)
-            // Ideally, production builds should fail if secrets are missing, but we allow debug signing for development convenience.
-            signingConfig = if (signingConfigs.getByName("release").storeFile != null) signingConfigs.getByName("release") else signingConfigs.getByName("debug")
+            signingConfig = if (signingConfigs.getByName("release").storeFile != null) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+
+    buildFeatures {
+        compose = true
     }
-    kotlinOptions {
-        jvmTarget = "11"
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.12.0")
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.12.0")
-    implementation("androidx.recyclerview:recyclerview:1.3.2")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
-    implementation("androidx.activity:activity-ktx:1.8.2")
+    implementation(platform("androidx.compose:compose-bom:2026.11.01"))
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-graphics")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.foundation:foundation")
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material:material-icons-extended")
 
-    // Health Connect
-    implementation("androidx.health.connect:connect-client:1.1.0-alpha07")
+    implementation("androidx.core:core-ktx:1.17.0")
+    implementation("androidx.activity:activity-compose:1.13.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.11.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.11.1")
+
+    // Health Connect (built into Android OS, stable client)
+    implementation("androidx.health.connect:connect-client:1.1.0")
+
+    debugImplementation("androidx.compose.ui:ui-tooling")
 
     testImplementation("junit:junit:4.13.2")
 }
