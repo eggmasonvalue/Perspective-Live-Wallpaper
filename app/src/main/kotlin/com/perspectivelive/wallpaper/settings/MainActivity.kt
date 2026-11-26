@@ -112,7 +112,8 @@ class MainActivity : ComponentActivity() {
                         onSaveCustomAura = viewModel::saveCustomColors,
                         onShapeSelected = viewModel::updateUnitShape,
                         onScaleChanged = viewModel::updateUnitScale,
-                        onPaddingChanged = viewModel::updateContainerPaddingScale,
+                        onHorizontalPaddingChanged = viewModel::updateHorizontalPaddingScale,
+                        onVerticalPaddingChanged = viewModel::updateVerticalPaddingScale,
                         onPulsePeriodChanged = viewModel::updatePulsePeriod,
                         onLaunchEyeDropper = ::launchEyeDropper,
                         onApplyWallpaper = ::applyWallpaper

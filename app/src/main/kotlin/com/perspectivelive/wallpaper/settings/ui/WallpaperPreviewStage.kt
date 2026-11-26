@@ -185,12 +185,19 @@ fun WallpaperPreviewStage(
     val neutralMatColor = Color(if (systemDark) NEUTRAL_MAT_DARK else NEUTRAL_MAT_LIGHT)
     val refWidth = REF_SCREEN_WIDTH
     val refHeight = (refWidth / deviceAspect).toInt().coerceAtLeast(REF_SCREEN_HEIGHT / 2)
-    val gridConfig = remember(gridState.totalItems, prefs.containerPaddingScale, refWidth, refHeight) {
+    val gridConfig = remember(
+        gridState.totalItems,
+        prefs.horizontalPaddingScale,
+        prefs.verticalPaddingScale,
+        refWidth,
+        refHeight
+    ) {
         GridCalculator.calculateGridLayout(
             totalDots = gridState.totalItems,
             screenWidth = refWidth,
             screenHeight = refHeight,
-            marginPercent = prefs.containerPaddingScale
+            horizontalMarginPercent = prefs.horizontalPaddingScale,
+            verticalMarginPercent = prefs.verticalPaddingScale
         )
     }
 
@@ -630,7 +637,8 @@ fun LiveWallpaperCanvas(
             totalDots = gridState.totalItems,
             screenWidth = size.width.toInt(),
             screenHeight = size.height.toInt(),
-            marginPercent = prefs.containerPaddingScale
+            horizontalMarginPercent = prefs.horizontalPaddingScale,
+            verticalMarginPercent = prefs.verticalPaddingScale
         )
 
         val effectiveSize = grid.dotSize * prefs.unitScale

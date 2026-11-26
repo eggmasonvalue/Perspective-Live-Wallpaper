@@ -115,7 +115,7 @@ class CanvasRenderer(
     customTypeface: Typeface? = null
 ) {
     companion object {
-        private const val DEFAULT_CONTAINER_PADDING_SCALE = 0.05f
+        private const val DEFAULT_PADDING_SCALE = 0.05f
         private const val DEFAULT_HEALTH_GOAL = 10000f
         private const val MIN_UNIT_SCALE = 0.5f
         private const val MAX_UNIT_SCALE = 1.0f
@@ -134,7 +134,8 @@ class CanvasRenderer(
     // Style settings
     private var unitShapeId: String = "rounded_square"
     private var unitScale: Float = 1.0f
-    private var containerPaddingScale: Float = DEFAULT_CONTAINER_PADDING_SCALE
+    private var horizontalPaddingScale: Float = DEFAULT_PADDING_SCALE
+    private var verticalPaddingScale: Float = DEFAULT_PADDING_SCALE
 
     private var shapeDrawer: ShapeDrawer = RoundedSquareDrawer()
 
@@ -180,7 +181,8 @@ class CanvasRenderer(
             totalDots = gridState.totalItems,
             screenWidth = screenWidth,
             screenHeight = screenHeight,
-            marginPercent = containerPaddingScale
+            horizontalMarginPercent = horizontalPaddingScale,
+            verticalMarginPercent = verticalPaddingScale
         )
     }
 
@@ -384,10 +386,16 @@ class CanvasRenderer(
         rebuildDots()
     }
 
-    fun updateStyle(shapeId: String, scale: Float, paddingScale: Float = DEFAULT_CONTAINER_PADDING_SCALE) {
+    fun updateStyle(
+        shapeId: String,
+        scale: Float,
+        horizontalPaddingScale: Float = DEFAULT_PADDING_SCALE,
+        verticalPaddingScale: Float = DEFAULT_PADDING_SCALE
+    ) {
         this.unitShapeId = shapeId
         this.unitScale = scale
-        this.containerPaddingScale = paddingScale
+        this.horizontalPaddingScale = horizontalPaddingScale
+        this.verticalPaddingScale = verticalPaddingScale
         gridConfig = calculateGrid()
         updateShapeDrawer()
         rebuildDots()

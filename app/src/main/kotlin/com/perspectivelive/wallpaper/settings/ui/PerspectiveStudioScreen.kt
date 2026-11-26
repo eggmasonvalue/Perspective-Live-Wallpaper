@@ -72,7 +72,8 @@ data class StudioActions(
     val onSaveCustomAura: (CustomColorScheme) -> Unit,
     val onShapeSelected: (String) -> Unit,
     val onScaleChanged: (Float) -> Unit,
-    val onPaddingChanged: (Float) -> Unit,
+    val onHorizontalPaddingChanged: (Float) -> Unit,
+    val onVerticalPaddingChanged: (Float) -> Unit,
     val onPulsePeriodChanged: (Long) -> Unit,
     val onLaunchEyeDropper: (CustomColorSlot) -> Unit,
     val onApplyWallpaper: (WallpaperMode) -> Unit
@@ -209,7 +210,8 @@ fun PerspectiveStudioScreen(
                                     prefs = prefs,
                                     onShapeSelected = actions.onShapeSelected,
                                     onScaleChanged = actions.onScaleChanged,
-                                    onPaddingChanged = actions.onPaddingChanged,
+                                    onHorizontalPaddingChanged = actions.onHorizontalPaddingChanged,
+                                    onVerticalPaddingChanged = actions.onVerticalPaddingChanged,
                                     onPulsePeriodChanged = actions.onPulsePeriodChanged
                                 )
                             }
