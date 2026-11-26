@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Transform abstract time into a tangible visual landscape. Perspective - Live is a minimalist Android live wallpaper featuring paired light/dark themes, daily wallpaper rotation, Health Connect sync, and Android 13+ Material You support.">
-    <meta name="keywords" content="life calendar, memento mori, quarter life crisis, productivity wallpaper, android live wallpaper, visual goal tracker, mindfulness app, time visualization, stoic philosophy, dynamic theming, material you, daily rotation, paired themes">
+    <meta name="description" content="Transform abstract time into a tangible visual landscape. Perspective - Live v3.0 is a minimalist Android 17+ live wallpaper built with Material 3 Expressive, featuring 12 unit shapes, 14 curated paired themes, procedural Atmosphere palettes, This Year mode, and Health Connect sync.">
+    <meta name="keywords" content="life calendar, memento mori, productivity wallpaper, android live wallpaper, visual goal tracker, mindfulness app, time visualization, stoic philosophy, material 3 expressive, android 17, daily rotation, paired themes, oklch atmosphere, health connect">
     <meta name="author" content="Perspective - Live">
     <meta property="og:title" content="Perspective - Live | Visual Life Calendar & Day Counter">
-    <meta property="og:description" content="See the Big Picture. Live the Moment. A minimalist Android live wallpaper with paired light/dark themes and daily rotation.">
+    <meta property="og:description" content="See the Big Picture. Live the Moment. A minimalist Android 17+ live wallpaper with 12 expressive shapes, 14 paired themes, procedural Atmosphere, and Health Connect sync.">
     <meta property="og:image" content="https://eggmasonvalue.github.io/Perspective-Live-Wallpaper/assets/icon.svg">
     <meta property="og:url" content="https://eggmasonvalue.github.io/Perspective-Live-Wallpaper/">
     <meta name="theme-color" content="#EAE7DC">
@@ -40,9 +40,9 @@
         <section id="hero" class="hero">
             <div class="container hero-content">
                 <div class="text-content">
-                    <div class="badge-new"><i class="fa-solid fa-sparkles"></i> New: Paired Themes &amp; Daily Rotation</div>
+                    <div class="badge-new"><i class="fa-solid fa-sparkles"></i> New in v3.0: M3 Expressive Studio, 12 Shapes &amp; Atmosphere</div>
                     <h1>See the Big Picture.<br>Live the Moment.</h1>
-                    <p class="subtitle">A minimalist live wallpaper that turns abstract time into a tangible landscape. Designed for clarity, mindfulness, and everyday focus.</p>
+                    <p class="subtitle">A minimalist live wallpaper engine for Android 17+ that turns abstract time into a tangible landscape. Rebuilt in Material 3 Expressive with 12 unit shapes, 14 paired themes, and generative Oklch palettes.</p>
                     <div class="cta-group">
                         <a href="https://github.com/eggmasonvalue/Perspective-Live-Wallpaper/releases/latest" class="btn-primary"><i class="fa-brands fa-android"></i> Download APK</a>
                         <a href="#themes" class="btn-secondary">Explore Themes</a>
@@ -65,10 +65,12 @@
                             <span class="control-label">Theme:</span>
                             <div class="theme-pills" id="hero-theme-pills">
                                 <button class="theme-pill active" data-theme="sage_garden">Iconic</button>
+                                <button class="theme-pill pill-atmosphere" data-theme="atmosphere">Atmosphere</button>
+                                <button class="theme-pill" data-theme="sumi_cinnabar">Sumi</button>
+                                <button class="theme-pill" data-theme="boreal_forest">Boreal</button>
+                                <button class="theme-pill" data-theme="kyoto_celadon">Kyoto</button>
+                                <button class="theme-pill" data-theme="alpenglow">Alpenglow</button>
                                 <button class="theme-pill" data-theme="nordic_minimal">Nordic</button>
-                                <button class="theme-pill" data-theme="warm_sand">Sand</button>
-                                <button class="theme-pill" data-theme="glacial_peak">Glacial</button>
-                                <button class="theme-pill" data-theme="rose_quartz">Rose</button>
                                 <button class="theme-pill" data-theme="monochrome_zen">Mono</button>
                             </div>
                         </div>
@@ -76,11 +78,11 @@
                             <button id="toggle-dark-mode" class="sim-btn" title="Toggle Light/Dark Theme Variant">
                                 <i class="fa-solid fa-moon" id="dark-mode-icon"></i> <span id="dark-mode-label">Dark Mode</span>
                             </button>
-                            <button id="toggle-daily-rotation" class="sim-btn" title="Simulate Daily Theme Rotation">
-                                <i class="fa-solid fa-rotate"></i> <span id="rotation-label">Daily Rotation: Off</span>
+                            <button id="toggle-daily-rotation" class="sim-btn" title="Simulate 14-Day Curated Rotation">
+                                <i class="fa-solid fa-rotate"></i> <span id="rotation-label">Rotation: Off</span>
                             </button>
-                            <button id="toggle-shape" class="sim-btn" title="Cycle Shapes (Square, Circle, Rhombus)">
-                                <i class="fa-solid fa-shapes"></i> <span id="shape-label">Rounded Square</span>
+                            <button id="toggle-shape" class="sim-btn" title="Cycle Through All 12 Unit Shapes">
+                                <i class="fa-solid fa-shapes"></i> <span id="shape-label">Rounded</span>
                             </button>
                         </div>
                     </div>
@@ -100,9 +102,9 @@
                         <p>Your life clock on your lock screen. Visualize how much life you've lived versus what you might have left. It's not about fear; it's about clarity and intentionality.</p>
                         <ul class="feature-list">
                             <li><i class="fa-solid fa-check"></i> Visualizes years lived vs expected (Default 90).</li>
-                            <li><i class="fa-solid fa-check"></i> Gentle pulse animation for the active current year.</li>
+                            <li><i class="fa-solid fa-check"></i> Configurable breathing pulse animation paced at 30 FPS.</li>
                             <li><i class="fa-solid fa-check"></i> Paired light and dark schemes adapt seamlessly with system theme changes.</li>
-                            <li><i class="fa-solid fa-check"></i> Midnight boundary listener smoothly advances date-dependent renders.</li>
+                            <li><i class="fa-solid fa-check"></i> Midnight boundary scheduler smoothly advances date-dependent renders.</li>
                         </ul>
                     </div>
                     <div class="feature-visual">
@@ -116,7 +118,7 @@
                     <div class="feature-text">
                         <div class="feature-tag">Micro View</div>
                         <h3>Day Counter</h3>
-                        <p>Bring focus to the immediate horizon. Track goals, compete with yesterday, or bridge physical vitality with your wallpaper.</p>
+                        <p>Bring focus to the immediate horizon. Track the current calendar year, compete with yesterday, set deadlines, or bridge physical vitality with your wallpaper.</p>
 
                         <div class="micro-modes">
                             <div class="mode-card">
@@ -127,13 +129,17 @@
                                 <h4>You vs. You (Yesterday)</h4>
                                 <p>Compete with your past self. Two shapes: Yesterday (static) vs Today (active pulse).</p>
                             </div>
+                            <div class="mode-card highlight-card">
+                                <h4>This Year</h4>
+                                <p>Auto-rolling current calendar year grid in <strong>Days</strong> (365/366) or <strong>52 Weeks</strong>, resetting automatically every January 1.</p>
+                            </div>
                             <div class="mode-card">
                                 <h4>Custom Event</h4>
                                 <p>Set a deadline or milestone. Visualize countdown days remaining until your target date.</p>
                             </div>
-                            <div class="mode-card highlight-card">
+                            <div class="mode-card highlight-card mode-card-wide">
                                 <h4>Health Connect</h4>
-                                <p>Sync your physical effort. Past days map their fill opacity to your goal progress (Steps, Calories, Distance, Sleep) with crisp Geist font overlays.</p>
+                                <p>Sync your physical effort directly into the grid. Past days map fill opacity to goal progress (Steps, Calories, Distance, Sleep) with crisp Geist font overlays.</p>
                             </div>
                         </div>
                     </div>
@@ -144,9 +150,9 @@
                         <div class="simulation-box micro-preview" id="micro-vs-yesterday">
                             <div class="micro-label">Vs Yesterday</div>
                         </div>
-                        <div class="simulation-box micro-preview" id="micro-custom">
-                            <div class="micro-label">Deadline Tracker</div>
-                            <div class="mini-grid" id="custom-event-grid"></div>
+                        <div class="simulation-box micro-preview" id="micro-this-year">
+                            <div class="micro-label">This Year · 52w</div>
+                            <div class="mini-grid" id="this-year-grid"></div>
                         </div>
                         <div class="simulation-box micro-preview" id="micro-health">
                             <div class="micro-label">Health Connect</div>
@@ -157,22 +163,41 @@
             </div>
         </section>
 
-        <!-- Curated Paired Themes Showcase -->
+        <!-- Curated Paired Themes & Procedural Atmosphere Showcase -->
         <section id="themes" class="themes-section">
             <div class="container">
-                <h2>Curated Paired Themes</h2>
-                <p class="section-desc">Every theme is meticulously crafted with paired Light and Dark variants that switch dynamically when your system theme changes.</p>
+                <h2>14 Curated Themes &amp; Procedural Atmosphere</h2>
+                <p class="section-desc">Every theme is crafted with paired Light and Dark variants that switch dynamically with your system theme. Click any palette to preview it live above.</p>
+
+                <!-- Procedural Atmosphere Spotlight -->
+                <div class="atmosphere-banner" id="atmosphere-banner" title="Click to preview today's Atmosphere theme in the simulator">
+                    <div class="atmosphere-info">
+                        <div class="atmosphere-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                        <div>
+                            <div class="atmosphere-heading">
+                                <h4>Atmosphere</h4>
+                                <span class="theme-badge atmosphere-pill">Procedural Oklch</span>
+                            </div>
+                            <p>Generates an infinite, unrepeatable paired palette every midnight using golden-angle hue stepping and perceptual Oklch color math.</p>
+                        </div>
+                    </div>
+                    <div class="atmosphere-today">
+                        <span class="badge-title">Today's Mood</span>
+                        <span class="badge-value" id="atmosphere-mood-name">Loading…</span>
+                        <div class="atmosphere-swatches" id="atmosphere-swatches"></div>
+                    </div>
+                </div>
                 
                 <div class="theme-gallery" id="theme-gallery">
-                    <!-- Javascript populates theme cards with interactive light/dark swatches -->
+                    <!-- Javascript populates all 14 curated + 4 Health Connect theme cards -->
                 </div>
 
                 <div class="daily-rotation-banner">
                     <div class="rotation-info">
                         <i class="fa-solid fa-clock-rotate-left"></i>
                         <div>
-                            <h4>Deterministic Daily Rotation</h4>
-                            <p>Enable Daily Rotation to wake up to a fresh curated theme each morning at midnight without background battery drain.</p>
+                            <h4>14-Day Deterministic Daily Rotation</h4>
+                            <p>Enable Daily Rotation to cycle through all 14 curated paired themes at midnight with zero background drain, or choose <strong>Atmosphere</strong> for infinite procedural palettes.</p>
                         </div>
                     </div>
                     <div class="today-badge" id="today-rotation-badge">
@@ -187,37 +212,37 @@
         <section id="customization" class="customization">
             <div class="container">
                 <h2>Crafted with Attention to Detail</h2>
-                <p class="section-desc">Fine-tune every visual dimension to match your setup.</p>
+                <p class="section-desc">Rebuilt from the ground up in Jetpack Compose Material 3 Expressive 1.5.0 for Android 17.</p>
                 <div class="style-grid">
                     <div class="style-item">
-                        <div class="icon-circle"><i class="fa-solid fa-palette"></i></div>
-                        <h4>Paired Light &amp; Dark</h4>
-                        <p>Streamlined paired themes with instant system theme switching and multi-engine tracking.</p>
-                    </div>
-                    <div class="style-item">
-                        <div class="icon-circle"><i class="fa-solid fa-calendar-day"></i></div>
-                        <h4>Daily Rotation</h4>
-                        <p>Deterministic date-based theme cycling at midnight. Zero background service overhead.</p>
-                    </div>
-                    <div class="style-item">
-                        <div class="icon-circle"><i class="fa-solid fa-mobile-screen-button"></i></div>
-                        <h4>Material You Icon</h4>
-                        <p>Redesigned 2×2 living grid matrix icon with Android 13+ monochrome themed icon support.</p>
-                    </div>
-                    <div class="style-item">
-                        <div class="icon-circle"><i class="fa-solid fa-font"></i></div>
-                        <h4>Geist Typography</h4>
-                        <p>Bundled Geist typeface injected natively into canvas rendering for razor-sharp health metric overlays.</p>
+                        <div class="icon-circle"><i class="fa-solid fa-wand-sparkles"></i></div>
+                        <h4>Material 3 Expressive Studio</h4>
+                        <p>True-aspect live wallpaper preview with tap-to-inspect 1:1 fullscreen mode and a floating Horizon, Palette &amp; Craft dock.</p>
                     </div>
                     <div class="style-item">
                         <div class="icon-circle"><i class="fa-solid fa-shapes"></i></div>
-                        <h4>Shape Shifting</h4>
-                        <p>Choose between <strong>Circle</strong>, <strong>Rounded Square</strong>, or <strong>Rhombus</strong> geometries.</p>
+                        <h4>12 Expressive Shapes</h4>
+                        <p>Choose from <strong>Circle</strong>, <strong>Rounded</strong>, <strong>Squircle</strong>, <strong>Square</strong>, <strong>Rhombus</strong>, <strong>Hexagon</strong>, <strong>Octagon</strong>, <strong>Capsule</strong>, <strong>Clover</strong>, <strong>Scallop</strong>, <strong>Leaf</strong>, and <strong>Spark</strong>.</p>
                     </div>
                     <div class="style-item">
                         <div class="icon-circle"><i class="fa-solid fa-sliders"></i></div>
-                        <h4>Density &amp; Scale</h4>
-                        <p>Adjust grid scale from 0.5x to 1.0x and customize margin padding to suit your device screen.</p>
+                        <h4>Independent Margins &amp; Scale</h4>
+                        <p>Fine-tune grid density (0.5x–1.0x) and independent horizontal, top, and bottom margins for lock-screen clocks, docks, and bezels.</p>
+                    </div>
+                    <div class="style-item">
+                        <div class="icon-circle"><i class="fa-solid fa-eye-dropper"></i></div>
+                        <h4>Custom Aura &amp; EyeDropper</h4>
+                        <p>Build custom 3-tone color schemes using Android 17's native EyeDropper alongside Material You dynamic color extraction.</p>
+                    </div>
+                    <div class="style-item">
+                        <div class="icon-circle"><i class="fa-solid fa-bolt"></i></div>
+                        <h4>30 FPS Hardware Engine</h4>
+                        <p>Hardware-accelerated Canvas with zero-allocation frame rendering, breathing tempo control, and automatic pause in Power Save mode.</p>
+                    </div>
+                    <div class="style-item">
+                        <div class="icon-circle"><i class="fa-solid fa-mobile-screen-button"></i></div>
+                        <h4>Smart Pixel Picker &amp; Geist</h4>
+                        <p>Jump straight into Pixel's <em>Wallpaper &amp; style</em> lock/home preview, paired with bundled Geist typography and a monochrome themed icon.</p>
                     </div>
                 </div>
             </div>
@@ -230,7 +255,7 @@
                 <h2>Ready to change your perspective?</h2>
                 <p class="cta-sub">Free and open source. Visualizing time with intention.</p>
                 <a href="https://github.com/eggmasonvalue/Perspective-Live-Wallpaper/releases/latest" class="btn-primary big-btn"><i class="fa-brands fa-android"></i> Download Latest Release</a>
-                <p class="small-text">Open Source • No Ads • Privacy Focused • Zero Telemetry</p>
+                <p class="small-text">Requires Android 17+ • Open Source • No Ads • Privacy Focused • Zero Telemetry</p>
             </div>
         </section>
     </main>
