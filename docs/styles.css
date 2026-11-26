@@ -277,17 +277,24 @@ nav a {
     transition: border-radius 0.25s ease, background-color 0.3s ease, border-color 0.3s ease;
 }
 
-.year-dot.shape-circle {
-    border-radius: 50% !important;
+.year-dot.svg-cell {
+    border: none !important;
+    background-color: transparent !important;
+    border-radius: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.year-dot.shape-rounded {
-    border-radius: 4px !important;
+.shape-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    overflow: visible;
 }
 
-.year-dot.shape-rhombus {
-    border-radius: 3px !important;
-    transform: rotate(45deg) scale(0.76);
+.shape-svg path {
+    transition: fill 0.3s ease, stroke 0.3s ease;
 }
 
 .year-dot.past {
@@ -308,7 +315,7 @@ nav a {
 
 @keyframes pulse {
     0% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.65; transform: scale(0.94); }
+    50% { opacity: 0.65; transform: scale(0.92); }
     100% { opacity: 1; transform: scale(1); }
 }
 
@@ -516,6 +523,10 @@ nav a {
     color: var(--accent-color);
 }
 
+.mode-card.mode-card-wide {
+    grid-column: 1 / -1;
+}
+
 /* Simulation Boxes */
 .simulation-box {
     background: #fff;
@@ -543,6 +554,12 @@ nav a {
     gap: 4px;
     width: 90%;
     justify-content: center;
+}
+
+#this-year-grid {
+    width: 72%;
+    gap: 4px;
+    margin-top: 14px;
 }
 
 .micro-visuals {
@@ -673,10 +690,106 @@ nav a {
     font-size: 1.05rem;
 }
 
+/* Procedural Atmosphere Spotlight */
+.atmosphere-banner {
+    background: linear-gradient(135deg, #ffffff 0%, #f7f4ee 100%);
+    border-radius: 20px;
+    padding: 1.6rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 2.25rem;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.atmosphere-banner:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+    border-color: var(--accent-color);
+}
+
+.atmosphere-info {
+    display: flex;
+    align-items: center;
+    gap: 1.35rem;
+}
+
+.atmosphere-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: rgba(232, 90, 79, 0.12);
+    color: var(--accent-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+}
+
+.atmosphere-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-bottom: 0.3rem;
+}
+
+.atmosphere-heading h4 {
+    font-size: 1.25rem;
+    color: var(--text-color);
+}
+
+.atmosphere-pill {
+    background: rgba(232, 90, 79, 0.12);
+    color: var(--accent-color);
+}
+
+.atmosphere-info p {
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    max-width: 560px;
+    line-height: 1.45;
+}
+
+.atmosphere-today {
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 0.85rem 1.25rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 205px;
+}
+
+.atmosphere-swatches {
+    display: flex;
+    gap: 0.55rem;
+    margin-top: 0.55rem;
+}
+
+.atmo-swatch-pair {
+    display: flex;
+    gap: 4px;
+    padding: 4px 6px;
+    border-radius: 8px;
+    background: #FAF8F5;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.atmo-swatch-pair.atmo-dark {
+    background: #191816;
+}
+
 .theme-gallery {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.35rem;
     margin-bottom: 3.5rem;
 }
 
@@ -972,19 +1085,29 @@ footer a {
         grid-template-columns: 1fr;
     }
 
+    .mode-card.mode-card-wide {
+        grid-column: auto;
+    }
+
     .micro-visuals {
         flex-direction: column;
         align-items: center;
     }
 
+    .atmosphere-banner,
     .daily-rotation-banner {
         flex-direction: column;
         text-align: center;
     }
 
+    .atmosphere-info,
     .rotation-info {
         flex-direction: column;
         text-align: center;
+    }
+
+    .atmosphere-heading {
+        justify-content: center;
     }
 
     header .container {
