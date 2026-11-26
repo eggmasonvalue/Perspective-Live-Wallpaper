@@ -29,7 +29,7 @@ class SettingsViewModel(private val preferencesManager: PreferencesManager) : Vi
         private const val MAX_UNIT_SCALE = 1.0f
         private const val MIN_PADDING_SCALE = 0.0f
         private const val MAX_HORIZONTAL_PADDING_SCALE = 0.2f
-        private const val MAX_VERTICAL_PADDING_SCALE = 0.35f
+        private const val MAX_VERTICAL_PADDING_SCALE = 0.40f
         private const val MIN_PULSE_MS = 500L
         private const val MAX_PULSE_MS = 5000L
         private const val FIRST_MONTH = 1
@@ -262,10 +262,21 @@ class SettingsViewModel(private val preferencesManager: PreferencesManager) : Vi
         }
     }
 
-    fun updateVerticalPaddingScale(paddingScale: Float) {
+    fun updateTopPaddingScale(paddingScale: Float) {
         updateAndPersist {
             it.copy(
-                verticalPaddingScale = paddingScale.coerceIn(
+                topPaddingScale = paddingScale.coerceIn(
+                    MIN_PADDING_SCALE,
+                    MAX_VERTICAL_PADDING_SCALE
+                )
+            )
+        }
+    }
+
+    fun updateBottomPaddingScale(paddingScale: Float) {
+        updateAndPersist {
+            it.copy(
+                bottomPaddingScale = paddingScale.coerceIn(
                     MIN_PADDING_SCALE,
                     MAX_VERTICAL_PADDING_SCALE
                 )

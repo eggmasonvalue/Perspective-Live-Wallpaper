@@ -45,6 +45,7 @@ class MainActivity : ComponentActivity() {
     private var pendingHealthSpec: HealthMetricSpec? = null
     private var pendingEyeDropperSlot: CustomColorSlot? = null
     private var sampledColorState by mutableStateOf<Pair<CustomColorSlot, Int>?>(null)
+    private var activeWallpaperModes by mutableStateOf<Set<WallpaperMode>>(emptySet())
 
     private val snackbarHostState = SnackbarHostState()
 
@@ -76,6 +77,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        activeWallpaperModes = queryActiveWallpaperModes()
 
         setContent {
             PerspectiveTheme {
@@ -114,22 +116,44 @@ class MainActivity : ComponentActivity() {
                         onShapeSelected = viewModel::updateUnitShape,
                         onScaleChanged = viewModel::updateUnitScale,
                         onHorizontalPaddingChanged = viewModel::updateHorizontalPaddingScale,
-                        onVerticalPaddingChanged = viewModel::updateVerticalPaddingScale,
+                        onTopPaddingChanged = viewModel::updateTopPaddingScale,
+                        onBottomPaddingChanged = viewModel::updateBottomPaddingScale,
                         onPulsePeriodChanged = viewModel::updatePulsePeriod,
                         onLaunchEyeDropper = ::launchEyeDropper,
-                        onApplyWallpaper = ::applyWallpaper
+                        onApplyWallpaper = ::applyWallpaper,
+                        onOpenWallpaperPicker = ::openWallpaperPicker
                     )
                 }
 
                 PerspectiveStudioScreen(
                     prefs = prefs,
                     customColors = customColors,
+                    activeWallpaperModes = activeWallpaperModes,
                     sampledColor = sampledColorState,
                     onConsumeSampledColor = { sampledColorState = null },
                     snackbarHostState = snackbarHostState,
                     actions = actions
                 )
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        activeWallpaperModes = queryActiveWallpaperModes()
+    }
+
+    private fun queryActiveWallpaperModes(): Set<WallpaperMode> {
+        val wallpaperManager = WallpaperManager.getInstance(this)
+        val activeComponents = listOfNotNull(
+            wallpaperManager.getWallpaperInfo(WallpaperManager.FLAG_SYSTEM)?.component,
+            wallpaperManager.getWallpaperInfo(WallpaperManager.FLAG_LOCK)?.component
+        )
+        val macroComponent = ComponentName(this, LifeCalendarService::class.java)
+        val microComponent = ComponentName(this, DayCounterService::class.java)
+        return buildSet {
+            if (macroComponent in activeComponents) add(WallpaperMode.MACRO)
+            if (microComponent in activeComponents) add(WallpaperMode.MICRO)
         }
     }
 
@@ -176,7 +200,14 @@ class MainActivity : ComponentActivity() {
                 ComponentName(this@MainActivity, serviceClass)
             )
         }
-        startActivity(intent)
+        runCatching { startActivity(intent) }
+            .onFailure { showSnackbar("Unable to open live wallpaper picker") }
+    }
+
+    private fun openWallpaperPicker() {
+        viewModel.savePreferences()
+        runCatching { startActivity(Intent(Intent.ACTION_SET_WALLPAPER)) }
+            .onFailure { showSnackbar("Unable to open Wallpaper & style") }
     }
 
     private fun showSnackbar(message: String) {

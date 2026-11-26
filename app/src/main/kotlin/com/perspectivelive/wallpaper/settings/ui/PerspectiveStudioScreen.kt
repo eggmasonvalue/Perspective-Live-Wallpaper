@@ -74,16 +74,19 @@ data class StudioActions(
     val onShapeSelected: (String) -> Unit,
     val onScaleChanged: (Float) -> Unit,
     val onHorizontalPaddingChanged: (Float) -> Unit,
-    val onVerticalPaddingChanged: (Float) -> Unit,
+    val onTopPaddingChanged: (Float) -> Unit,
+    val onBottomPaddingChanged: (Float) -> Unit,
     val onPulsePeriodChanged: (Long) -> Unit,
     val onLaunchEyeDropper: (CustomColorSlot) -> Unit,
-    val onApplyWallpaper: (WallpaperMode) -> Unit
+    val onApplyWallpaper: (WallpaperMode) -> Unit,
+    val onOpenWallpaperPicker: () -> Unit
 )
 
 @Composable
 fun PerspectiveStudioScreen(
     prefs: UserPreferences,
     customColors: CustomColorScheme?,
+    activeWallpaperModes: Set<WallpaperMode>,
     sampledColor: Pair<CustomColorSlot, Int>?,
     onConsumeSampledColor: () -> Unit,
     snackbarHostState: SnackbarHostState,
@@ -92,7 +95,6 @@ fun PerspectiveStudioScreen(
     val systemDark = isSystemInDarkTheme()
     var activeMode by rememberSaveable { mutableStateOf(WallpaperMode.MACRO) }
     var activeTab by rememberSaveable { mutableStateOf(StudioTab.HORIZON) }
-    var peekMode by rememberSaveable { mutableStateOf(SurfacePeekMode.CLEAN) }
     var previewDark by rememberSaveable { mutableStateOf(systemDark) }
     var isFullscreen by rememberSaveable { mutableStateOf(false) }
     var showCustomAuraSheet by rememberSaveable { mutableStateOf(false) }
@@ -160,10 +162,8 @@ fun PerspectiveStudioScreen(
                         gridState = gridState,
                         colorScheme = resolvedScheme,
                         themeDisplayName = themeTitle,
-                        peekMode = peekMode,
                         previewDark = previewDark,
                         pulseAlpha = pulseAlpha,
-                        onPeekModeChange = { peekMode = it },
                         onPreviewDarkChange = { previewDark = it },
                         onExpandFullscreen = { isFullscreen = true }
                     )
@@ -213,7 +213,8 @@ fun PerspectiveStudioScreen(
                                     onShapeSelected = actions.onShapeSelected,
                                     onScaleChanged = actions.onScaleChanged,
                                     onHorizontalPaddingChanged = actions.onHorizontalPaddingChanged,
-                                    onVerticalPaddingChanged = actions.onVerticalPaddingChanged,
+                                    onTopPaddingChanged = actions.onTopPaddingChanged,
+                                    onBottomPaddingChanged = actions.onBottomPaddingChanged,
                                     onPulsePeriodChanged = actions.onPulsePeriodChanged
                                 )
                             }
@@ -225,8 +226,10 @@ fun PerspectiveStudioScreen(
                 StudioFloatingDock(
                     activeTab = activeTab,
                     activeMode = activeMode,
+                    isActiveModeApplied = activeMode in activeWallpaperModes,
                     onTabSelected = { activeTab = it },
                     onApplyWallpaper = actions.onApplyWallpaper,
+                    onOpenWallpaperPicker = actions.onOpenWallpaperPicker,
                     modifier = Modifier.align(Alignment.BottomCenter)
                 )
             }
@@ -239,9 +242,7 @@ fun PerspectiveStudioScreen(
             mode = activeMode,
             gridState = gridState,
             colorScheme = resolvedScheme,
-            peekMode = peekMode,
             pulseAlpha = pulseAlpha,
-            onPeekModeChange = { peekMode = it },
             onDismiss = { isFullscreen = false }
         )
 

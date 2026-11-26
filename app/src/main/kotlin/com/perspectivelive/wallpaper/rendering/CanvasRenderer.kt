@@ -110,7 +110,8 @@ class CanvasRenderer(
     private var unitShape: UnitShape = UnitShape.DEFAULT
     private var unitScale: Float = 1.0f
     private var horizontalPaddingScale: Float = DEFAULT_PADDING_SCALE
-    private var verticalPaddingScale: Float = DEFAULT_PADDING_SCALE
+    private var topPaddingScale: Float = DEFAULT_PADDING_SCALE
+    private var bottomPaddingScale: Float = DEFAULT_PADDING_SCALE
 
     private var shapeDrawer: ShapeDrawer = RoundedSquareDrawer()
 
@@ -157,7 +158,8 @@ class CanvasRenderer(
             screenWidth = screenWidth,
             screenHeight = screenHeight,
             horizontalMarginPercent = horizontalPaddingScale,
-            verticalMarginPercent = verticalPaddingScale
+            topMarginPercent = topPaddingScale,
+            bottomMarginPercent = bottomPaddingScale
         )
     }
 
@@ -374,12 +376,14 @@ class CanvasRenderer(
         shapeId: String,
         scale: Float,
         horizontalPaddingScale: Float = DEFAULT_PADDING_SCALE,
-        verticalPaddingScale: Float = DEFAULT_PADDING_SCALE
+        topPaddingScale: Float = DEFAULT_PADDING_SCALE,
+        bottomPaddingScale: Float = DEFAULT_PADDING_SCALE
     ) {
         this.unitShape = UnitShape.fromId(shapeId)
         this.unitScale = scale
         this.horizontalPaddingScale = horizontalPaddingScale
-        this.verticalPaddingScale = verticalPaddingScale
+        this.topPaddingScale = topPaddingScale
+        this.bottomPaddingScale = bottomPaddingScale
         gridConfig = calculateGrid()
         updateShapeDrawer()
         rebuildDots()

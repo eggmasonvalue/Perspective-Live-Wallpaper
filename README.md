@@ -42,7 +42,7 @@ Customize the aesthetic via the built-in **Style** sheet:
 
 - **Shape Shifting**: Choose from 12 architectural and Material 3 Expressive shapes — **Circle**, **Rounded**, **Squircle**, **Square**, **Rhombus**, **Hexagon**, **Octagon**, **Capsule**, **Clover**, **Scallop**, **Leaf**, and **Spark**.
 - **Density Control**: Adjust grid scale from **0.5x** (airy, minimalist) to **1.0x** (dense, data-rich).
-- **Container Padding**: Fine-tune margins around the grid for device bezels.
+- **Container Padding**: Fine-tune independent horizontal, top, and bottom margins around the grid for lock-screen clocks, docks, and device bezels.
 - **Colors**: 14 curated paired themes (*Iconic*, *Nordic Minimal*, *Warm Sand*, *Glacial Peak*, *Rose Quartz*, *Monochrome Zen*, *Sumi & Cinnabar*, *Boreal Forest*, *Sahara Dunes*, *Kyoto Celadon*, *Alpenglow*, *Basalt & Ochre*, *Pacific Drift*, *Terracotta Courtyard*), the generative *Atmosphere* theme producing unique daily palettes via perceptual Oklch color math, and dedicated Health Connect presets.
 - **Daily Rotation**: Automatically cycle through rotatable color schemes daily at midnight over a 14-day cycle, or select *Atmosphere* for infinite, unrepeatable daily procedural palettes.
 - **Material You**: Dynamic wallpaper color extraction on supported Android versions.
@@ -61,8 +61,8 @@ Customize the aesthetic via the built-in **Style** sheet:
 1. Download the APK from the [Releases](https://github.com/eggmasonvalue/Perspective-Live-Wallpaper/releases/latest) page (requires Android 17+).
 2. Open the **Perspective - Live** studio app.
 3. Switch between **Macro** and **Micro** in the top bar while viewing the live true-aspect preview (tap the preview to inspect 1:1 fullscreen).
-4. Use the floating bottom toolbar to configure **Horizon**, **Palette** (3-tone Color Orbs, *Atmosphere*, or **Custom Aura** with Android 17 EyeDropper), and **Craft** (shape, scale, margin, breathing tempo).
-5. Tap **Set** on the floating split button to apply the live wallpaper.
+4. Use the floating bottom toolbar to configure **Horizon**, **Palette** (3-tone Color Orbs, *Atmosphere*, or **Custom Aura** with Android 17 EyeDropper), and **Craft** (shape, scale, independent horizontal/top/bottom margins, breathing tempo).
+5. Tap **Set** on the floating split button to apply the live wallpaper, or **Preview** (when active) to open Pixel's **Wallpaper & style** lock/home screen preview.
 
 ## 💻 Development & Building
 
