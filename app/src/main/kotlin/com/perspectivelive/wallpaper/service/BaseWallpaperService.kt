@@ -281,7 +281,8 @@ abstract class BaseWallpaperService : WallpaperService() {
                     preferences.unitShapeId,
                     preferences.unitScale,
                     preferences.horizontalPaddingScale,
-                    preferences.verticalPaddingScale
+                    preferences.topPaddingScale,
+                    preferences.bottomPaddingScale
                 )
                 if (preferences.healthMetric != "NONE") {
                     updateHealthData(

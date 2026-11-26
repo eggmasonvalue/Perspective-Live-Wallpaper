@@ -17,6 +17,7 @@ import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material.icons.rounded.Tune
+import androidx.compose.material.icons.rounded.Wallpaper
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -59,15 +60,18 @@ private val DOCK_DESTINATIONS = listOf(
 
 /**
  * Floating M3 Expressive 1.5.0 bottom dock pairing a vibrant HorizontalFloatingToolbar
- * with a detached SplitButtonLayout for applying Macro or Micro wallpapers.
+ * with a detached SplitButtonLayout that opens Wallpaper & style when the selected mode
+ * is already active, or directly applies the live wallpaper otherwise.
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun StudioFloatingDock(
     activeTab: StudioTab,
     activeMode: WallpaperMode,
+    isActiveModeApplied: Boolean,
     onTabSelected: (StudioTab) -> Unit,
     onApplyWallpaper: (WallpaperMode) -> Unit,
+    onOpenWallpaperPicker: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
@@ -113,15 +117,24 @@ fun StudioFloatingDock(
             SplitButtonLayout(
                 leadingButton = {
                     SplitButtonDefaults.LeadingButton(
-                        onClick = { onApplyWallpaper(activeMode) }
+                        onClick = {
+                            if (isActiveModeApplied) {
+                                onOpenWallpaperPicker()
+                            } else {
+                                onApplyWallpaper(activeMode)
+                            }
+                        }
                     ) {
                         Icon(
-                            imageVector = Icons.Rounded.Check,
+                            imageVector = if (isActiveModeApplied) Icons.Rounded.Wallpaper else Icons.Rounded.Check,
                             contentDescription = null,
                             modifier = Modifier.size(SplitButtonDefaults.LeadingIconSize)
                         )
                         Spacer(Modifier.width(ToggleButtonDefaults.IconSpacing))
-                        Text(text = "Set", style = MaterialTheme.typography.labelLarge)
+                        Text(
+                            text = if (isActiveModeApplied) "Preview" else "Set",
+                            style = MaterialTheme.typography.labelLarge
+                        )
                     }
                 },
                 trailingButton = {
@@ -136,7 +149,7 @@ fun StudioFloatingDock(
                     ) {
                         Icon(
                             imageVector = Icons.Rounded.KeyboardArrowDown,
-                            contentDescription = "Choose wallpaper service",
+                            contentDescription = "Wallpaper actions",
                             modifier = Modifier
                                 .size(SplitButtonDefaults.TrailingIconSize)
                                 .graphicsLayer { rotationZ = rotation }
@@ -149,6 +162,13 @@ fun StudioFloatingDock(
                 expanded = menuExpanded,
                 onDismissRequest = { menuExpanded = false }
             ) {
+                DropdownMenuItem(
+                    text = { Text("Open Wallpaper & style") },
+                    onClick = {
+                        menuExpanded = false
+                        onOpenWallpaperPicker()
+                    }
+                )
                 DropdownMenuItem(
                     text = { Text("Set Macro (Life Horizon)") },
                     onClick = {

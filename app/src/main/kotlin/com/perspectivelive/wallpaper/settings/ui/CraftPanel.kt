@@ -45,8 +45,8 @@ private const val UNIT_SCALE_STEPS = 9
 private const val MIN_PADDING = 0.0f
 private const val MAX_HORIZONTAL_PADDING = 0.2f
 private const val HORIZONTAL_PADDING_STEPS = 19
-private const val MAX_VERTICAL_PADDING = 0.35f
-private const val VERTICAL_PADDING_STEPS = 34
+private const val MAX_VERTICAL_PADDING = 0.40f
+private const val VERTICAL_PADDING_STEPS = 39
 private const val MIN_PULSE_MS = 500f
 private const val MAX_PULSE_MS = 5000f
 private const val PULSE_STEP_MS = 100f
@@ -73,7 +73,8 @@ fun CraftPanel(
     onShapeSelected: (String) -> Unit,
     onScaleChanged: (Float) -> Unit,
     onHorizontalPaddingChanged: (Float) -> Unit,
-    onVerticalPaddingChanged: (Float) -> Unit,
+    onTopPaddingChanged: (Float) -> Unit,
+    onBottomPaddingChanged: (Float) -> Unit,
     onPulsePeriodChanged: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -117,7 +118,7 @@ fun CraftPanel(
             }
         }
 
-        // Segmented Card Group: Unit Size, Horizontal Margin, Vertical Margin, Breathing Cycle
+        // Segmented Card Group: Unit Size, Horizontal Margin, Top Margin, Bottom Margin, Breathing Cycle
         Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
             SegmentedSliderCard(
                 label = "Unit Size",
@@ -140,12 +141,22 @@ fun CraftPanel(
             )
 
             SegmentedSliderCard(
-                label = "Vertical Margin",
-                valueLabel = "${(prefs.verticalPaddingScale * PERCENT_MULTIPLIER).roundToInt()}%",
-                value = prefs.verticalPaddingScale.coerceIn(MIN_PADDING, MAX_VERTICAL_PADDING),
+                label = "Top Margin",
+                valueLabel = "${(prefs.topPaddingScale * PERCENT_MULTIPLIER).roundToInt()}%",
+                value = prefs.topPaddingScale.coerceIn(MIN_PADDING, MAX_VERTICAL_PADDING),
                 valueRange = MIN_PADDING..MAX_VERTICAL_PADDING,
                 steps = VERTICAL_PADDING_STEPS,
-                onValueChange = onVerticalPaddingChanged,
+                onValueChange = onTopPaddingChanged,
+                shape = RoundedCornerShape(6.dp)
+            )
+
+            SegmentedSliderCard(
+                label = "Bottom Margin",
+                valueLabel = "${(prefs.bottomPaddingScale * PERCENT_MULTIPLIER).roundToInt()}%",
+                value = prefs.bottomPaddingScale.coerceIn(MIN_PADDING, MAX_VERTICAL_PADDING),
+                valueRange = MIN_PADDING..MAX_VERTICAL_PADDING,
+                steps = VERTICAL_PADDING_STEPS,
+                onValueChange = onBottomPaddingChanged,
                 shape = RoundedCornerShape(6.dp)
             )
 

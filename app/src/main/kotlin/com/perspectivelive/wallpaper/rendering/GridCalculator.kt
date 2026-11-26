@@ -24,15 +24,18 @@ object GridCalculator {
      * @param screenWidth Width of the screen in pixels
      * @param screenHeight Height of the screen in pixels
      * @param horizontalMarginPercent Percentage of screen width to use as left/right margin (default 5%)
-     * @param verticalMarginPercent Percentage of screen height to use as top/bottom margin (default 5%)
+     * @param topMarginPercent Percentage of screen height to use as top margin (default 5%)
+     * @param bottomMarginPercent Percentage of screen height to use as bottom margin (default 5%)
      * @return A GridConfig with optimal rows, columns, dot size, spacing, and offsets
      */
+    @Suppress("LongParameterList")
     fun calculateGridLayout(
         totalDots: Int,
         screenWidth: Int,
         screenHeight: Int,
         horizontalMarginPercent: Float = DEFAULT_MARGIN_PERCENT,
-        verticalMarginPercent: Float = DEFAULT_MARGIN_PERCENT
+        topMarginPercent: Float = DEFAULT_MARGIN_PERCENT,
+        bottomMarginPercent: Float = DEFAULT_MARGIN_PERCENT
     ): GridConfig {
         // Safeguard against invalid inputs
         if (totalDots <= 0 || screenWidth <= 0 || screenHeight <= 0) {
@@ -49,10 +52,11 @@ object GridCalculator {
 
         // Subtract independent margins first so grid rows/columns reflow to match the usable aspect ratio
         val horizontalMargin = (screenWidth * horizontalMarginPercent).toInt()
-        val verticalMargin = (screenHeight * verticalMarginPercent).toInt()
+        val topMargin = (screenHeight * topMarginPercent).toInt()
+        val bottomMargin = (screenHeight * bottomMarginPercent).toInt()
 
         val usableWidth = (screenWidth - (2 * horizontalMargin)).coerceAtLeast(1)
-        val usableHeight = (screenHeight - (2 * verticalMargin)).coerceAtLeast(1)
+        val usableHeight = (screenHeight - topMargin - bottomMargin).coerceAtLeast(1)
 
         val aspectRatio = usableWidth.toFloat() / usableHeight.toFloat()
 
@@ -87,14 +91,12 @@ object GridCalculator {
 
         val spacing = dotSize * SPACING_PERCENT
 
-        // The key to exact vertical centering:
-        // 1. Grid width/height derived directly from bestCols/bestRows
-        // 2. Offsets derived directly from screenWidth/screenHeight, taking the exact empty space
+        // Center horizontally across the screen and vertically within [topMargin, height - bottomMargin]
         val gridWidth = (bestCols * dotSize) + ((bestCols - 1) * spacing)
         val gridHeight = (bestRows * dotSize) + ((bestRows - 1) * spacing)
 
         val offsetX = (screenWidth - gridWidth) / 2f
-        val offsetY = (screenHeight - gridHeight) / 2f
+        val offsetY = topMargin + (usableHeight - gridHeight) / 2f
 
         return GridConfig(
             rows = bestRows,

@@ -39,7 +39,8 @@ class PreferencesManager(context: Context) {
         private const val KEY_UNIT_SHAPE_ID = "unit_shape_id"
         private const val KEY_UNIT_SCALE = "unit_scale"
         private const val KEY_HORIZONTAL_PADDING_SCALE = "horizontal_padding_scale"
-        private const val KEY_VERTICAL_PADDING_SCALE = "vertical_padding_scale"
+        private const val KEY_TOP_PADDING_SCALE = "top_padding_scale"
+        private const val KEY_BOTTOM_PADDING_SCALE = "bottom_padding_scale"
         private const val KEY_PULSE_PERIOD_MS = "pulse_period_ms"
 
         // Health Connect keys
@@ -102,7 +103,8 @@ class PreferencesManager(context: Context) {
         val dayCounterMode = prefs.getString(KEY_DAY_COUNTER_MODE, DayCounterMode.STATIC) ?: DayCounterMode.STATIC
         val unitShapeId = prefs.getString(KEY_UNIT_SHAPE_ID, "rounded_square") ?: "rounded_square"
         val horizontalPaddingScale = prefs.getFloat(KEY_HORIZONTAL_PADDING_SCALE, DEFAULT_PADDING_SCALE)
-        val verticalPaddingScale = prefs.getFloat(KEY_VERTICAL_PADDING_SCALE, DEFAULT_PADDING_SCALE)
+        val topPaddingScale = prefs.getFloat(KEY_TOP_PADDING_SCALE, DEFAULT_PADDING_SCALE)
+        val bottomPaddingScale = prefs.getFloat(KEY_BOTTOM_PADDING_SCALE, DEFAULT_PADDING_SCALE)
         val unitScale = prefs.getFloat(KEY_UNIT_SCALE, DEFAULT_UNIT_SCALE)
         val pulsePeriodMs = prefs.getLong(KEY_PULSE_PERIOD_MS, DEFAULT_PULSE_PERIOD_MS)
         val healthMetric = prefs.getString(KEY_HEALTH_METRIC, "NONE") ?: "NONE"
@@ -124,7 +126,8 @@ class PreferencesManager(context: Context) {
             unitShapeId = unitShapeId,
             unitScale = unitScale,
             horizontalPaddingScale = horizontalPaddingScale,
-            verticalPaddingScale = verticalPaddingScale,
+            topPaddingScale = topPaddingScale,
+            bottomPaddingScale = bottomPaddingScale,
             pulsePeriodMs = pulsePeriodMs,
             healthMetric = healthMetric,
             healthMetricGoal = healthGoal,
@@ -160,7 +163,8 @@ class PreferencesManager(context: Context) {
             putString(KEY_DAY_COUNTER_MODE, preferences.dayCounterMode)
 
             putFloat(KEY_HORIZONTAL_PADDING_SCALE, preferences.horizontalPaddingScale)
-            putFloat(KEY_VERTICAL_PADDING_SCALE, preferences.verticalPaddingScale)
+            putFloat(KEY_TOP_PADDING_SCALE, preferences.topPaddingScale)
+            putFloat(KEY_BOTTOM_PADDING_SCALE, preferences.bottomPaddingScale)
             // Style fields
             putString(KEY_UNIT_SHAPE_ID, preferences.unitShapeId)
             putFloat(KEY_UNIT_SCALE, preferences.unitScale)
