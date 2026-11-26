@@ -13,12 +13,6 @@ enum class StudioTab {
     CRAFT
 }
 
-enum class SurfacePeekMode {
-    CLEAN,
-    LOCK,
-    HOME
-}
-
 enum class CustomColorSlot {
     BACKGROUND,
     PAST_FUTURE,

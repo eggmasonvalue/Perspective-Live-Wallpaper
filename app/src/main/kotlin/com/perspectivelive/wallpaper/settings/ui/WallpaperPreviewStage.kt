@@ -2,6 +2,7 @@ package com.perspectivelive.wallpaper.settings.ui
 
 import android.graphics.Paint
 import android.graphics.Typeface
+import android.view.WindowManager
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -9,7 +10,6 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -27,9 +27,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
@@ -61,7 +59,6 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.rotate
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
@@ -72,7 +69,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.content.res.ResourcesCompat
 import com.perspectivelive.wallpaper.R
 import com.perspectivelive.wallpaper.data.ColorScheme
@@ -80,9 +76,6 @@ import com.perspectivelive.wallpaper.data.GridState
 import com.perspectivelive.wallpaper.data.UserPreferences
 import com.perspectivelive.wallpaper.rendering.GridCalculator
 import com.perspectivelive.wallpaper.service.HealthConnectManager
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 import java.util.Locale
 import kotlin.math.PI
 import kotlin.math.min
@@ -111,8 +104,6 @@ private const val HEALTH_ALPHA_SPAN = 0.78f
 private const val HEALTH_TEXT_SCALE = 0.28f
 private const val MIN_TEXT_DOT_PX = 24f
 private const val THOUSAND = 1000f
-private const val LIGHT_BG_LUMINANCE_THRESHOLD = 0.5f
-private const val HOME_DOCK_ICONS = 4
 private const val REF_SCREEN_WIDTH = 1080
 private const val REF_SCREEN_HEIGHT = 2400
 
@@ -131,11 +122,15 @@ private val SAMPLE_SLEEP = floatArrayOf(
 
 @Composable
 fun rememberDeviceAspectRatio(): Float {
+    val context = LocalContext.current
     val containerSize = LocalWindowInfo.current.containerSize
-    return remember(containerSize) {
-        if (containerSize.width > 0 && containerSize.height > 0) {
-            val shortSide = min(containerSize.width, containerSize.height).toFloat()
-            val longSide = maxOf(containerSize.width, containerSize.height).toFloat()
+    return remember(context, containerSize) {
+        val bounds = context.getSystemService(WindowManager::class.java)?.maximumWindowMetrics?.bounds
+        val width = bounds?.width()?.takeIf { it > 0 } ?: containerSize.width
+        val height = bounds?.height()?.takeIf { it > 0 } ?: containerSize.height
+        if (width > 0 && height > 0) {
+            val shortSide = min(width, height).toFloat()
+            val longSide = maxOf(width, height).toFloat()
             (shortSide / longSide).coerceIn(MIN_ASPECT_RATIO, MAX_ASPECT_RATIO)
         } else {
             DEFAULT_PHONE_ASPECT_RATIO
@@ -172,10 +167,8 @@ fun WallpaperPreviewStage(
     gridState: GridState,
     colorScheme: ColorScheme,
     themeDisplayName: String,
-    peekMode: SurfacePeekMode,
     previewDark: Boolean,
     pulseAlpha: Float,
-    onPeekModeChange: (SurfacePeekMode) -> Unit,
     onPreviewDarkChange: (Boolean) -> Unit,
     onExpandFullscreen: () -> Unit,
     modifier: Modifier = Modifier
@@ -188,7 +181,8 @@ fun WallpaperPreviewStage(
     val gridConfig = remember(
         gridState.totalItems,
         prefs.horizontalPaddingScale,
-        prefs.verticalPaddingScale,
+        prefs.topPaddingScale,
+        prefs.bottomPaddingScale,
         refWidth,
         refHeight
     ) {
@@ -197,7 +191,8 @@ fun WallpaperPreviewStage(
             screenWidth = refWidth,
             screenHeight = refHeight,
             horizontalMarginPercent = prefs.horizontalPaddingScale,
-            verticalMarginPercent = prefs.verticalPaddingScale
+            topMarginPercent = prefs.topPaddingScale,
+            bottomMarginPercent = prefs.bottomPaddingScale
         )
     }
 
@@ -236,12 +231,6 @@ fun WallpaperPreviewStage(
                     pulseAlpha = pulseAlpha,
                     modifier = Modifier.fillMaxSize()
                 )
-                SurfacePeekOverlay(
-                    peekMode = peekMode,
-                    backgroundColor = Color(colorScheme.backgroundColor),
-                    isFullscreen = false,
-                    modifier = Modifier.fillMaxSize()
-                )
             }
 
             // Right: Uncluttered Stage Control Rail
@@ -265,19 +254,6 @@ fun WallpaperPreviewStage(
                         text = "${gridConfig.columns} × ${gridConfig.rows} · ${gridState.totalItems} $dotLabel",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-
-                // Surface Peek Connected Toggle Group
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text(
-                        text = "SURFACE PEEK",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    SurfacePeekSelector(
-                        peekMode = peekMode,
-                        onPeekModeChange = onPeekModeChange
                     )
                 }
 
@@ -311,47 +287,6 @@ fun WallpaperPreviewStage(
                         style = MaterialTheme.typography.labelLarge
                     )
                 }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-private fun SurfacePeekSelector(
-    peekMode: SurfacePeekMode,
-    onPeekModeChange: (SurfacePeekMode) -> Unit
-) {
-    val entries = SurfacePeekMode.entries
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
-    ) {
-        entries.forEachIndexed { index, item ->
-            val label = when (item) {
-                SurfacePeekMode.CLEAN -> "Clean"
-                SurfacePeekMode.LOCK -> "Lock"
-                SurfacePeekMode.HOME -> "Home"
-            }
-            ToggleButton(
-                checked = peekMode == item,
-                onCheckedChange = { if (it) onPeekModeChange(item) },
-                modifier = Modifier
-                    .weight(1f)
-                    .height(34.dp)
-                    .semantics { role = Role.RadioButton },
-                shapes = when (index) {
-                    0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                    entries.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                    else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                },
-                contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp)
-            ) {
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.labelSmall,
-                    maxLines = 1
-                )
             }
         }
     }
@@ -413,9 +348,7 @@ fun FullscreenWallpaperPreview(
     mode: WallpaperMode,
     gridState: GridState,
     colorScheme: ColorScheme,
-    peekMode: SurfacePeekMode,
     pulseAlpha: Float,
-    onPeekModeChange: (SurfacePeekMode) -> Unit,
     onDismiss: () -> Unit
 ) {
     AnimatedVisibility(
@@ -432,175 +365,22 @@ fun FullscreenWallpaperPreview(
                 pulseAlpha = pulseAlpha,
                 modifier = Modifier.fillMaxSize()
             )
-            SurfacePeekOverlay(
-                peekMode = peekMode,
-                backgroundColor = Color(colorScheme.backgroundColor),
-                isFullscreen = true,
-                modifier = Modifier.fillMaxSize()
-            )
 
-            Row(
+            FilledTonalButton(
+                onClick = onDismiss,
                 modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
+                    .align(Alignment.BottomEnd)
                     .navigationBarsPadding()
-                    .padding(horizontal = 20.dp, vertical = 20.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(horizontal = 20.dp, vertical = 20.dp)
             ) {
-                Surface(
-                    shape = CircleShape,
-                    color = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.88f)
-                ) {
-                    Row(
-                        modifier = Modifier.padding(4.dp),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        SurfacePeekMode.entries.forEach { item ->
-                            val selected = item == peekMode
-                            val label = when (item) {
-                                SurfacePeekMode.CLEAN -> "Clean"
-                                SurfacePeekMode.LOCK -> "Lock"
-                                SurfacePeekMode.HOME -> "Home"
-                            }
-                            Surface(
-                                onClick = { onPeekModeChange(item) },
-                                shape = CircleShape,
-                                color = if (selected) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    Color.Transparent
-                                }
-                            ) {
-                                Text(
-                                    text = label,
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = if (selected) {
-                                        MaterialTheme.colorScheme.onPrimary
-                                    } else {
-                                        MaterialTheme.colorScheme.onSurface
-                                    },
-                                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
-                                )
-                            }
-                        }
-                    }
-                }
-
-                FilledTonalButton(onClick = onDismiss) {
-                    Icon(
-                        imageVector = Icons.Rounded.Close,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(Modifier.width(6.dp))
-                    Text("Done")
-                }
+                Icon(
+                    imageVector = Icons.Rounded.Close,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(Modifier.width(6.dp))
+                Text("Done")
             }
-        }
-    }
-}
-
-@Composable
-private fun SurfacePeekOverlay(
-    peekMode: SurfacePeekMode,
-    backgroundColor: Color,
-    isFullscreen: Boolean,
-    modifier: Modifier = Modifier
-) {
-    if (peekMode == SurfacePeekMode.CLEAN) return
-
-    val ink = if (backgroundColor.luminance() > LIGHT_BG_LUMINANCE_THRESHOLD) {
-        Color.Black.copy(alpha = 0.82f)
-    } else {
-        Color.White.copy(alpha = 0.90f)
-    }
-
-    when (peekMode) {
-        SurfacePeekMode.LOCK -> LockSurfacePeek(ink = ink, isFullscreen = isFullscreen, modifier = modifier)
-        SurfacePeekMode.HOME -> HomeSurfacePeek(ink = ink, isFullscreen = isFullscreen, modifier = modifier)
-        SurfacePeekMode.CLEAN -> Unit
-    }
-}
-
-@Composable
-private fun LockSurfacePeek(
-    ink: Color,
-    isFullscreen: Boolean,
-    modifier: Modifier = Modifier
-) {
-    val nowTime = remember { LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")) }
-    val nowDate = remember { LocalDate.now().format(DateTimeFormatter.ofPattern("EEE, MMM d")) }
-    Column(
-        modifier = modifier
-            .then(if (isFullscreen) Modifier.statusBarsPadding() else Modifier)
-            .padding(top = if (isFullscreen) 48.dp else 18.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = nowDate,
-            color = ink,
-            fontSize = if (isFullscreen) 16.sp else 7.sp,
-            fontWeight = FontWeight.Medium
-        )
-        Text(
-            text = nowTime,
-            color = ink,
-            fontSize = if (isFullscreen) 84.sp else 28.sp,
-            fontWeight = FontWeight.ExtraBold,
-            lineHeight = if (isFullscreen) 88.sp else 30.sp
-        )
-    }
-}
-
-@Composable
-private fun HomeSurfacePeek(
-    ink: Color,
-    isFullscreen: Boolean,
-    modifier: Modifier = Modifier
-) {
-    val paddingMod = if (isFullscreen) {
-        Modifier.statusBarsPadding().navigationBarsPadding()
-    } else {
-        Modifier
-    }
-    Column(
-        modifier = modifier
-            .then(paddingMod)
-            .padding(
-                horizontal = if (isFullscreen) 24.dp else 10.dp,
-                vertical = if (isFullscreen) 48.dp else 14.dp
-            ),
-        verticalArrangement = Arrangement.SpaceBetween
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(if (isFullscreen) 56.dp else 18.dp)
-                .clip(RoundedCornerShape(if (isFullscreen) 20.dp else 6.dp))
-                .background(ink.copy(alpha = 0.16f))
-        )
-        Column(verticalArrangement = Arrangement.spacedBy(if (isFullscreen) 18.dp else 6.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                repeat(HOME_DOCK_ICONS) {
-                    Box(
-                        modifier = Modifier
-                            .size(if (isFullscreen) 52.dp else 18.dp)
-                            .clip(CircleShape)
-                            .background(ink.copy(alpha = 0.22f))
-                    )
-                }
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(if (isFullscreen) 44.dp else 14.dp)
-                    .clip(CircleShape)
-                    .background(ink.copy(alpha = 0.18f))
-            )
         }
     }
 }
@@ -638,7 +418,8 @@ fun LiveWallpaperCanvas(
             screenWidth = size.width.toInt(),
             screenHeight = size.height.toInt(),
             horizontalMarginPercent = prefs.horizontalPaddingScale,
-            verticalMarginPercent = prefs.verticalPaddingScale
+            topMarginPercent = prefs.topPaddingScale,
+            bottomMarginPercent = prefs.bottomPaddingScale
         )
 
         val effectiveSize = grid.dotSize * prefs.unitScale
