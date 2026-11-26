@@ -55,12 +55,10 @@ import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asComposePath
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
@@ -76,9 +74,12 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.res.ResourcesCompat
 import com.perspectivelive.wallpaper.R
 import com.perspectivelive.wallpaper.data.ColorScheme
+import com.perspectivelive.wallpaper.data.DayCounterMode
 import com.perspectivelive.wallpaper.data.GridState
+import com.perspectivelive.wallpaper.data.UnitShape
 import com.perspectivelive.wallpaper.data.UserPreferences
 import com.perspectivelive.wallpaper.rendering.GridCalculator
+import com.perspectivelive.wallpaper.rendering.UnitShapeGeometry
 import com.perspectivelive.wallpaper.service.HealthConnectManager
 import java.time.LocalDate
 import java.time.LocalTime
@@ -101,14 +102,10 @@ private const val PULSE_ALPHA_SPAN = 0.75f
 private const val NANOS_PER_MS = 1_000_000.0
 private const val FULL_CIRCLE_RADIANS = 2.0 * PI
 private const val HALF_PI = PI / 2.0
-private const val ROUNDED_CORNER_RATIO = 0.22f
-private const val RHOMBUS_SCALE = 0.707f
-private const val RHOMBUS_ROTATION_DEGREES = 45f
-private const val RHOMBUS_CORNER_RATIO = 0.16f
 private const val FUTURE_DOT_ALPHA = 0.28f
 private const val HEALTH_BASE_ALPHA = 0.22f
 private const val HEALTH_ALPHA_SPAN = 0.78f
-private const val HEALTH_TEXT_SCALE = 0.28f
+private const val HEALTH_TEXT_SCALE = 0.36f
 private const val MIN_TEXT_DOT_PX = 24f
 private const val THOUSAND = 1000f
 private const val LIGHT_BG_LUMINANCE_THRESHOLD = 0.5f
@@ -628,7 +625,10 @@ fun LiveWallpaperCanvas(
     val bgColor = Color(colorScheme.backgroundColor)
     val pastColor = Color(colorScheme.pastYearsColor)
     val currentColor = Color(colorScheme.currentYearColor)
-    val useHealth = mode == WallpaperMode.MICRO && prefs.healthMetric != HealthConnectManager.METRIC_NONE
+    val unitShape = UnitShape.fromId(prefs.unitShapeId)
+    val useHealth = mode == WallpaperMode.MICRO &&
+        prefs.healthMetric != HealthConnectManager.METRIC_NONE &&
+        prefs.dayCounterMode != DayCounterMode.THIS_YEAR_WEEKS
 
     Canvas(modifier = modifier) {
         drawRect(color = bgColor)
@@ -645,6 +645,12 @@ fun LiveWallpaperCanvas(
         val innerOffset = (grid.dotSize - effectiveSize) / 2f
         val cellStep = grid.dotSize + grid.spacing
         val showOverlay = useHealth && prefs.showStatOverlay && effectiveSize >= MIN_TEXT_DOT_PX
+        val unitPath = UnitShapeGeometry.buildPath(
+            shape = unitShape,
+            x = 0f,
+            y = 0f,
+            size = effectiveSize
+        ).asComposePath()
 
         for (index in 0 until gridState.totalItems) {
             val row = index / grid.columns
@@ -663,19 +669,16 @@ fun LiveWallpaperCanvas(
                 healthGoal = prefs.healthMetricGoal
             )
 
-            drawUnitShape(
-                shapeId = prefs.unitShapeId,
-                topLeft = Offset(x, y),
-                dotSize = effectiveSize,
-                color = dotColor
-            )
+            translate(left = x, top = y) {
+                drawPath(path = unitPath, color = dotColor)
+            }
 
             if (showOverlay && healthVal != null && index <= gridState.currentIndex) {
                 drawHealthOverlayText(
                     text = formatHealthStat(healthVal, prefs.healthMetric),
                     centerX = x + effectiveSize / 2f,
                     centerY = y + effectiveSize / 2f,
-                    dotSize = effectiveSize,
+                    dotSize = effectiveSize * unitShape.textSafeBoundsScale,
                     bgArgb = bgColor.copy(alpha = 0.85f).toArgb(),
                     paint = textPaint
                 )
@@ -705,40 +708,6 @@ private fun resolveDotColor(
 
     index == currentIndex -> currentColor.copy(alpha = pulseAlpha)
     else -> pastColor.copy(alpha = FUTURE_DOT_ALPHA)
-}
-
-private fun DrawScope.drawUnitShape(
-    shapeId: String,
-    topLeft: Offset,
-    dotSize: Float,
-    color: Color
-) {
-    val center = Offset(topLeft.x + dotSize / 2f, topLeft.y + dotSize / 2f)
-    when (shapeId) {
-        "circle" -> drawCircle(color = color, radius = dotSize / 2f, center = center)
-        "rhombus" -> {
-            val side = dotSize * RHOMBUS_SCALE
-            val radius = side * RHOMBUS_CORNER_RATIO
-            rotate(degrees = RHOMBUS_ROTATION_DEGREES, pivot = center) {
-                drawRoundRect(
-                    color = color,
-                    topLeft = Offset(center.x - side / 2f, center.y - side / 2f),
-                    size = Size(side, side),
-                    cornerRadius = CornerRadius(radius, radius)
-                )
-            }
-        }
-
-        else -> {
-            val radius = dotSize * ROUNDED_CORNER_RATIO
-            drawRoundRect(
-                color = color,
-                topLeft = topLeft,
-                size = Size(dotSize, dotSize),
-                cornerRadius = CornerRadius(radius, radius)
-            )
-        }
-    }
 }
 
 private fun DrawScope.drawHealthOverlayText(

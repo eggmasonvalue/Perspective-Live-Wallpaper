@@ -28,6 +28,7 @@ Focus energy on the immediate future.
 - **The Modes**:
   - **"There is no tomorrow"**: Single visible shape for today (breathing animation).
   - **"You vs. You (yesterday)"**: Two visible shapes — one for today (breathing) and one for yesterday.
+  - **"This Year"**: Auto-rolling current calendar year grid in **Days** (365/366) or **52 Weeks**, resetting automatically every January 1.
   - **"Custom"**: Goal and deadline tracking across custom date ranges.
 - **Health Connect Integration**: Link daily physical effort directly into the grid.
   - **Metrics**: Track **Steps**, **Calories**, **Distance**, or **Sleep**.
@@ -39,7 +40,7 @@ Focus energy on the immediate future.
 
 Customize the aesthetic via the built-in **Style** sheet:
 
-- **Shape Shifting**: Choose between **Circle**, **Rounded Square**, or **Rhombus** (rotated square).
+- **Shape Shifting**: Choose from 12 architectural and Material 3 Expressive shapes — **Circle**, **Rounded**, **Squircle**, **Square**, **Rhombus**, **Hexagon**, **Octagon**, **Capsule**, **Clover**, **Scallop**, **Leaf**, and **Spark**.
 - **Density Control**: Adjust grid scale from **0.5x** (airy, minimalist) to **1.0x** (dense, data-rich).
 - **Container Padding**: Fine-tune margins around the grid for device bezels.
 - **Colors**: 14 curated paired themes (*Iconic*, *Nordic Minimal*, *Warm Sand*, *Glacial Peak*, *Rose Quartz*, *Monochrome Zen*, *Sumi & Cinnabar*, *Boreal Forest*, *Sahara Dunes*, *Kyoto Celadon*, *Alpenglow*, *Basalt & Ochre*, *Pacific Drift*, *Terracotta Courtyard*), the generative *Atmosphere* theme producing unique daily palettes via perceptual Oklch color math, and dedicated Health Connect presets.

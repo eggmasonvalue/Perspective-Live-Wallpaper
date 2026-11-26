@@ -60,6 +60,7 @@ data class StudioActions(
     val onLifespanChanged: (Int) -> Unit,
     val onSelectNoTomorrow: () -> Unit,
     val onSelectVsYesterday: () -> Unit,
+    val onSelectThisYear: (Boolean) -> Unit,
     val onSelectCustomObjective: () -> Unit,
     val onEventNameChanged: (String) -> Unit,
     val onStartDateSelected: (LocalDate) -> Unit,
@@ -186,6 +187,7 @@ fun PerspectiveStudioScreen(
                                     onLifespanChanged = actions.onLifespanChanged,
                                     onSelectNoTomorrow = actions.onSelectNoTomorrow,
                                     onSelectVsYesterday = actions.onSelectVsYesterday,
+                                    onSelectThisYear = actions.onSelectThisYear,
                                     onSelectCustomObjective = actions.onSelectCustomObjective,
                                     onEventNameChanged = actions.onEventNameChanged,
                                     onStartDateSelected = actions.onStartDateSelected,
@@ -342,7 +344,7 @@ private fun computePreviewGridState(
 
     WallpaperMode.MICRO -> {
         val module = DayCounterModule()
-        val total = module.calculateTotalItems(prefs).coerceAtLeast(1)
+        val total = module.calculateTotalItems(prefs, today).coerceAtLeast(1)
         val past = module.calculatePastItems(prefs, today).coerceIn(0, total)
         val current = module.calculateCurrentItemIndex(prefs, today).coerceIn(0, total - 1)
         GridState(

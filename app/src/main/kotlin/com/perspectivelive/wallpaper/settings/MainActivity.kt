@@ -92,6 +92,7 @@ class MainActivity : ComponentActivity() {
                         onLifespanChanged = viewModel::updateExpectedLifespan,
                         onSelectNoTomorrow = viewModel::setNoTomorrowMode,
                         onSelectVsYesterday = viewModel::setVsYesterdayMode,
+                        onSelectThisYear = viewModel::setThisYearMode,
                         onSelectCustomObjective = viewModel::setCustomObjectiveMode,
                         onEventNameChanged = viewModel::updateEventName,
                         onStartDateSelected = { date ->

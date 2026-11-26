@@ -2,7 +2,6 @@ package com.perspectivelive.wallpaper.rendering
 
 import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.Typeface
@@ -15,15 +14,13 @@ import android.text.style.RelativeSizeSpan
 import com.perspectivelive.wallpaper.data.ColorScheme
 import com.perspectivelive.wallpaper.data.GridConfig
 import com.perspectivelive.wallpaper.data.GridState
+import com.perspectivelive.wallpaper.data.UnitShape
 import com.perspectivelive.wallpaper.utils.ColorUtils
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Locale
 
 private const val FULL_ALPHA = 255
-private const val SAFE_BOUNDS_SCALE = 0.707f
-private const val RHOMBUS_SCALE = 0.707f
-private const val RHOMBUS_ROTATION_DEGREES = 45f
 private const val THOUSAND_STEPS = 1000
 private const val RELATIVE_SIZE_SPAN_PROPORTION = 0.6f
 
@@ -46,33 +43,13 @@ private class PrecomputedDot(
     var centerX: Float = 0f
     var centerY: Float = 0f
     var radius: Float = 0f
-    var rhombusPath: Path? = null
+    var shapePath: Path? = null
     var textLayout: StaticLayout? = null
     var textScaleFactor: Float = 1.0f
     var textTranslateX: Float = 0f
     var textTranslateY: Float = 0f
     var textCenterOffsetX: Float = 0f
     var textCenterOffsetY: Float = 0f
-}
-
-private fun buildRhombusPath(x: Float, y: Float, size: Float): Path {
-    val path = Path()
-    val center = size / 2f
-    val halfScaled = (size * RHOMBUS_SCALE) / 2f
-    val matrix = Matrix().apply {
-        setRotate(RHOMBUS_ROTATION_DEGREES, x + center, y + center)
-    }
-    val rectPath = Path().apply {
-        addRect(
-            x + center - halfScaled,
-            y + center - halfScaled,
-            x + center + halfScaled,
-            y + center + halfScaled,
-            Path.Direction.CW
-        )
-    }
-    rectPath.transform(matrix, path)
-    return path
 }
 
 private fun formatHealthText(value: Float, metric: String): CharSequence {
@@ -124,15 +101,13 @@ class CanvasRenderer(
         private const val BG_CACHE_INTERVAL_MS = 60_000L
         private const val MAX_SINGLE_LINE_WIDTH = 10000
         private const val PROGRESS_BASE_ALPHA_RATIO = 0.2f
-        private const val SQUIRCLE_CORNER_RATIO = 0.22f
-        private const val ROUNDED_CORNER_RATIO = 0.15f
     }
 
     private var gridConfig: GridConfig
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     // Style settings
-    private var unitShapeId: String = "rounded_square"
+    private var unitShape: UnitShape = UnitShape.DEFAULT
     private var unitScale: Float = 1.0f
     private var horizontalPaddingScale: Float = DEFAULT_PADDING_SCALE
     private var verticalPaddingScale: Float = DEFAULT_PADDING_SCALE
@@ -275,8 +250,7 @@ class CanvasRenderer(
         val itemDate = gridState.startDate.plusDays(dotIndex.toLong())
         val isPast = dotIndex < gridState.pastItems
         val isCurrent = dotIndex == gridState.currentIndex
-        val isRhombus = unitShapeId == "rhombus" || unitShapeId == "square"
-        val cornerRatio = if (unitShapeId == "squircle") SQUIRCLE_CORNER_RATIO else ROUNDED_CORNER_RATIO
+        val usesPrecomputedPath = usesPathDrawer(unitShape)
 
         val baseColor = when {
             isPast -> colorScheme.pastYearsColor
@@ -290,12 +264,22 @@ class CanvasRenderer(
         dot.size = effectiveSize
         dot.baseColor = baseColor
         dot.alpha = computeInitialDotAlpha(isCurrent, isPast, baseColor, itemDate)
-        dot.cornerRadius = effectiveSize * cornerRatio
+        dot.cornerRadius = effectiveSize * UnitShapeGeometry.ROUNDED_SQUARE_CORNER_RATIO
         dot.radius = effectiveSize / 2f
         dot.centerX = x + dot.radius
         dot.centerY = y + dot.radius
-        dot.rhombusPath = if (isRhombus) buildRhombusPath(x, y, effectiveSize) else null
+        dot.shapePath = if (usesPrecomputedPath) {
+            UnitShapeGeometry.buildPath(unitShape, x, y, effectiveSize)
+        } else {
+            null
+        }
         return dot
+    }
+
+    private fun usesPathDrawer(shape: UnitShape): Boolean {
+        return shape != UnitShape.CIRCLE &&
+            shape != UnitShape.ROUNDED_SQUARE &&
+            shape != UnitShape.SQUARE
     }
 
     private fun computeInitialDotAlpha(
@@ -368,7 +352,7 @@ class CanvasRenderer(
         }
 
         val actualTextHeight = staticLayout.height.toFloat()
-        val safeBounds = dot.size * SAFE_BOUNDS_SCALE
+        val safeBounds = dot.size * unitShape.textSafeBoundsScale
         val scaleX = if (actualTextWidth > safeBounds) safeBounds / actualTextWidth else 1.0f
         val scaleY = if (actualTextHeight > safeBounds) safeBounds / actualTextHeight else 1.0f
 
@@ -392,7 +376,7 @@ class CanvasRenderer(
         horizontalPaddingScale: Float = DEFAULT_PADDING_SCALE,
         verticalPaddingScale: Float = DEFAULT_PADDING_SCALE
     ) {
-        this.unitShapeId = shapeId
+        this.unitShape = UnitShape.fromId(shapeId)
         this.unitScale = scale
         this.horizontalPaddingScale = horizontalPaddingScale
         this.verticalPaddingScale = verticalPaddingScale
@@ -402,11 +386,11 @@ class CanvasRenderer(
     }
 
     private fun updateShapeDrawer() {
-        shapeDrawer = when (unitShapeId) {
-            "circle" -> CircleDrawer()
-            "rhombus", "square" -> RhombusDrawer()
-            "squircle" -> SquircleDrawer()
-            else -> RoundedSquareDrawer()
+        shapeDrawer = when (unitShape) {
+            UnitShape.CIRCLE -> CircleDrawer()
+            UnitShape.ROUNDED_SQUARE -> RoundedSquareDrawer()
+            UnitShape.SQUARE -> SquareDrawer()
+            else -> PathShapeDrawer()
         }
     }
 
@@ -417,26 +401,6 @@ class CanvasRenderer(
     private class CircleDrawer : ShapeDrawer {
         override fun draw(canvas: Canvas, dot: PrecomputedDot, paint: Paint) {
             canvas.drawCircle(dot.centerX, dot.centerY, dot.radius, paint)
-        }
-    }
-
-    private class RhombusDrawer : ShapeDrawer {
-        override fun draw(canvas: Canvas, dot: PrecomputedDot, paint: Paint) {
-            dot.rhombusPath?.let { canvas.drawPath(it, paint) }
-        }
-    }
-
-    private class SquircleDrawer : ShapeDrawer {
-        override fun draw(canvas: Canvas, dot: PrecomputedDot, paint: Paint) {
-            canvas.drawRoundRect(
-                dot.x,
-                dot.y,
-                dot.x + dot.size,
-                dot.y + dot.size,
-                dot.cornerRadius,
-                dot.cornerRadius,
-                paint
-            )
         }
     }
 
@@ -451,6 +415,18 @@ class CanvasRenderer(
                 dot.cornerRadius,
                 paint
             )
+        }
+    }
+
+    private class SquareDrawer : ShapeDrawer {
+        override fun draw(canvas: Canvas, dot: PrecomputedDot, paint: Paint) {
+            canvas.drawRect(dot.x, dot.y, dot.x + dot.size, dot.y + dot.size, paint)
+        }
+    }
+
+    private class PathShapeDrawer : ShapeDrawer {
+        override fun draw(canvas: Canvas, dot: PrecomputedDot, paint: Paint) {
+            dot.shapePath?.let { canvas.drawPath(it, paint) }
         }
     }
 }

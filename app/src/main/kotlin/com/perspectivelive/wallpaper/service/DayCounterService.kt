@@ -2,6 +2,7 @@ package com.perspectivelive.wallpaper.service
 
 import android.content.SharedPreferences
 import android.util.Log
+import com.perspectivelive.wallpaper.data.DayCounterMode
 import com.perspectivelive.wallpaper.data.GridState
 import com.perspectivelive.wallpaper.data.HealthCacheManager
 import com.perspectivelive.wallpaper.data.HealthCacheSnapshot
@@ -17,7 +18,7 @@ import kotlinx.coroutines.withContext
 import java.time.LocalDate
 
 private data class HealthLoadState(
-    val renderCache: Map<LocalDate, Float>,
+    val renderCache: Map<LocalDate, Float>?,
     val requiresFullBackfill: Boolean,
     val shouldRefreshImmediately: Boolean
 )
@@ -145,7 +146,7 @@ class DayCounterService : BaseWallpaperService() {
             if (!hasPreferences()) return null
 
             val today = LocalDate.now()
-            val totalDays = dayCounterModule.calculateTotalItems(preferences)
+            val totalDays = dayCounterModule.calculateTotalItems(preferences, today)
             val pastDays = dayCounterModule.calculatePastItems(preferences, today)
             val currentIndex = dayCounterModule.calculateCurrentItemIndex(preferences, today)
             val remainingDays = maxOf(0, totalDays - pastDays - 1)
@@ -192,7 +193,7 @@ class DayCounterService : BaseWallpaperService() {
                 cachedHealthData.clear()
                 lastHealthRefreshEpochMs = 0L
                 return HealthLoadState(
-                    renderCache = emptyMap(),
+                    renderCache = null,
                     requiresFullBackfill = false,
                     shouldRefreshImmediately = false
                 )
@@ -411,7 +412,8 @@ class DayCounterService : BaseWallpaperService() {
         }
 
         private fun isHealthEnabled(preferences: UserPreferences): Boolean {
-            return preferences.healthMetric != HealthConnectManager.METRIC_NONE
+            return preferences.healthMetric != HealthConnectManager.METRIC_NONE &&
+                preferences.dayCounterMode != DayCounterMode.THIS_YEAR_WEEKS
         }
 
         private fun isHealthRefreshDue(): Boolean {

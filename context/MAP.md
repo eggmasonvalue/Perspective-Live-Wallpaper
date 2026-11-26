@@ -17,9 +17,9 @@ Root namespace: `com.perspectivelive.wallpaper` in `app/src/main/kotlin/com/pers
 
 | Package | Purpose | Key Classes |
 | --------- | --------- | ------------- |
-| `data` | Models, state, palettes, and persistent storage | `UserPreferences`, `PreferencesManager`, `GridState`, `GridConfig`, `StyleConfig`, `ColorScheme`, `ColorSchemeProvider`, `CuratedThemes`, `ProceduralThemeGenerator`, `WallpaperTheme`, `CustomColorScheme`, `DayCounterMode`, `HealthCacheManager` |
+| `data` | Models, state, palettes, and persistent storage | `UserPreferences`, `PreferencesManager`, `GridState`, `GridConfig`, `StyleConfig`, `UnitShape`, `ColorScheme`, `ColorSchemeProvider`, `CuratedThemes`, `ProceduralThemeGenerator`, `WallpaperTheme`, `CustomColorScheme`, `DayCounterMode`, `HealthCacheManager` |
 | `modules` | Domain business logic and date countdown calculations | `CountdownModule`, `DayCounterModule`, `LifeCalendarModule`, `ModuleRegistry` |
-| `rendering` | Canvas drawing, geometry layout, and animation drivers | `CanvasRenderer`, `GridCalculator`, `PulseAnimator` |
+| `rendering` | Canvas drawing, geometry layout, and animation drivers | `CanvasRenderer`, `GridCalculator`, `PulseAnimator`, `UnitShapeGeometry` |
 | `service` | Android `WallpaperService` lifecycles and background sync | `BaseWallpaperService`, `LifeCalendarService`, `DayCounterService`, `HealthConnectManager`, `MidnightScheduler` |
 | `settings` | Jetpack Compose M3 Expressive studio, theme, ViewModel, live preview, and EyeDropper custom aura sheet | `MainActivity`, `SettingsViewModel`, `PerspectiveTheme`, `PerspectiveStudioScreen`, `WallpaperPreviewStage`, `HorizonPanel`, `PalettePanel`, `CraftPanel`, `CustomAuraSheet`, `StudioFloatingDock`, `StudioUiModels` |
 | `utils` | Date arithmetic and color manipulation utilities | `DateCalculator`, `ColorUtils`, `OklchColor` |

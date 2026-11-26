@@ -49,7 +49,7 @@ Terse imperative rules for writing and verifying code in Perspective - Live.
 
 ## Graphics & Rendering
 
-- Use `CanvasRenderer` with `ShapeDrawer` strategies for primitive drawing (Circle, Rounded Square, Rhombus).
+- Use `CanvasRenderer` with `ShapeDrawer` strategies and shared `UnitShapeGeometry` paths for all `UnitShape` variants.
 - Use `SurfaceHolder.lockHardwareCanvas()` with fallback to software canvas.
 - Set surface frame rate hint via `Surface.setFrameRate`.
 - Pre-allocate Paint, Path, geometry objects, and `StaticLayout` text layouts during update passes rather than inside `render()`.

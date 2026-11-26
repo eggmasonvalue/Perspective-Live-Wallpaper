@@ -186,6 +186,8 @@ class PreferencesManager(context: Context) {
      * Checks if day counter preferences are available.
      */
     fun hasDayCounterPreferences(): Boolean {
+        val mode = prefs.getString(KEY_DAY_COUNTER_MODE, DayCounterMode.STATIC) ?: DayCounterMode.STATIC
+        if (DayCounterMode.isDynamic(mode)) return true
         return prefs.contains(KEY_EVENT_DATE) && prefs.contains(KEY_COUNTDOWN_START_DATE)
     }
 
