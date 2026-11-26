@@ -23,6 +23,9 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
+    - name: Install Android SDK 37.1
+      run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-37.1" "build-tools;37.0.0"
+
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 

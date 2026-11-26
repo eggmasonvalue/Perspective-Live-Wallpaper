@@ -1,17 +1,14 @@
 plugins {
-    id("com.android.application") version "8.3.0" apply false
-    id("org.jetbrains.kotlin.android") version "1.9.22" apply false
-    id("io.gitlab.arturbosch.detekt") version "1.23.3"
+    id("com.android.application") version "9.5.0" apply false
+    id("org.jetbrains.kotlin.plugin.compose") version "2.4.21" apply false
+    id("dev.detekt") version "2.0.0-alpha.6" apply false
 }
 
 subprojects {
-    apply(plugin = "io.gitlab.arturbosch.detekt")
+    apply(plugin = "dev.detekt")
 
-    detekt {
-        buildUponDefaultConfig = true
-    }
-
-    tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
-        jvmTarget = "11"
+    extensions.configure<dev.detekt.gradle.extensions.DetektExtension> {
+        buildUponDefaultConfig.set(true)
+        config.setFrom(rootProject.files("config/detekt/detekt.yml"))
     }
 }

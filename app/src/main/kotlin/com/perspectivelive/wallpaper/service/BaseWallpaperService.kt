@@ -10,7 +10,6 @@ import android.content.res.Configuration
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Typeface
-import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.PowerManager
@@ -18,7 +17,6 @@ import android.service.wallpaper.WallpaperService
 import android.util.Log
 import android.view.Surface
 import android.view.SurfaceHolder
-import androidx.annotation.RequiresApi
 import androidx.core.content.res.ResourcesCompat
 import com.perspectivelive.wallpaper.R
 import com.perspectivelive.wallpaper.data.ColorSchemeProvider
@@ -131,14 +129,12 @@ abstract class BaseWallpaperService : WallpaperService() {
             surfaceHeight = height
 
             // Hint display subsystem and LTPO panels to run at 30Hz target frame rate
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                runCatching {
-                    holder.surface.setFrameRate(
-                        PulseAnimator.TARGET_FPS.toFloat(),
-                        Surface.FRAME_RATE_COMPATIBILITY_DEFAULT
-                    )
-                }.onFailure { Log.w(TAG, "Could not set surface frame rate", it) }
-            }
+            runCatching {
+                holder.surface.setFrameRate(
+                    PulseAnimator.TARGET_FPS.toFloat(),
+                    Surface.FRAME_RATE_COMPATIBILITY_DEFAULT
+                )
+            }.onFailure { Log.w(TAG, "Could not set surface frame rate", it) }
 
             initializeRendererAsync()
         }
@@ -154,7 +150,6 @@ abstract class BaseWallpaperService : WallpaperService() {
             initializeRendererAsync()
         }
 
-        @RequiresApi(Build.VERSION_CODES.O_MR1)
         override fun onComputeColors(): WallpaperColors? {
             val scheme = renderer?.colorScheme ?: return null
             return WallpaperColors(
@@ -232,9 +227,7 @@ abstract class BaseWallpaperService : WallpaperService() {
                 isSafeMode = false
                 lastRenderedDate = LocalDate.now()
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-                    notifyColorsChanged()
-                }
+                notifyColorsChanged()
 
                 if (isPowerSaveMode) {
                     drawFrame(forcedOpacity = 1.0f)
@@ -384,12 +377,7 @@ abstract class BaseWallpaperService : WallpaperService() {
 
         private fun registerEngineReceivers() {
             val midnightFilter = IntentFilter(MidnightReceiver.ACTION_UPDATE_WALLPAPER)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                registerReceiver(updateReceiver, midnightFilter, Context.RECEIVER_NOT_EXPORTED)
-            } else {
-                @Suppress("UnspecifiedRegisterReceiverFlag")
-                registerReceiver(updateReceiver, midnightFilter)
-            }
+            registerReceiver(updateReceiver, midnightFilter, Context.RECEIVER_NOT_EXPORTED)
 
             val powerFilter = IntentFilter(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED)
             registerReceiver(powerSaveReceiver, powerFilter)

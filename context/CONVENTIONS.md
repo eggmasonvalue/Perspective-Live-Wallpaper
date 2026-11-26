@@ -20,13 +20,14 @@ Terse imperative rules for writing and verifying code in Perspective - Live.
 ## Architecture & Layering
 
 - Maintain strict layer boundaries: UI in `settings`, calculation logic in `modules`, drawing in `rendering`, persistence and data models in `data`, wallpaper runtime in `service`, general helpers in `utils`.
-- Use MVVM for UI components (`SettingsViewModel`, LiveData).
+- Use MVVM with unidirectional data flow (`SettingsViewModel`, `StateFlow` collected via `collectAsStateWithLifecycle()`).
 - Keep calculation modules free of Android UI/View dependencies.
 - Use dependency injection through ViewModel factories (`SettingsViewModelFactory`).
 
 ## Compatibility & Migrations
 
-- Do not maintain backward compatibility considerations, legacy aliases, deprecated fallbacks, or migration layers anywhere; target current schema and active state directly.
+- Target Android 17 (`minSdk = 37`, `targetSdk = 37`, `compileSdk 37.1`) directly.
+- Do not maintain backward compatibility considerations, legacy aliases, deprecated fallbacks, `Build.VERSION.SDK_INT` guards, or migration layers anywhere.
 
 ## State & Persistence
 
@@ -41,7 +42,7 @@ Terse imperative rules for writing and verifying code in Perspective - Live.
 - Extend `BaseWallpaperService` for common surface, visibility, and color-change handling.
 - Disable unused offset notifications and touch events via `setOffsetNotificationsEnabled(false)` and `setTouchEventsEnabled(false)`.
 - Override `onSurfaceDestroyed` to stop animators, coroutines, and scheduled callbacks.
-- Override `onComputeColors` on API 27+ and trigger `notifyColorsChanged` upon palette changes.
+- Override `onComputeColors` and trigger `notifyColorsChanged` upon palette changes.
 - Pause animation scheduling and render a single static frame when `PowerManager.isPowerSaveMode` is active.
 - Isolate feature-specific background jobs (such as Health Connect polling) to the owning service (`DayCounterService`).
 - Throttle Health Connect refreshes while the wallpaper is visible.
@@ -50,12 +51,13 @@ Terse imperative rules for writing and verifying code in Perspective - Live.
 
 - Use `CanvasRenderer` with `ShapeDrawer` strategies for primitive drawing (Circle, Rounded Square, Rhombus).
 - Use `SurfaceHolder.lockHardwareCanvas()` with fallback to software canvas.
-- Set surface frame rate hint via `Surface.setFrameRate` on API 30+.
+- Set surface frame rate hint via `Surface.setFrameRate`.
 - Pre-allocate Paint, Path, geometry objects, and `StaticLayout` text layouts during update passes rather than inside `render()`.
 - Drive breathing pulse animations through `PulseAnimator` paced at 30 FPS.
 
 ## UI & Design
 
-- Use Material Design 3 components.
+- Build all companion UI in Jetpack Compose using `MaterialExpressiveTheme` (Compose Material 3 1.5.0+ via Compose BOM).
+- Prefer stable Material 3 Expressive components (`HorizontalFloatingToolbar`, `SplitButtonLayout`, connected `ToggleButton` groups, `LinearWavyProgressIndicator`, `SliderState`, `TextFieldState`).
+- Frame live wallpaper previews on a neutral achromatic mat matching the device aspect ratio.
 - Use the bundled `Geist` font family for all text rendering.
-- Keep XML layout hierarchies flat.

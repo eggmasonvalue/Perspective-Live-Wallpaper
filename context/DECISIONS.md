@@ -2,6 +2,16 @@
 
 Curated record of durable, non-obvious project-level architectural decisions and tradeoffs.
 
+## 2026-11-26 — Pure Jetpack Compose Material 3 Expressive Studio and Android 17 (API 37) Minimum Floor
+
+Context: The companion app previously relied on legacy XML Views (`AppCompat`, `com.google.android.material:material:1.12.0`, `minSdk = 28`, `compileSdk = 34`) with no live wallpaper preview on the main screen. Material Views entered maintenance mode while Jetpack Compose 1.13 + Compose Material 3 1.5.0 (`compose-bom:2026.11.01`) graduated Material 3 Expressive components to stable and requires `compileSdk 37.1`. Furthermore, the app targets modern Android 17 devices (Pixel 10) without legacy compatibility overhead.
+
+Decision: Replace the entire XML companion UI with pure Jetpack Compose (`ComponentActivity`, `StateFlow` UDF) built on `MaterialExpressiveTheme`, `MotionScheme.expressive()`, connected `ToggleButton` groups, `HorizontalFloatingToolbar`, `SplitButtonLayout`, `LinearWavyProgressIndicator`, `PolygonShape`, and stateful `SliderState`. Pin a true device-aspect-ratio live preview on an achromatic neutral mat (to avoid simultaneous-contrast color distortion) above a zero-scroll Palette strip of pure 3-tone Color Orbs rather than miniature dot-grid cards. Raise `minSdk` and `targetSdk` to `37` (`compileSdk 37.1`) to use Dynamic Color, OS-integrated Health Connect, and Android 17's native `Intent.ACTION_OPEN_EYE_DROPPER` without runtime `SDK_INT` branches or legacy fallbacks.
+
+Tradeoff: Drops installation support for devices below Android 17 (API 37), but eliminates AppCompat/MDC-Android/XML layout bloat, removes all runtime API-level branching, and unlocks the full stable Material 3 Expressive 1.5.0 and Android 17 feature set.
+
+Status: active
+
 ## 2026-09-06 — Oklch-Based Procedural Theme Generation and Expanded Curated Catalog
 
 Context: The 6-day daily rotation cycle repeated presets too quickly. Generating colors dynamically without strict constraints leads to discordant, low-contrast palettes in non-uniform color spaces (RGB/HSL), while solely hardcoding presets creates maintenance bloat without infinite variety.
@@ -9,6 +19,7 @@ Context: The 6-day daily rotation cycle repeated presets too quickly. Generating
 Decision: Expand curated rotation to 14 hand-crafted paired themes, and implement a deterministic procedural theme generator (`ProceduralThemeGenerator`) using the perceptually uniform Oklch color space (`OklchColor`). The generator fixes perceptual lightness and chroma invariants (background L 96.5% / 9.5%, past dots L 58%, accent L 62%–72% with golden-angle base hue stepping and complementary offsets) seeded by `LocalDate.toEpochDay()`, producing the dynamic "Atmosphere" theme with evocative naming.
 
 Tradeoff: Requires lightweight color conversions between Oklch, Oklab, and linear sRGB, but eliminates external dependencies, avoids state storage, and guarantees mathematical contrast across all 360 degrees of hue.
+
 ## 2026-09-05 — Hardware-Accelerated Rendering, 30 FPS Pacing, and Power-Save Idling
 
 Context: The live wallpaper engine previously utilized software-locked canvas (`SurfaceHolder.lockCanvas()`) running at 60 FPS. On modern high-refresh OLED devices (such as Pixel LTPO panels), software rendering forces expensive CPU-to-GPU framebuffer copies (~600 MB/s memory bandwidth) and keeps LTPO displays running at elevated refresh rates. Furthermore, running animations continuously during system Battery Saver depleted battery on low charge.

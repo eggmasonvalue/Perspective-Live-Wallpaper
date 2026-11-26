@@ -57,17 +57,17 @@ Customize the aesthetic via the built-in **Style** sheet:
 
 ## 🛠️ Usage
 
-1. Download the APK from the [Releases](https://github.com/eggmasonvalue/Perspective-Live-Wallpaper/releases/latest) page.
-2. Open the **Perspective - Live** app.
-3. Select the **Macro** or **Micro** tab.
-4. Tap **Style** to customize shapes, sizes, padding, and colors.
-5. Tap **Set Perspective** to apply the live wallpaper.
+1. Download the APK from the [Releases](https://github.com/eggmasonvalue/Perspective-Live-Wallpaper/releases/latest) page (requires Android 17+).
+2. Open the **Perspective - Live** studio app.
+3. Switch between **Macro** and **Micro** in the top bar while viewing the live true-aspect preview (tap the preview to inspect 1:1 fullscreen).
+4. Use the floating bottom toolbar to configure **Horizon**, **Palette** (3-tone Color Orbs, *Atmosphere*, or **Custom Aura** with Android 17 EyeDropper), and **Craft** (shape, scale, margin, breathing tempo).
+5. Tap **Set** on the floating split button to apply the live wallpaper.
 
 ## 💻 Development & Building
 
 ### Prerequisites
 
-- Android SDK (API 34, Min SDK 28)
+- Android SDK (`compileSdk 37.1`, `minSdk 37`, `targetSdk 37`)
 - JDK 17+
 
 ### Commands
