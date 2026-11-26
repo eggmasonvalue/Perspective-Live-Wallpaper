@@ -1,54 +1,42 @@
 package com.perspectivelive.wallpaper.rendering
 
-import com.perspectivelive.wallpaper.data.GridConfig
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * Unit tests for GridCalculator to verify that padding settings affect grid layout.
+ * Unit tests for GridCalculator to verify that horizontal and vertical margin settings
+ * independently control usable bounds and grid reflow.
  */
 class GridCalculatorTest {
 
     @Test
-    fun `calculateGridLayout changes dot size and offsets based on margin`() {
-        // Arrange
+    fun `calculateGridLayout changes dot size and offsets based on margins`() {
         val totalDots = 100
         val screenWidth = 1000
         val screenHeight = 2000
-        val defaultMargin = 0.05f // 5%
-        val largeMargin = 0.20f   // 20%
+        val defaultMargin = 0.05f
+        val largeMargin = 0.20f
 
-        // Act
         val configDefault = GridCalculator.calculateGridLayout(
             totalDots = totalDots,
             screenWidth = screenWidth,
             screenHeight = screenHeight,
-            marginPercent = defaultMargin
+            horizontalMarginPercent = defaultMargin,
+            verticalMarginPercent = defaultMargin
         )
 
         val configLarge = GridCalculator.calculateGridLayout(
             totalDots = totalDots,
             screenWidth = screenWidth,
             screenHeight = screenHeight,
-            marginPercent = largeMargin
+            horizontalMarginPercent = largeMargin,
+            verticalMarginPercent = largeMargin
         )
 
-        // Assert
-        // 1. Offsets should change
         assertNotEquals("OffsetX should be different", configDefault.offsetX, configLarge.offsetX, 0.01f)
         assertNotEquals("OffsetY should be different", configDefault.offsetY, configLarge.offsetY, 0.01f)
-
-        // 2. Dot size should decrease with larger margin
         assertTrue("Dot size should decrease with larger margin", configLarge.dotSize < configDefault.dotSize)
-
-        // 3. Grid dimensions calculation check
-        // With 20% margin on each side, usable width is 60% of original.
-        // With 5% margin on each side, usable width is 90% of original.
-
-        // This confirms the math inside GridCalculator is respecting the marginPercent
-        // The dot size is constrained by width/height, so it must shrink.
     }
 
     @Test
@@ -56,27 +44,91 @@ class GridCalculatorTest {
         val totalDots = 100
         val screenWidth = 1000
         val screenHeight = 2000
-        val zeroMargin = 0.0f
 
         val configZero = GridCalculator.calculateGridLayout(
             totalDots = totalDots,
             screenWidth = screenWidth,
             screenHeight = screenHeight,
-            marginPercent = zeroMargin
+            horizontalMarginPercent = 0.0f,
+            verticalMarginPercent = 0.0f
         )
 
-        // It should use full width roughly
-        // 100 dots -> 10x10 roughly
-        // 1000 width / 10 cols = 100 dot size (minus spacing)
-
-        val marginPercent = 0.05f
         val configMargin = GridCalculator.calculateGridLayout(
             totalDots = totalDots,
             screenWidth = screenWidth,
             screenHeight = screenHeight,
-            marginPercent = marginPercent
+            horizontalMarginPercent = 0.05f,
+            verticalMarginPercent = 0.05f
         )
 
         assertTrue("Zero margin should result in larger dots", configZero.dotSize > configMargin.dotSize)
+    }
+
+    @Test
+    fun `increasing vertical margin reflows grid to more columns and fewer rows`() {
+        val totalDots = 90
+        val screenWidth = 1080
+        val screenHeight = 2400
+
+        val tallConfig = GridCalculator.calculateGridLayout(
+            totalDots = totalDots,
+            screenWidth = screenWidth,
+            screenHeight = screenHeight,
+            horizontalMarginPercent = 0.05f,
+            verticalMarginPercent = 0.05f
+        )
+
+        val shortUsableConfig = GridCalculator.calculateGridLayout(
+            totalDots = totalDots,
+            screenWidth = screenWidth,
+            screenHeight = screenHeight,
+            horizontalMarginPercent = 0.05f,
+            verticalMarginPercent = 0.30f
+        )
+
+        assertTrue(
+            "Larger vertical margin should increase columns (${shortUsableConfig.columns} vs ${tallConfig.columns})",
+            shortUsableConfig.columns > tallConfig.columns
+        )
+        assertTrue(
+            "Larger vertical margin should decrease rows (${shortUsableConfig.rows} vs ${tallConfig.rows})",
+            shortUsableConfig.rows < tallConfig.rows
+        )
+        assertTrue(
+            "Vertical offset should respect at least 30% vertical margin",
+            shortUsableConfig.offsetY >= screenHeight * 0.30f - 1f
+        )
+    }
+
+    @Test
+    fun `increasing horizontal margin reflows grid to fewer columns and more rows`() {
+        val totalDots = 90
+        val screenWidth = 1080
+        val screenHeight = 2400
+
+        val wideConfig = GridCalculator.calculateGridLayout(
+            totalDots = totalDots,
+            screenWidth = screenWidth,
+            screenHeight = screenHeight,
+            horizontalMarginPercent = 0.0f,
+            verticalMarginPercent = 0.25f
+        )
+
+        val narrowConfig = GridCalculator.calculateGridLayout(
+            totalDots = totalDots,
+            screenWidth = screenWidth,
+            screenHeight = screenHeight,
+            horizontalMarginPercent = 0.20f,
+            verticalMarginPercent = 0.25f
+        )
+
+        assertTrue(
+            "Larger horizontal margin should decrease columns (${narrowConfig.columns} vs ${wideConfig.columns})",
+            narrowConfig.columns < wideConfig.columns
+        )
+        assertTrue(
+            "Horizontal offset should respect at least 20% horizontal margin",
+            narrowConfig.offsetX >= screenWidth * 0.20f - 1f
+        )
     }
 }

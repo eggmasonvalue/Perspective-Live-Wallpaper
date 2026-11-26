@@ -28,7 +28,8 @@ data class UserPreferences(
     // Style settings
     val unitShapeId: String = "rounded_square",
     val unitScale: Float = 1.0f,
-    val containerPaddingScale: Float = 0.05f, // Default 5% margin
+    val horizontalPaddingScale: Float = 0.05f,
+    val verticalPaddingScale: Float = 0.05f,
     val pulsePeriodMs: Long = 2000L,
 
     // Health Connect settings

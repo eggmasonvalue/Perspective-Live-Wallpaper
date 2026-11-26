@@ -38,7 +38,8 @@ class PreferencesManager(context: Context) {
         // Style keys
         private const val KEY_UNIT_SHAPE_ID = "unit_shape_id"
         private const val KEY_UNIT_SCALE = "unit_scale"
-        private const val KEY_CONTAINER_PADDING_SCALE = "container_padding_scale"
+        private const val KEY_HORIZONTAL_PADDING_SCALE = "horizontal_padding_scale"
+        private const val KEY_VERTICAL_PADDING_SCALE = "vertical_padding_scale"
         private const val KEY_PULSE_PERIOD_MS = "pulse_period_ms"
 
         // Health Connect keys
@@ -48,7 +49,7 @@ class PreferencesManager(context: Context) {
 
         // Defaults
         private const val DEFAULT_EXPECTED_LIFESPAN = 90
-        private const val DEFAULT_CONTAINER_PADDING_SCALE = 0.05f
+        private const val DEFAULT_PADDING_SCALE = 0.05f
         private const val DEFAULT_UNIT_SCALE = 1.0f
         private const val DEFAULT_PULSE_PERIOD_MS = 2000L
         private const val DEFAULT_HEALTH_GOAL = 10000f
@@ -100,7 +101,8 @@ class PreferencesManager(context: Context) {
 
         val dayCounterMode = prefs.getString(KEY_DAY_COUNTER_MODE, DayCounterMode.STATIC) ?: DayCounterMode.STATIC
         val unitShapeId = prefs.getString(KEY_UNIT_SHAPE_ID, "rounded_square") ?: "rounded_square"
-        val containerPaddingScale = prefs.getFloat(KEY_CONTAINER_PADDING_SCALE, DEFAULT_CONTAINER_PADDING_SCALE)
+        val horizontalPaddingScale = prefs.getFloat(KEY_HORIZONTAL_PADDING_SCALE, DEFAULT_PADDING_SCALE)
+        val verticalPaddingScale = prefs.getFloat(KEY_VERTICAL_PADDING_SCALE, DEFAULT_PADDING_SCALE)
         val unitScale = prefs.getFloat(KEY_UNIT_SCALE, DEFAULT_UNIT_SCALE)
         val pulsePeriodMs = prefs.getLong(KEY_PULSE_PERIOD_MS, DEFAULT_PULSE_PERIOD_MS)
         val healthMetric = prefs.getString(KEY_HEALTH_METRIC, "NONE") ?: "NONE"
@@ -121,7 +123,8 @@ class PreferencesManager(context: Context) {
             dayCounterMode = dayCounterMode,
             unitShapeId = unitShapeId,
             unitScale = unitScale,
-            containerPaddingScale = containerPaddingScale,
+            horizontalPaddingScale = horizontalPaddingScale,
+            verticalPaddingScale = verticalPaddingScale,
             pulsePeriodMs = pulsePeriodMs,
             healthMetric = healthMetric,
             healthMetricGoal = healthGoal,
@@ -156,7 +159,8 @@ class PreferencesManager(context: Context) {
             putBoolean(KEY_DAY_COUNTER_ONBOARDING_COMPLETE, preferences.isDayCounterOnboardingComplete)
             putString(KEY_DAY_COUNTER_MODE, preferences.dayCounterMode)
 
-            putFloat(KEY_CONTAINER_PADDING_SCALE, preferences.containerPaddingScale)
+            putFloat(KEY_HORIZONTAL_PADDING_SCALE, preferences.horizontalPaddingScale)
+            putFloat(KEY_VERTICAL_PADDING_SCALE, preferences.verticalPaddingScale)
             // Style fields
             putString(KEY_UNIT_SHAPE_ID, preferences.unitShapeId)
             putFloat(KEY_UNIT_SCALE, preferences.unitScale)

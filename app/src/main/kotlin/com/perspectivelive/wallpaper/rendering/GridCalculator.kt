@@ -12,20 +12,27 @@ import kotlin.math.sqrt
  */
 object GridCalculator {
 
+    private const val DEFAULT_MARGIN_PERCENT = 0.05f
+    private const val SPACING_PERCENT = 0.1f
+    private const val CORNER_RADIUS_RATIO = 0.15f
+    private const val COL_SEARCH_MULTIPLIER = 2.0
+
     /**
      * Calculates the optimal grid layout for a given number of dots on a screen.
      *
      * @param totalDots Total number of dots to display
      * @param screenWidth Width of the screen in pixels
      * @param screenHeight Height of the screen in pixels
-     * @param marginPercent Percentage of screen to use as margin (default 5%)
+     * @param horizontalMarginPercent Percentage of screen width to use as left/right margin (default 5%)
+     * @param verticalMarginPercent Percentage of screen height to use as top/bottom margin (default 5%)
      * @return A GridConfig with optimal rows, columns, dot size, spacing, and offsets
      */
     fun calculateGridLayout(
         totalDots: Int,
         screenWidth: Int,
         screenHeight: Int,
-        marginPercent: Float = 0.05f
+        horizontalMarginPercent: Float = DEFAULT_MARGIN_PERCENT,
+        verticalMarginPercent: Float = DEFAULT_MARGIN_PERCENT
     ): GridConfig {
         // Safeguard against invalid inputs
         if (totalDots <= 0 || screenWidth <= 0 || screenHeight <= 0) {
@@ -40,9 +47,16 @@ object GridCalculator {
             )
         }
 
-        val aspectRatio = screenWidth.toFloat() / screenHeight.toFloat()
+        // Subtract independent margins first so grid rows/columns reflow to match the usable aspect ratio
+        val horizontalMargin = (screenWidth * horizontalMarginPercent).toInt()
+        val verticalMargin = (screenHeight * verticalMarginPercent).toInt()
 
-        // Find optimal rows/columns that match screen aspect ratio
+        val usableWidth = (screenWidth - (2 * horizontalMargin)).coerceAtLeast(1)
+        val usableHeight = (screenHeight - (2 * verticalMargin)).coerceAtLeast(1)
+
+        val aspectRatio = usableWidth.toFloat() / usableHeight.toFloat()
+
+        // Find optimal rows/columns that match usable area aspect ratio
         var bestRows = 1
         var bestCols = totalDots
         var bestRatioDiff = Float.MAX_VALUE
@@ -59,27 +73,19 @@ object GridCalculator {
                 bestCols = cols
             }
 
-            if (cols > sqrt(totalDots.toDouble()) * 2.0) break
+            if (cols > sqrt(totalDots.toDouble()) * COL_SEARCH_MULTIPLIER && gridRatio > aspectRatio) break
         }
 
-        // Calculate dot size with margins
-        val horizontalMargin = (screenWidth * marginPercent).toInt()
-        val verticalMargin = (screenHeight * marginPercent).toInt()
-
-        val usableWidth = screenWidth - (2 * horizontalMargin)
-        val usableHeight = screenHeight - (2 * verticalMargin)
-
         // Calculate maximum dot size that fits
-        val spacingPercent = 0.1f  // 10% spacing between dots
-        val maxDotWidth = usableWidth.toFloat() / (bestCols + (bestCols - 1) * spacingPercent)
-        val maxDotHeight = usableHeight.toFloat() / (bestRows + (bestRows - 1) * spacingPercent)
+        val maxDotWidth = usableWidth.toFloat() / (bestCols + (bestCols - 1) * SPACING_PERCENT)
+        val maxDotHeight = usableHeight.toFloat() / (bestRows + (bestRows - 1) * SPACING_PERCENT)
 
         var dotSize = min(maxDotWidth, maxDotHeight)
 
         // Safeguard against extremely small or negative dot size
         if (dotSize < 1f) dotSize = 1f
 
-        val spacing = dotSize * spacingPercent
+        val spacing = dotSize * SPACING_PERCENT
 
         // The key to exact vertical centering:
         // 1. Grid width/height derived directly from bestCols/bestRows
@@ -97,7 +103,7 @@ object GridCalculator {
             spacing = spacing,
             offsetX = offsetX,
             offsetY = offsetY,
-            cornerRadius = dotSize * 0.15f  // 15% of dot size
+            cornerRadius = dotSize * CORNER_RADIUS_RATIO
         )
     }
 }
