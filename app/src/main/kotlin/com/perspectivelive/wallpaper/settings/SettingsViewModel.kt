@@ -32,6 +32,10 @@ class SettingsViewModel(private val preferencesManager: PreferencesManager) : Vi
         private const val MAX_VERTICAL_PADDING_SCALE = 0.40f
         private const val MIN_PULSE_MS = 500L
         private const val MAX_PULSE_MS = 5000L
+        private const val FIRST_MONTH = 1
+        private const val FIRST_DAY = 1
+        private const val LAST_MONTH = 12
+        private const val LAST_DAY = 31
     }
 
     private val _userPreferences = MutableStateFlow(loadInitialPreferences())
@@ -125,6 +129,19 @@ class SettingsViewModel(private val preferencesManager: PreferencesManager) : Vi
         }
     }
 
+    fun setThisYearMode(weekly: Boolean = false) {
+        val today = LocalDate.now()
+        val mode = if (weekly) DayCounterMode.THIS_YEAR_WEEKS else DayCounterMode.THIS_YEAR
+        updateAndPersist {
+            it.copy(
+                eventName = "This Year",
+                countdownStartDate = LocalDate.of(today.year, FIRST_MONTH, FIRST_DAY),
+                eventDate = LocalDate.of(today.year, LAST_MONTH, LAST_DAY),
+                dayCounterMode = mode
+            )
+        }
+    }
+
     fun setCustomObjectiveMode() {
         val today = LocalDate.now()
         updateAndPersist { prefs ->
@@ -136,7 +153,7 @@ class SettingsViewModel(private val preferencesManager: PreferencesManager) : Vi
                 currentTarget
             }
             val name = when (prefs.eventName) {
-                null, "", "No Tomorrow", "Rise Above" -> "My Objective"
+                null, "", "No Tomorrow", "Rise Above", "This Year" -> "My Objective"
                 else -> prefs.eventName
             }
             prefs.copy(

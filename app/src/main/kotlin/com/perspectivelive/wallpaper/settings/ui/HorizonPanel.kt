@@ -63,6 +63,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.perspectivelive.wallpaper.data.DayCounterMode
 import com.perspectivelive.wallpaper.data.UserPreferences
+import com.perspectivelive.wallpaper.modules.DayCounterModule
 import com.perspectivelive.wallpaper.service.HealthConnectManager
 import java.time.Instant
 import java.time.LocalDate
@@ -93,6 +94,7 @@ fun HorizonPanel(
     onLifespanChanged: (Int) -> Unit,
     onSelectNoTomorrow: () -> Unit,
     onSelectVsYesterday: () -> Unit,
+    onSelectThisYear: (Boolean) -> Unit,
     onSelectCustomObjective: () -> Unit,
     onEventNameChanged: (String) -> Unit,
     onStartDateSelected: (LocalDate) -> Unit,
@@ -116,6 +118,7 @@ fun HorizonPanel(
             prefs = prefs,
             onSelectNoTomorrow = onSelectNoTomorrow,
             onSelectVsYesterday = onSelectVsYesterday,
+            onSelectThisYear = onSelectThisYear,
             onSelectCustomObjective = onSelectCustomObjective,
             onEventNameChanged = onEventNameChanged,
             onOpenStartDatePicker = { activeDialog = ActiveDateDialog.START_DATE },
@@ -332,6 +335,7 @@ private fun MicroHorizonContent(
     prefs: UserPreferences,
     onSelectNoTomorrow: () -> Unit,
     onSelectVsYesterday: () -> Unit,
+    onSelectThisYear: (Boolean) -> Unit,
     onSelectCustomObjective: () -> Unit,
     onEventNameChanged: (String) -> Unit,
     onOpenStartDatePicker: () -> Unit,
@@ -341,51 +345,66 @@ private fun MicroHorizonContent(
     onShowStatOverlayChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val modes = listOf(
-        DayCounterMode.NO_TOMORROW to "No Tomorrow",
-        DayCounterMode.VS_YESTERDAY to "vs Yesterday",
-        DayCounterMode.STATIC to "Objective"
-    )
+    val isThisYear = DayCounterMode.isThisYear(prefs.dayCounterMode)
+    val isThisYearWeeks = prefs.dayCounterMode == DayCounterMode.THIS_YEAR_WEEKS
 
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        // Momentum Mode Connected ButtonGroup
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
-        ) {
-            modes.forEachIndexed { index, (modeId, label) ->
-                ToggleButton(
-                    checked = prefs.dayCounterMode == modeId,
-                    onCheckedChange = { checked ->
-                        if (checked) {
-                            when (modeId) {
-                                DayCounterMode.NO_TOMORROW -> onSelectNoTomorrow()
-                                DayCounterMode.VS_YESTERDAY -> onSelectVsYesterday()
-                                else -> onSelectCustomObjective()
-                            }
-                        }
-                    },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(40.dp)
-                        .semantics { role = Role.RadioButton },
-                    shapes = when (index) {
-                        0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                        modes.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                        else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                    },
-                    contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp)
-                ) {
-                    Text(
-                        text = label,
-                        style = MaterialTheme.typography.labelMedium,
-                        maxLines = 1
-                    )
-                }
+        // Momentum & Horizon 2x2 Connected Button Groups
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
+            ) {
+                ModePairToggleButton(
+                    label = "No Tomorrow",
+                    checked = prefs.dayCounterMode == DayCounterMode.NO_TOMORROW,
+                    isLeading = true,
+                    onSelect = onSelectNoTomorrow,
+                    modifier = Modifier.weight(1f)
+                )
+                ModePairToggleButton(
+                    label = "vs Yesterday",
+                    checked = prefs.dayCounterMode == DayCounterMode.VS_YESTERDAY,
+                    isLeading = false,
+                    onSelect = onSelectVsYesterday,
+                    modifier = Modifier.weight(1f)
+                )
             }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
+            ) {
+                ModePairToggleButton(
+                    label = "This Year",
+                    checked = isThisYear,
+                    isLeading = true,
+                    onSelect = { if (!isThisYear) onSelectThisYear(false) },
+                    modifier = Modifier.weight(1f)
+                )
+                ModePairToggleButton(
+                    label = "Objective",
+                    checked = prefs.dayCounterMode == DayCounterMode.STATIC,
+                    isLeading = false,
+                    onSelect = onSelectCustomObjective,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+
+        // Auto-rolling This Year progress + Days/Weeks granularity card
+        CapturedAnimatedVisibility(
+            visible = isThisYear,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically()
+        ) {
+            ThisYearConfigCard(
+                isWeekly = isThisYearWeeks,
+                onSelectGranularity = onSelectThisYear
+            )
         }
 
         // Compose 1.13 CapturedAnimatedVisibility for Objective fields
@@ -402,13 +421,143 @@ private fun MicroHorizonContent(
             )
         }
 
-        // Health Connect Card (Micro exclusive)
-        HealthConnectCard(
-            prefs = prefs,
-            onHealthMetricSelected = onHealthMetricSelected,
-            onHealthGoalChanged = onHealthGoalChanged,
-            onShowStatOverlayChanged = onShowStatOverlayChanged
+        // Health Connect Card (day-based Micro modes)
+        CapturedAnimatedVisibility(
+            visible = !isThisYearWeeks,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically()
+        ) {
+            HealthConnectCard(
+                prefs = prefs,
+                onHealthMetricSelected = onHealthMetricSelected,
+                onHealthGoalChanged = onHealthGoalChanged,
+                onShowStatOverlayChanged = onShowStatOverlayChanged
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun ModePairToggleButton(
+    label: String,
+    checked: Boolean,
+    isLeading: Boolean,
+    onSelect: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    ToggleButton(
+        checked = checked,
+        onCheckedChange = { if (it) onSelect() },
+        modifier = modifier
+            .height(40.dp)
+            .semantics { role = Role.RadioButton },
+        shapes = if (isLeading) {
+            ButtonGroupDefaults.connectedLeadingButtonShapes()
+        } else {
+            ButtonGroupDefaults.connectedTrailingButtonShapes()
+        },
+        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelLarge,
+            maxLines = 1
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun ThisYearConfigCard(
+    isWeekly: Boolean,
+    onSelectGranularity: (Boolean) -> Unit
+) {
+    val today = remember { LocalDate.now() }
+    val totalDays = today.lengthOfYear()
+    val currentDay = today.dayOfYear
+    val totalWeeks = DayCounterModule.TOTAL_WEEKS_IN_YEAR
+    val currentWeek = (((currentDay - 1) / 7) + 1).coerceIn(1, totalWeeks)
+
+    val fraction = (currentDay.toFloat() / totalDays.toFloat()).coerceIn(0f, 1f)
+    val pctFormatted = String.format(Locale.US, "%.1f%%", fraction * PERCENT_MULTIPLIER)
+    val counterLabel = if (isWeekly) {
+        "Week $currentWeek / $totalWeeks"
+    } else {
+        "Day $currentDay / $totalDays"
+    }
+
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(22.dp),
+        color = MaterialTheme.colorScheme.surfaceContainer
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                Row(
+                    verticalAlignment = Alignment.Bottom,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Text(
+                        text = pctFormatted,
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                    Text(
+                        text = "of ${today.year}",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+                }
+                Text(
+                    text = counterLabel,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 3.dp)
+                )
+            }
+
+            LinearWavyProgressIndicator(
+                progress = { fraction },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
+            ) {
+                ModePairToggleButton(
+                    label = "Days · $totalDays",
+                    checked = !isWeekly,
+                    isLeading = true,
+                    onSelect = { onSelectGranularity(false) },
+                    modifier = Modifier.weight(1f)
+                )
+                ModePairToggleButton(
+                    label = "Weeks · $totalWeeks",
+                    checked = isWeekly,
+                    isLeading = false,
+                    onSelect = { onSelectGranularity(true) },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            Text(
+                text = "Auto-rolls over every January 1",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
 

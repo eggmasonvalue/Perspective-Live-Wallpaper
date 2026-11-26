@@ -284,12 +284,12 @@ abstract class BaseWallpaperService : WallpaperService() {
                     preferences.topPaddingScale,
                     preferences.bottomPaddingScale
                 )
-                if (preferences.healthMetric != "NONE") {
+                if (healthCache != null && preferences.healthMetric != "NONE") {
                     updateHealthData(
                         preferences.healthMetric,
                         preferences.healthMetricGoal,
                         preferences.showStatOverlay,
-                        healthCache ?: emptyMap()
+                        healthCache
                     )
                 }
             }

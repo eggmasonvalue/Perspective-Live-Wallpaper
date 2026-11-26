@@ -3,6 +3,7 @@ package com.perspectivelive.wallpaper.modules
 import com.perspectivelive.wallpaper.data.DayCounterMode
 import com.perspectivelive.wallpaper.data.UserPreferences
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.time.LocalDate
 
@@ -12,10 +13,6 @@ class DayCounterModuleTest {
 
     @Test
     fun testNoTomorrow_DynamicMode() {
-        // In dynamic mode, dates are calculated based on LocalDate.now()
-        // so we can't easily test "tomorrow" without mocking now().
-        // But we can test that for "today", it behaves as expected.
-
         val today = LocalDate.now()
 
         val prefs = UserPreferences(
@@ -24,18 +21,11 @@ class DayCounterModuleTest {
             eventName = "No Tomorrow"
         )
 
-        // Logic: Start=Today, Event=Today.
-
         val totalItems = module.calculateTotalItems(prefs)
-        // Expected: 1
         assertEquals(1, totalItems)
 
         val pastItems = module.calculatePastItems(prefs, today)
-        // Expected: 0
         assertEquals(0, pastItems)
-
-        // This confirms that for "today", it shows 1 item, which is current (0 past).
-        // Breathing shape visible.
     }
 
     @Test
@@ -48,21 +38,11 @@ class DayCounterModuleTest {
             eventName = "Rise Above"
         )
 
-        // Logic: Start=Yesterday, Event=Today.
-        // Total = between(Yesterday, Today) + 1 = 2.
-
         val totalItems = module.calculateTotalItems(prefs)
         assertEquals(2, totalItems)
 
         val pastItems = module.calculatePastItems(prefs, today)
-        // Start=Yesterday. Current=Today.
-        // Elapsed = 1 day.
-        // Past = 1.
         assertEquals(1, pastItems)
-
-        // Current index = 1.
-        // Item 0 is past. Item 1 is current.
-        // Breathing shape visible (item 1).
     }
 
     @Test
@@ -87,6 +67,64 @@ class DayCounterModuleTest {
 
         assertEquals(currentDate.minusDays(1), module.getEffectiveStartDate(prefs, currentDate))
         assertEquals(currentDate, module.getEffectiveEventDate(prefs, currentDate))
+    }
+
+    @Test
+    fun testThisYearDays_RegularAndLeapYears() {
+        val prefs = UserPreferences(
+            birthDate = LocalDate.of(1990, 1, 1),
+            dayCounterMode = DayCounterMode.THIS_YEAR
+        )
+
+        assertTrue(module.validatePreferences(prefs))
+
+        val jan1 = LocalDate.of(2026, 1, 1)
+        assertEquals(365, module.calculateTotalItems(prefs, jan1))
+        assertEquals(0, module.calculatePastItems(prefs, jan1))
+        assertEquals(0, module.calculateCurrentItemIndex(prefs, jan1))
+        assertEquals(LocalDate.of(2026, 1, 1), module.getEffectiveStartDate(prefs, jan1))
+        assertEquals(LocalDate.of(2026, 12, 31), module.getEffectiveEventDate(prefs, jan1))
+
+        val dec31 = LocalDate.of(2026, 12, 31)
+        assertEquals(364, module.calculatePastItems(prefs, dec31))
+
+        val leapDec31 = LocalDate.of(2024, 12, 31)
+        assertEquals(366, module.calculateTotalItems(prefs, leapDec31))
+        assertEquals(365, module.calculatePastItems(prefs, leapDec31))
+        assertEquals(LocalDate.of(2024, 1, 1), module.getEffectiveStartDate(prefs, leapDec31))
+        assertEquals(LocalDate.of(2024, 12, 31), module.getEffectiveEventDate(prefs, leapDec31))
+    }
+
+    @Test
+    fun testThisYearWeeks_BoundariesAndRollover() {
+        val prefs = UserPreferences(
+            birthDate = LocalDate.of(1990, 1, 1),
+            dayCounterMode = DayCounterMode.THIS_YEAR_WEEKS
+        )
+
+        assertTrue(module.validatePreferences(prefs))
+
+        val jan1 = LocalDate.of(2026, 1, 1)
+        assertEquals(52, module.calculateTotalItems(prefs, jan1))
+        assertEquals(0, module.calculatePastItems(prefs, jan1))
+
+        val jan7 = LocalDate.of(2026, 1, 7)
+        assertEquals(0, module.calculatePastItems(prefs, jan7))
+
+        val jan8 = LocalDate.of(2026, 1, 8)
+        assertEquals(1, module.calculatePastItems(prefs, jan8))
+
+        val dec31Regular = LocalDate.of(2026, 12, 31)
+        assertEquals(51, module.calculatePastItems(prefs, dec31Regular))
+        assertEquals(51, module.calculateCurrentItemIndex(prefs, dec31Regular))
+
+        val dec31Leap = LocalDate.of(2024, 12, 31)
+        assertEquals(52, module.calculateTotalItems(prefs, dec31Leap))
+        assertEquals(51, module.calculatePastItems(prefs, dec31Leap))
+
+        val nextYearJan1 = LocalDate.of(2027, 1, 1)
+        assertEquals(0, module.calculatePastItems(prefs, nextYearJan1))
+        assertEquals(LocalDate.of(2027, 1, 1), module.getEffectiveStartDate(prefs, nextYearJan1))
     }
 
     @Test
