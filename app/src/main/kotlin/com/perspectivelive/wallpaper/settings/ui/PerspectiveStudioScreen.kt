@@ -86,6 +86,8 @@ data class StudioActions(
 fun PerspectiveStudioScreen(
     prefs: UserPreferences,
     customColors: CustomColorScheme?,
+    activeMode: WallpaperMode,
+    onModeChange: (WallpaperMode) -> Unit,
     activeWallpaperModes: Set<WallpaperMode>,
     sampledColor: Pair<CustomColorSlot, Int>?,
     onConsumeSampledColor: () -> Unit,
@@ -93,7 +95,6 @@ fun PerspectiveStudioScreen(
     actions: StudioActions
 ) {
     val systemDark = isSystemInDarkTheme()
-    var activeMode by rememberSaveable { mutableStateOf(WallpaperMode.MACRO) }
     var activeTab by rememberSaveable { mutableStateOf(StudioTab.HORIZON) }
     var previewDark by rememberSaveable { mutableStateOf(systemDark) }
     var isFullscreen by rememberSaveable { mutableStateOf(false) }
@@ -150,7 +151,7 @@ fun PerspectiveStudioScreen(
                 ) {
                     StudioTopHeader(
                         activeMode = activeMode,
-                        onModeChange = { activeMode = it }
+                        onModeChange = onModeChange
                     )
 
                     Spacer(Modifier.height(8.dp))

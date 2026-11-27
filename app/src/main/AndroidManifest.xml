@@ -77,6 +77,16 @@
             </intent-filter>
         </activity>
 
+        <activity-alias
+            android:name=".settings.MacroSettingsActivity"
+            android:exported="true"
+            android:targetActivity=".settings.MainActivity" />
+
+        <activity-alias
+            android:name=".settings.MicroSettingsActivity"
+            android:exported="true"
+            android:targetActivity=".settings.MainActivity" />
+
     </application>
 
 </manifest>
