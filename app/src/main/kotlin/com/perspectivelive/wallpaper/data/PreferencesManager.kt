@@ -48,6 +48,9 @@ class PreferencesManager(context: Context) {
         private const val KEY_HEALTH_GOAL = "health_goal"
         private const val KEY_SHOW_STAT_OVERLAY = "show_stat_overlay"
 
+        // Studio UI state keys
+        private const val KEY_LAST_WALLPAPER_MODE = "last_wallpaper_mode"
+
         // Defaults
         private const val DEFAULT_EXPECTED_LIFESPAN = 90
         private const val DEFAULT_PADDING_SCALE = 0.05f
@@ -252,5 +255,19 @@ class PreferencesManager(context: Context) {
      */
     fun setDailyRotationEnabled(enabled: Boolean) {
         prefs.edit().putBoolean(KEY_DAILY_ROTATION_ENABLED, enabled).apply()
+    }
+
+    /**
+     * Retrieves the last selected wallpaper mode name (e.g. "MACRO" or "MICRO"), or null if unset.
+     */
+    fun getLastWallpaperMode(): String? {
+        return prefs.getString(KEY_LAST_WALLPAPER_MODE, null)
+    }
+
+    /**
+     * Persists the last selected wallpaper mode name.
+     */
+    fun saveLastWallpaperMode(mode: String) {
+        prefs.edit().putString(KEY_LAST_WALLPAPER_MODE, mode).apply()
     }
 }

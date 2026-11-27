@@ -78,11 +78,18 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         activeWallpaperModes = queryActiveWallpaperModes()
+        if (savedInstanceState == null) {
+            viewModel.initializeActiveMode(
+                launchedMode = resolveLaunchedMode(intent),
+                activeWallpaperModes = activeWallpaperModes
+            )
+        }
 
         setContent {
             PerspectiveTheme {
                 val prefs by viewModel.userPreferences.collectAsStateWithLifecycle()
                 val customColors by viewModel.customColors.collectAsStateWithLifecycle()
+                val activeMode by viewModel.activeMode.collectAsStateWithLifecycle()
 
                 val actions = remember(viewModel) {
                     StudioActions(
@@ -128,6 +135,8 @@ class MainActivity : ComponentActivity() {
                 PerspectiveStudioScreen(
                     prefs = prefs,
                     customColors = customColors,
+                    activeMode = activeMode,
+                    onModeChange = viewModel::setActiveMode,
                     activeWallpaperModes = activeWallpaperModes,
                     sampledColor = sampledColorState,
                     onConsumeSampledColor = { sampledColorState = null },
@@ -138,9 +147,23 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        resolveLaunchedMode(intent)?.let(viewModel::setActiveMode)
+    }
+
     override fun onResume() {
         super.onResume()
         activeWallpaperModes = queryActiveWallpaperModes()
+    }
+
+    private fun resolveLaunchedMode(intent: Intent?): WallpaperMode? {
+        return when (intent?.component?.className) {
+            MACRO_SETTINGS_ACTIVITY -> WallpaperMode.MACRO
+            MICRO_SETTINGS_ACTIVITY -> WallpaperMode.MICRO
+            else -> null
+        }
     }
 
     private fun queryActiveWallpaperModes(): Set<WallpaperMode> {
@@ -189,6 +212,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun applyWallpaper(mode: WallpaperMode) {
+        viewModel.setActiveMode(mode)
         viewModel.savePreferences()
         val serviceClass = when (mode) {
             WallpaperMode.MACRO -> LifeCalendarService::class.java
@@ -214,5 +238,12 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             snackbarHostState.showSnackbar(message)
         }
+    }
+
+    companion object {
+        private const val MACRO_SETTINGS_ACTIVITY =
+            "com.perspectivelive.wallpaper.settings.MacroSettingsActivity"
+        private const val MICRO_SETTINGS_ACTIVITY =
+            "com.perspectivelive.wallpaper.settings.MicroSettingsActivity"
     }
 }

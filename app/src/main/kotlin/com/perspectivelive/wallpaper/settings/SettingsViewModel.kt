@@ -7,6 +7,7 @@ import com.perspectivelive.wallpaper.data.CustomColorScheme
 import com.perspectivelive.wallpaper.data.DayCounterMode
 import com.perspectivelive.wallpaper.data.PreferencesManager
 import com.perspectivelive.wallpaper.data.UserPreferences
+import com.perspectivelive.wallpaper.settings.ui.WallpaperMode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -43,6 +44,32 @@ class SettingsViewModel(private val preferencesManager: PreferencesManager) : Vi
 
     private val _customColors = MutableStateFlow(preferencesManager.getCustomColors())
     val customColors: StateFlow<CustomColorScheme?> = _customColors.asStateFlow()
+
+    private val _activeMode = MutableStateFlow(loadSavedWallpaperMode() ?: WallpaperMode.MACRO)
+    val activeMode: StateFlow<WallpaperMode> = _activeMode.asStateFlow()
+
+    private fun loadSavedWallpaperMode(): WallpaperMode? {
+        val saved = preferencesManager.getLastWallpaperMode() ?: return null
+        return WallpaperMode.entries.firstOrNull { it.name == saved }
+    }
+
+    fun initializeActiveMode(
+        launchedMode: WallpaperMode?,
+        activeWallpaperModes: Set<WallpaperMode>
+    ) {
+        val resolved = when {
+            launchedMode != null -> launchedMode
+            loadSavedWallpaperMode() != null -> return
+            activeWallpaperModes == setOf(WallpaperMode.MICRO) -> WallpaperMode.MICRO
+            else -> WallpaperMode.MACRO
+        }
+        setActiveMode(resolved)
+    }
+
+    fun setActiveMode(mode: WallpaperMode) {
+        _activeMode.value = mode
+        preferencesManager.saveLastWallpaperMode(mode.name)
+    }
 
     private fun loadInitialPreferences(): UserPreferences {
         if (!preferencesManager.hasPreferences()) {
